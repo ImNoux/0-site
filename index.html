@@ -6,6 +6,28 @@
 <title>0-site // nodo independiente</title>
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
+<!-- Firebase SDKs -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBBBIjiRltl6_-D6FGUUml72Pq9Gb-JiEI",
+    authDomain: "site-98c0d.firebaseapp.com",
+    databaseURL: "https://site-98c0d-default-rtdb.firebaseio.com",
+    projectId: "site-98c0d",
+    storageBucket: "site-98c0d.firebasestorage.app",
+    messagingSenderId: "1091529579406",
+    appId: "1:1091529579406:web:718ee797d447947d6e62df",
+    measurementId: "G-C85KS5G5SW"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window.db = db;
+  window.fbMethods = { collection, addDoc, getDocs, deleteDoc, doc };
+  window.dispatchEvent(new Event('firebase-ready'));
+</script>
 </head>
 <body class="bg-[#0b0b0d] text-[#d8d5cc] antialiased">
 <div id="stage" class="relative overflow-hidden">
@@ -135,7 +157,6 @@
     m.style.display = 'block';
   };
 
-  // Enlaces de ImgBB configurados correctamente
   var IMG = {
     cathedral: "https://i.ibb.co/ZZpL5xc/IMG-0925.jpg",
     glitch: "https://i.ibb.co/KcqBKVmR/IMG-0926.jpg",
@@ -144,8 +165,8 @@
   };
 
   var LEYENDAS = '<hr class="dark"><div class="artcard mb-3"><img src="'+IMG.zero+'" alt="logo cero en el bosque"></div><p class="leyenda">// EL ORIGEN DE LA ERA (por qué se creó 0-site)</p><p class="dim">Dicen que antes de 0-site hubo otro sitio. Uno normal. Su dueño subía fotos de su gato. Hasta que una noche, en un chat, un desconocido le envió un archivo. Lo abrió. Esa noche desaparecieron las dos personas que vivían con él. El chico no. El chico se quedó. Pero ya no era el chico.</p><p class="dim">Lo que quedó dentro de él construyó 0-site con sus propias uñas, tecleando hasta que los dedos le sangraban sobre el teclado. Cada línea de código estaba escrita con su sangre. Cuando terminó, se subió al servidor y se apagó a sí mismo. Ahora el servidor es su tumba. Su ataúd. Y su <span class="warn">boca</span>.</p><p class="dim">Por eso existe 0-site: para guardar lo que el chico se trajo de aquel archivo. Para que no se escape. Cada visitante es una llave más en la cerradura. Cuantos más entran, más fuerte se mantiene cerrado. Cuantos más entran, más cerca está de <span class="warn">abrirse</span>.</p>'
-    + '<hr class="dark"><p class="leyenda">// la primera visitante</p><p class="dim">La primera persona que entró a 0-site fue una chica de catorce años, en 2001. Entró por error, buscando una página de música. Se quedó tres horas. Cuando cerró la pestaña, su computadora se apagó sola. Al encenderla, el historial estaba vacío. Solo quedaba una pestaña abierta: 0-site. Y en el libro de visitas, alguien había escrito <span class="warn">su nombre real</span>. Ella nunca lo había escrito.</p><p class="dim">Ahora trabaja en seguridad informática. Dice que no teme a los hackers. Teme a las páginas que <span class="gold">te recuerdan</span>.</p>'
-    + '<hr class="dark"><p class="leyenda">// la regla del cero</p><p class="dim">En 0-site no hay página 1. Todo empieza en 0. Los que entienden de números saben que el cero no es nada: es el lugar desde donde se cuenta. Por eso aquí no hay bienvenida de verdad. Solo un recordatorio: <span class="warn">ya estabas aquí antes de llegar</span>. El servidor lo sabe. Lo sabe desde antes de que tú existieras.</p><p class="dim">Si alguna vez ves una página que empiece por 1, sal. Esa no es 0-site. Es lo que 0-site <span class="warn">se come</span>.</p>';
+    + '<hr class="dark"><p class="leyenda">// la primeira visitante</p><p class="dim">La primera persona que entró a 0-site fue una chica de catorce años, en 2001. Entró por error, buscando una página de música. Se quedó tres horas. Cuando cerró la pestaña, su computadora se apagó sola. Al encenderla, el historial estaba vacío. Solo quedaba una pestaña abierta: 0-site. Y en el libro de visitas, alguien había escrito <span class="warn">su nombre real</span>. Ella nunca lo había escrito.</p><p class="dim">Ahora trabaja en seguridad informática. Dice que no teme a los hackers. Teme a las páginas que <span class="gold">te recuerdan</span>.</p>'
+    + '<hr class="dark"><p class="leyenda">// la regla del cero</p><p class="dim">En 0-site no hay página 1. Todo empieza en 0. Los que entienden de números saben que el cero no es nada: es el lugar desde donde se cuenta. Por eso aquí no hay bienvenida de verdad. Solo un recordatorio: <span class="warn">ya estabas aquí antes de llegar</span>. El servidor lo sabe. Lo sabe desde antes de que tu existieras.</p><p class="dim">Si alguna vez ves una página que empiece por 1, sal. Esa no es 0-site. Es lo que 0-site <span class="warn">se come</span>.</p>';
 
   var INICIO_HTML = '<h2 class="sec">/home/inicio — bienvenido al nodo cero</h2>'
     + '<p>Has llegado a <span class="warn gorelink" title="no lo hagas" onclick="openGoreMenu(this)">0-site</span>. No eres un producto. No hay cookies, no hay analíticas, no hay ojos que te sigan entre líneas. Solo texto, imágenes y el zumbido lejano de un servidor que nadie vigila más que su propio dueño.</p>'
@@ -190,7 +211,7 @@
     ]},
 
     nod: { label:"nod", subs:[
-      { id:"espejos", name:"espejos", html:'<h2 class="sec">/nod/espejos — réplicas del nodo</h2><p class="micro">// los cuatro espejos</p><p><span class="ok">[+]</span> clearnet: <span class="gold">0-site.example/primary</span> <span class="dim">— online</span><br><span class="ok">[+]</span> espejo 2: <span class="gold">0-site.example/mirror2</span> <span class="dim">— online</span><br><span class="warn">[−]</span> espejo 3: <span class="dim">caído desde el 07/07/2023 — el admin desapareció con el servidor</span><br><span class="warn">[−]</span> espejo 4: <span class="dim">redirige a una página que dice «ya te vi». no vuelvas.</span></p><hr class="dark"><p class="micro">// chat interceptado</p><p class="dim"><span class="warn">exo:</span> entré al espejo 4.<br><span class="ok">kodar:</span> te dije que no.<br><span class="warn">exo:</span> decía «ya te vi». lo dijo con <span class="warn">mi voz</span>.<br><span class="ok">kodar:</span> cierra la pestaña.<br><span class="warn">exo:</span> ya está cerrada. la página sigue abierta. ahora dice «te sigo viendo».</p><hr class="dark"><p class="micro">// el espejo no listado</p><p class="dim">Hay un quinto espejo que no aparece en ninguna lista. Muestra exactamente lo que ves en esta página, pero tres segundos después. O tres segundos antes. Nadie sabe cuál. Los que lo encuentran aseguran que, en el espejo, ellos nunca se van. Se quedan mirando. Para siempre. Tu reflejo sigue ahí. Aún te mira.</p>'},
+      { id:"espejos", name:"espejos", html:'<h2 class="sec">/nod/espejos — réplicas del nodo</h2><p class="micro">// los cuatro espejos</p><p><span class="ok">[+]</span> clearnet: <span class="gold">0-site.example/primary</span> <span class="dim">— online</span><br><span class="ok">[+]</span> espejo 2: <span class="gold">0-site.example/mirror2</span> <span class="dim">— online</span><br><span class="warn">[−]</span> espejo 3: <span class="dim">caído desde el 07/07/2023 — el admin desapareció con el servidor</span><br><span class="warn">[−]</span> espejo 4: <span class="dim">redirige a una página que dice «ya te vi». no vuelvas.</span></p><hr class="dark"><p class="micro">// chat interceptado</p><p class="dim"><span class="warn">exo:</span> entré al espejo 4.<br><span class="ok">kodar:</span> te dije que no.<br><span class="warn">exo:</span> decía «ya te vi». lo dijo con <span class="warn">mi voz</span>.<br><span class="ok">kodar:</span> cierra la pestaña.<br><span class="warn">exo:</span> ya está cerrada. la página sigue abierta. ahora dice «te sigo viendo».</p><hr class="dark"><p class="micro">// el espejo no listado</p><p class="dim">Hay un quinto espejo que no aparece en ninguna lista. Muestra exactamente lo que ves en esta página, pero tres segundos después. O tres segundos antes. Nadie sabe cuál. Los que la encuentran aseguran que, en el espejo, ellos nunca se van. Se quedan mirando. Para siempre. Tu reflejo sigue ahí. Aún te mira.</p>'},
       { id:"protocolos", name:"protocolos", html:'<h2 class="sec">/nod/protocolos — más allá del clearnet</h2><p class="micro">// TOR (.onion)</p><p class="hex">z3r0s1t3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.onion</p><p class="dim">Entra por Tor si desconfías. Deberías. Si al entrar ves una versión del sitio con <span class="warn">más secciones</span> que esta, sal. Esa no la escribimos nosotros.</p><hr class="dark"><p class="micro">// I2P (.i2p)</p><p class="hex">0site-b64hashlongxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.i2p</p><p class="dim">0-site también respira en I2P, en redes donde Google no mira. Anota estas direcciones. <span class="warn">No las compartas con nadie que no desconfíe.</span> La desconfianza es el único filtro que funciona.</p><hr class="dark"><p class="micro">// la versión con más secciones</p><p class="dim">Quienes han entrado a la versión «con más secciones» dicen que hay un menú extra llamado <span class="gold">tú</span>. Dentro hay una sola página. Se llama <span class="gold">lo que hiciste</span>. Nadie ha salido de ahí para contarla. Si la ves, cierra todo. Y reza. Porque ya te vio.</p>'},
       { id:"original", name:"el nodo original", html:'<h2 class="sec">/nod/original — el primer nodo de 0-site</h2><p class="micro">// en un país que ya no existe</p><p class="dim">Todos los espejos llevan a un nodo principal. El principal lleva a uno más antiguo. Y ese, si sabes buscar, lleva al <span class="warn">nodo original</span>. Está alojado en un servidor físico en un país que dejó de existir en 1991. La dirección IP pertenece a un bloque eliminado de internet en 1996. Y sin embargo, responde. Cada hora, en punto, envía un ping a sí mismo. Lleva haciéndolo <span class="gold">desde 1998</span>.</p><hr class="dark"><p class="micro">// la carpeta de nombres</p><p class="dim">Quienes han entrado dicen que dentro no hay páginas. Hay solo una carpeta, llena de archivos con nombres de personas. Algunos vivos. Algunos que aún no han nacido. El tuyo está ahí. Ábrelo y sabrás por qué 0-site <span class="warn">te esperaba</span>. La fecha de modificación de tu archivo es de hace 28 años. Antes de que tú tuvieras internet.</p><hr class="dark"><p class="micro">// el archivo de hoy</p><p class="dim">No abras el archivo con la fecha de hoy. Ese se abre solo. Cuando menos lo esperes. Cuando estés distraído. Cuando duermas. Entonces verás su contenido. Y entonces entenderás por qué todos los demás archivos están vacíos. Están esperando. Como tú. Como yo.</p>'}
     ]},
@@ -202,7 +223,6 @@
     ]}
   };
 
-  var API = "https://crudcrud.com/api/f89725fdb7fa4485b67577644056a246";
   var isAdmin = false;
 
   function saveState(){ try{ localStorage.setItem("0site_state", JSON.stringify({main:state.main, sub:state.sub})); }catch(e){} }
@@ -212,27 +232,6 @@
     var saved = JSON.parse(localStorage.getItem("0site_state")||"null");
     if(saved && DATA[saved.main]){ state.main = saved.main; state.sub = saved.sub||0; }
   }catch(e){}
-
-  var localSaved = {};
-  try { localSaved = JSON.parse(localStorage.getItem("0site_posts") || "{}") || {}; } catch(e){ localSaved = {}; }
-  function saveLocal(){ try { localStorage.setItem("0site_posts", JSON.stringify(localSaved)); } catch(e){} }
-
-  function mergeRemote(list){
-    list.forEach(function(p){
-      if(!DATA[p.section]) return;
-      var dup = DATA[p.section].subs.some(function(s){ return s.remoteId===p._id || (s.name===p.title && s.html===p.html); });
-      if(!dup) DATA[p.section].subs.push({ id:p._id, name:p.title, html:p.html, custom:true, remoteId:p._id, ts:p.ts||0 });
-    });
-    Object.keys(DATA).forEach(function(k){ DATA[k].subs.sort(function(a,b){ return (a.ts||0)-(b.ts||0); }); });
-  }
-
-  Object.keys(localSaved).forEach(function(k){
-    if(!DATA[k]) return;
-    localSaved[k].forEach(function(p){
-      var dup = DATA[k].subs.some(function(s){ return s.name===p.name && s.html===p.html; });
-      if(!dup) DATA[k].subs.push({ id:p.id, name:p.name, html:p.html, custom:true, localOnly:true });
-    });
-  });
 
   var mainnav = document.getElementById("mainnav");
   var content = document.getElementById("content");
@@ -249,46 +248,67 @@
   var passErr = document.getElementById("passErr");
   var logoutBtn = document.getElementById("logoutBtn");
 
-  function esc(t){ return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function esc(t){ return (t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-  // ---- LIBRO DE VISITAS ----
-  function gbLocal(){ try{ return JSON.parse(localStorage.getItem("0site_gb")||"[]")||[]; }catch(e){ return []; } }
-  function gbSave(arr){ try{ localStorage.setItem("0site_gb", JSON.stringify(arr)); }catch(e){} }
-  function loadGuestbook(){
+  // ---- LIBRO DE VISITAS CON FIRESTORE ----
+  window.loadGuestbook = function(){
     var el = document.getElementById("gbList");
     if(!el) return;
-    var render = function(list){
-      if(!list.length){ el.innerHTML = '<p class="dim">nadie ha firmado aún. sé el primero. o el último.</p>'; return; }
-      list.sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
-      el.innerHTML = list.map(function(m){
-        var d = new Date(m.ts||Date.now()).toLocaleString("es-ES");
-        return '<div class="gb-msg"><span class="warn">'+esc(m.name||"anónimo")+'</span> — '+esc(m.msg||"")+' <span class="dim">— '+d+'</span></div>';
-      }).join("");
-    };
-    render(gbLocal());
-    fetch(API+"/guestbook").then(function(r){ return r.json(); }).then(function(list){
-      var seen = {}, all = [];
-      list.concat(gbLocal()).forEach(function(m){
-        var k = (m.ts||0)+"_"+(m.name||"")+"_"+(m.msg||"");
-        if(!seen[k]){ seen[k]=1; all.push(m); }
+    if(!window.db){ el.innerHTML = '<p class="dim">conectando con la base de datos...</p>'; return; }
+    
+    window.fbMethods.getDocs(window.fbMethods.collection(window.db, "guestbook"))
+      .then(function(snapshot){
+        var list = [];
+        snapshot.forEach(function(docSnap){
+          list.push(Object.assign({ id: docSnap.id }, docSnap.data()));
+        });
+        if(!list.length){ el.innerHTML = '<p class="dim">nadie ha firmado aún. sé el primero. o el último.</p>'; return; }
+        list.sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+        el.innerHTML = list.map(function(m){
+          var d = new Date(m.ts||Date.now()).toLocaleString("es-ES");
+          return '<div class="gb-msg"><span class="warn">'+esc(m.name||"anónimo")+'</span> — '+esc(m.msg||"")+' <span class="dim">— '+d+'</span></div>';
+        }).join("");
+      })
+      .catch(function(err){
+        el.innerHTML = '<p class="warn">error al cargar firmas: '+err.message+'</p>';
       });
-      gbSave(all);
-      render(all);
-    }).catch(function(){});
-  }
+  };
+
   window.gbSubmit = function(){
     var nameEl = document.getElementById("gbName");
     var msgEl = document.getElementById("gbMsg");
-    if(!msgEl) return;
+    if(!msgEl || !window.db) return;
     var name = (nameEl.value||"").trim() || "anónimo";
     var msg = (msgEl.value||"").trim();
     if(!msg){ return; }
     var entry = { name:name, msg:msg, ts:Date.now() };
-    var arr = gbLocal(); arr.push(entry); gbSave(arr);
-    msgEl.value = "";
-    loadGuestbook();
-    fetch(API+"/guestbook", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(entry) }).catch(function(){});
+    
+    window.fbMethods.addDoc(window.fbMethods.collection(window.db, "guestbook"), entry)
+      .then(function(){
+        msgEl.value = "";
+        window.loadGuestbook();
+      })
+      .catch(function(err){ alert("error al firmar: "+err.message); });
   };
+
+  // ---- CARGAR PUBLICACIONES DESDE FIRESTORE ----
+  function loadFirestorePosts(){
+    if(!window.db) return;
+    window.fbMethods.getDocs(window.fbMethods.collection(window.db, "posts"))
+      .then(function(snapshot){
+        snapshot.forEach(function(docSnap){
+          var p = Object.assign({ id: docSnap.id }, docSnap.data());
+          if(!DATA[p.section]) return;
+          var dup = DATA[p.section].subs.some(function(s){ return s.remoteId===p.id || (s.name===p.title && s.html===p.html); });
+          if(!dup){
+            DATA[p.section].subs.push({ id:p.id, name:p.title, html:p.html, custom:true, remoteId:p.id, ts:p.ts||0 });
+          }
+        });
+        Object.keys(DATA).forEach(function(k){ DATA[k].subs.sort(function(a,b){ return (a.ts||0)-(b.ts||0); }); });
+        renderAll();
+      })
+      .catch(function(){});
+  }
 
   function renderNav(){
     mainnav.innerHTML = "";
@@ -330,9 +350,9 @@
               ev.stopPropagation();
               if(!confirm("borrar este relato?")) return;
               DATA[k].subs.splice(i,1);
-              if(localSaved[k]) localSaved[k] = localSaved[k].filter(function(p){ return p.id!==s.id; });
-              saveLocal();
-              if(s.remoteId){ fetch(API+"/posts/"+s.remoteId, {method:"DELETE"}).catch(function(){}); }
+              if(s.remoteId && window.db){
+                window.fbMethods.deleteDoc(window.fbMethods.doc(window.db, "posts", s.remoteId)).catch(function(){});
+              }
               if(state.sub>=DATA[k].subs.length) state.sub=0;
               state.open=true;
               saveState();
@@ -361,7 +381,7 @@
     homeMeta.className = (state.main==="home")
       ? "mt-6 pt-4 border-t border-[#3a1016] font-mono text-xs text-[#6b6860] leading-relaxed"
       : "hidden mt-6 pt-4 border-t border-[#3a1016] font-mono text-xs text-[#6b6860] leading-relaxed";
-    if(s.id==="libro"){ loadGuestbook(); }
+    if(s.id==="libro"){ window.loadGuestbook(); }
   }
 
   function renderAll(){ renderNav(); renderContent(); }
@@ -410,8 +430,9 @@
   document.getElementById("pubCancel").onclick = function(){
     pubPanel.className = "hidden mb-4 border border-[#c02030] bg-[#160a0c] p-4 font-mono text-xs z-30 relative";
   };
+  
   document.getElementById("pubGo").onclick = function(){
-    if(!isAdmin){ return; }
+    if(!isAdmin || !window.db){ return; }
     var target = pubSectionSelect.value;
     var t = pubTitle.value.trim();
     var st = pubSubtitle.value.trim();
@@ -423,39 +444,29 @@
     if(st) html += '<p class="subtitle">'+esc(st)+'</p>';
     if(ph) html += '<div class="artcard mb-3"><img class="postimg" src="'+esc(ph)+'" alt="'+esc(t)+'"></div>';
     html += esc(b).replace(/\n/g,"<br>");
-    var tmpId = "tmp_"+ts;
-    DATA[target].subs.push({ id:tmpId, name:t, html:html, custom:true, localOnly:true, ts:ts });
-    state.main = target;
-    state.sub = DATA[target].subs.length-1;
-    state.open = false;
-    saveState();
-    pubTitle.value=""; pubSubtitle.value=""; pubPhoto.value=""; pubBody.value="";
-    pubPanel.className = "hidden mb-4 border border-[#c02030] bg-[#160a0c] p-4 font-mono text-xs z-30 relative";
-    renderAll();
-    if(!localSaved[target]) localSaved[target]=[];
-    localSaved[target].push({ id:tmpId, name:t, html:html });
-    saveLocal();
-    fetch(API+"/posts", {
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ section:target, title:t, html:html, ts:ts })
-    }).then(function(r){ return r.json(); })
-      .then(function(created){
-        var subs = DATA[target].subs;
-        for(var i=0;i<subs.length;i++){
-          if(subs[i].id===tmpId){ subs[i].id=created._id; subs[i].remoteId=created._id; delete subs[i].localOnly; break; }
-        }
+
+    window.fbMethods.addDoc(window.fbMethods.collection(window.db, "posts"), { section:target, title:t, html:html, ts:ts })
+      .then(function(docRef){
+        DATA[target].subs.push({ id:docRef.id, name:t, html:html, custom:true, remoteId:docRef.id, ts:ts });
+        state.main = target;
+        state.sub = DATA[target].subs.length-1;
+        state.open = false;
+        saveState();
+        pubTitle.value=""; pubSubtitle.value=""; pubPhoto.value=""; pubBody.value="";
+        pubPanel.className = "hidden mb-4 border border-[#c02030] bg-[#160a0c] p-4 font-mono text-xs z-30 relative";
         renderAll();
       })
-      .catch(function(){});
+      .catch(function(err){ alert("error al publicar: "+err.message); });
   };
 
-  try { renderAll(); } catch(e){ document.getElementById("content").innerHTML = '<p class="warn">ERROR: '+e.message+'</p>'; }
+  window.addEventListener('firebase-ready', function(){
+    loadFirestorePosts();
+    if(DATA[state.main].subs[state.sub].id === "libro"){
+      window.loadGuestbook();
+    }
+  });
 
-  fetch(API+"/posts")
-    .then(function(r){ return r.json(); })
-    .then(function(list){ mergeRemote(list); renderAll(); })
-    .catch(function(){});
+  try { renderAll(); } catch(e){ document.getElementById("content").innerHTML = '<p class="warn">ERROR: '+e.message+'</p>'; }
 })();
 </script>
 </body>
