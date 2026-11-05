@@ -9,7 +9,7 @@
 <!-- Firebase Realtime Database SDKs -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getDatabase, ref, set, push, get, remove, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+  import { getDatabase, ref, set, push, onValue, remove, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyBBBIjiRltl6_-D6FGUUml72Pq9Gb-JiEI",
@@ -25,7 +25,7 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
   window.db = db;
-  window.rtdbMethods = { ref, set, push, get, remove, child };
+  window.rtdbMethods = { ref, set, push, onValue, remove, child };
   window.dispatchEvent(new Event('firebase-ready'));
 </script>
 </head>
@@ -39,7 +39,7 @@
     <p class="font-bold mb-2" style="color:#0b0b0d">// abriste la puerta. no hay vuelta atrás.</p>
     <p style="color:#1a0a0c">El servidor no está en ningún datacenter. Está en el sótano de una casa abandonada. Dentro del rack, entre cables, hay algo <b>vivo</b>. Lo llaman operador 7, pero no es humano: cada noche abre la bahía de discos como si fuera una boca, y de vez en cuando escupe un diente.</p>
     <p style="color:#1a0a0c;margin-top:8px">Los técnicos que lo limpiaban desaparecieron uno por uno. El último escribió en la pared, con su propia sangre todavía caliente: <b>"no es un servidor. es un estómago."</b> Lo encontraron medio dentro de la unidad de cinta, todavía respirando, con los ojos reemplazados por LEDs rojos que parpadeaban al ritmo de tu corazón.</p>
-    <p style="color:#1a0a0c;margin-top:8px">Los relatos que lees hier no son historias. Son lo que ha digerido. Y tú, que acabas de hacer clic, ya estás en el <b>menú de la cena</b>.</p>
+    <p style="color:#1a0a0c;margin-top:8px">Los relatos que lees aquí no son historias. Son lo que ha digerido. Y tú, que acabas de hacer clic, ya estás en el <b>menú de la cena</b>.</p>
     <p class="font-bold mt-2" style="color:#0b0b0d">// gracias por visitar 0-site. ahora tú también eres parte de él.</p>
   </div>
 
@@ -133,7 +133,7 @@
     ".subtitle{color:#8a7b4f;font-style:italic;margin-bottom:12px;font-size:13px}",
     "select option{background:#0e0e11;color:#d8d5cc}",
     ".gorelink{cursor:pointer;text-decoration:underline;text-decoration-style:dotted}",
-    ".goremenu{position:absolute;display:none;z-60;width:300px;max-width:calc(100vw - 32px);background:#c02030;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 1px,transparent 1px 3px);border:1px solid #8a1020;box-shadow:6px 6px 0 rgba(0,0,0,.6);padding:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.6;animation:fadein .25s ease}",
+    ".goremenu{position:absolute;display:none;z-index:60;width:300px;max-width:calc(100vw - 32px);background:#c02030;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 1px,transparent 1px 3px);border:1px solid #8a1020;box-shadow:6px 6px 0 rgba(0,0,0,.6);padding:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.6;animation:fadein .25s ease}",
     ".goreclose{position:absolute;top:6px;right:10px;cursor:pointer;color:#0b0b0d;font-weight:700;font-size:16px}",
     ".leyenda{color:#8a7b4f;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:13px;margin-top:8px}",
     ".micro{color:#8a7b4f;font-weight:700;letter-spacing:.08em;font-size:12px;margin-top:4px}",
@@ -250,26 +250,22 @@
 
   function esc(t){ return (t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-  // ---- LIBRO DE VISITAS CON REALTIME DATABASE ----
+  // ---- LIBRO DE VISITAS EN TIEMPO REAL ----
   window.loadGuestbook = function(){
     var el = document.getElementById("gbList");
     if(!el) return;
     if(!window.db){ el.innerHTML = '<p class="dim">conectando con la base de datos...</p>'; return; }
     
-    window.rtdbMethods.get(window.rtdbMethods.child(window.rtdbMethods.ref(window.db), "guestbook"))
-      .then(function(snapshot){
-        if(!snapshot.exists()){ el.innerHTML = '<p class="dim">nadie ha firmado aún. sé el primero. o el último.</p>'; return; }
-        var data = snapshot.val();
-        var list = Object.keys(data).map(function(k){ return Object.assign({ id: k }, data[k]); });
-        list.sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
-        el.innerHTML = list.map(function(m){
-          var d = new Date(m.ts||Date.now()).toLocaleString("es-ES");
-          return '<div class="gb-msg"><span class="warn">'+esc(m.name||"anónimo")+'</span> — '+esc(m.msg||"")+' <span class="dim">— '+d+'</span></div>';
-        }).join("");
-      })
-      .catch(function(err){
-        el.innerHTML = '<p class="warn">error al cargar firmas: '+err.message+'</p>';
-      });
+    window.rtdbMethods.onValue(window.rtdbMethods.ref(window.db, "guestbook"), function(snapshot){
+      if(!snapshot.exists()){ el.innerHTML = '<p class="dim">nadie ha firmado aún. sé el primero. o el último.</p>'; return; }
+      var data = snapshot.val();
+      var list = Object.keys(data).map(function(k){ return Object.assign({ id: k }, data[k]); });
+      list.sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+      el.innerHTML = list.map(function(m){
+        var d = new Date(m.ts||Date.now()).toLocaleString("es-ES");
+        return '<div class="gb-msg"><span class="warn">'+esc(m.name||"anónimo")+'</span> — '+esc(m.msg||"")+' <span class="dim">— '+d+'</span></div>';
+      }).join("");
+    });
   };
 
   window.gbSubmit = function(){
@@ -285,30 +281,27 @@
     window.rtdbMethods.set(newPostRef, entry)
       .then(function(){
         msgEl.value = "";
-        window.loadGuestbook();
       })
       .catch(function(err){ alert("error al firmar: "+err.message); });
   };
 
-  // ---- CARGAR PUBLICACIONES DESDE REALTIME DATABASE ----
-  function loadRTDBPosts(){
+  // ---- PUBLICACIONES EN TIEMPO REAL ----
+  function listenRTDBPosts(){
     if(!window.db) return;
-    window.rtdbMethods.get(window.rtdbMethods.child(window.rtdbMethods.ref(window.db), "posts"))
-      .then(function(snapshot){
-        if(!snapshot.exists()) return;
-        var data = snapshot.val();
-        Object.keys(data).forEach(function(key){
-          var p = Object.assign({ id: key }, data[key]);
-          if(!DATA[p.section]) return;
-          var dup = DATA[p.section].subs.some(function(s){ return s.remoteId===p.id || (s.name===p.title && s.html===p.html); });
-          if(!dup){
-            DATA[p.section].subs.push({ id:p.id, name:p.title, html:p.html, custom:true, remoteId:p.id, ts:p.ts||0 });
-          }
-        });
-        Object.keys(DATA).forEach(function(k){ DATA[k].subs.sort(function(a,b){ return (a.ts||0)-(b.ts||0); }); });
-        renderAll();
-      })
-      .catch(function(){});
+    window.rtdbMethods.onValue(window.rtdbMethods.ref(window.db, "posts"), function(snapshot){
+      if(!snapshot.exists()) return;
+      var data = snapshot.val();
+      Object.keys(data).forEach(function(key){
+        var p = Object.assign({ id: key }, data[key]);
+        if(!DATA[p.section]) return;
+        var dup = DATA[p.section].subs.some(function(s){ return s.remoteId===p.id || (s.name===p.title && s.html===p.html); });
+        if(!dup){
+          DATA[p.section].subs.push({ id:p.id, name:p.title, html:p.html, custom:true, remoteId:p.id, ts:p.ts||0 });
+        }
+      });
+      Object.keys(DATA).forEach(function(k){ DATA[k].subs.sort(function(a,b){ return (a.ts||0)-(b.ts||0); }); });
+      renderAll();
+    });
   }
 
   function renderNav(){
@@ -449,21 +442,14 @@
     var newPostRef = window.rtdbMethods.push(window.rtdbMethods.ref(window.db, "posts"));
     window.rtdbMethods.set(newPostRef, { section:target, title:t, html:html, ts:ts })
       .then(function(){
-        var postId = newPostRef.key;
-        DATA[target].subs.push({ id:postId, name:t, html:html, custom:true, remoteId:postId, ts:ts });
-        state.main = target;
-        state.sub = DATA[target].subs.length-1;
-        state.open = false;
-        saveState();
         pubTitle.value=""; pubSubtitle.value=""; pubPhoto.value=""; pubBody.value="";
         pubPanel.className = "hidden mb-4 border border-[#c02030] bg-[#160a0c] p-4 font-mono text-xs z-30 relative";
-        renderAll();
       })
       .catch(function(err){ alert("error al publicar: "+err.message); });
   };
 
   window.addEventListener('firebase-ready', function(){
-    loadRTDBPosts();
+    listenRTDBPosts();
     if(DATA[state.main].subs[state.sub].id === "libro"){
       window.loadGuestbook();
     }
