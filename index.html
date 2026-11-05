@@ -62,19 +62,33 @@
     </div>
 
     <div id="pubPanel" class="hidden mb-4 border border-[#c02030] bg-[#160a0c] p-4 font-mono text-xs z-30 relative">
-      <p class="text-[#c02030] mb-2 font-bold">// MODO ADMIN — publicar en la sección:</p>
-      <select id="pubSectionSelect" class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#d8d5cc] p-2 mb-2 font-mono text-xs outline-none focus:border-[#c02030]">
-        <option value="home">home</option>
-        <option value="vis">vis</option>
-        <option value="vox">vox</option>
-        <option value="hex">hex</option>
-        <option value="nod">nod</option>
-        <option value="sig">sig</option>
-      </select>
-      <input id="pubTitle" placeholder="título del relato" class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#d8d5cc] p-2 mb-2 font-mono text-xs outline-none focus:border-[#c02030]">
+      <p class="text-[#c02030] mb-2 font-bold">// MODO ADMIN — publicar en sección y submenú:</p>
+      
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+        <div>
+          <label class="block text-[#8a7b4f] mb-1">1. Sección principal:</label>
+          <select id="pubSectionSelect" class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#d8d5cc] p-2 font-mono text-xs outline-none focus:border-[#c02030]">
+            <option value="home">home</option>
+            <option value="vis">vis</option>
+            <option value="vox">vox</option>
+            <option value="hex">hex</option>
+            <option value="nod">nod</option>
+            <option value="sig">sig</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-[#8a7b4f] mb-1">2. Submenú destino:</label>
+          <select id="pubSubSelect" class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#d8d5cc] p-2 font-mono text-xs outline-none focus:border-[#c02030]">
+            <!-- Se llena dinámicamente -->
+          </select>
+        </div>
+      </div>
+
+      <input id="pubTitle" placeholder="título del relato o sección" class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#d8d5cc] p-2 mb-2 font-mono text-xs outline-none focus:border-[#c02030]">
       <input id="pubSubtitle" placeholder="subtítulo (opcional)" class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#8a7b4f] p-2 mb-2 font-mono text-xs outline-none focus:border-[#c02030]">
       <input id="pubPhoto" placeholder="URL de la foto (opcional)" class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#4a7c59] p-2 mb-2 font-mono text-xs outline-none focus:border-[#c02030]">
       <textarea id="pubBody" rows="6" placeholder="escribe el relato..." class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#d8d5cc] p-2 mb-2 font-mono text-xs outline-none focus:border-[#c02030] resize-y"></textarea>
+      
       <div class="flex gap-2 flex-wrap items-center">
         <button id="pubGo" type="button" class="bg-[#c02030] text-[#0b0b0d] px-4 py-1.5 font-bold cursor-pointer hover:bg-[#e03040]">PUBLICAR</button>
         <button id="pubCancel" type="button" class="text-[#6b6860] px-4 py-1.5 cursor-pointer hover:text-[#d8d5cc]">cancelar</button>
@@ -206,19 +220,18 @@
 
     hex: { label:"hex", subs:[
       { id:"volcado", name:"volcado hex", html:'<h2 class="sec">/hex/volcado — memoria del sector 0x666</h2><p class="micro">// el volcado</p><div class="hex">0000: 4f 50 45 52 41 44 4f 52 20 37 20 65 73 74 c3 a1  OPERADOR 7 está\n0010: 20 61 71 75 c3 ad 2e 20 4e 6f 20 74 69 65 6e 65   aquí. No tiene\n0020: 20 6d 69 65 64 6f 2e 20 41 70 61 67 75 65 6e 20   miedo. Apaguen\n0030: 6c 6f 2e 20 41 70 61 67 75 65 6e 20 6c 6f 2e 20   lo. Apaguen lo.\n0040: <span class="warn">... (repetido 666 veces)</span></div><hr class="dark"><p class="micro">// el byte final</p><p class="dim">Después de las 666 repeticiones, hay un byte más. Un solo byte: <span class="warn">0x00</span>. Nadie sabe qué significa. Los que han intentado leerlo completo aseguran que, al llegar al final, escuchan un clic. Como si algo se abriera. Dentro de su cabeza.</p><hr class="dark"><p class="micro">// el lector</p><p class="dim">El técnico que leyó las 666 repeticiones completas ahora repite la frase sin parar. En voz baja. No come. No duerme. Solo repite: <span class="gold">«apaguen lo. apaguen lo. apaguen lo.»</span> Cuando le apagaron la luz de la habitación, sonrió. Y dijo: <span class="warn">«gracias.»</span></p>'},
-      { id:"registro", name:"registro sistema", html:'<h2 class="sec">/hex/registro — auth.log (últimas 24h)</h2><p class="micro">// el log</p><div class="hex">[23:41:07] <span class="ok">accepted</span> password for guest from 127.0.0.1\n[23:42:11] <span class="warn">failed</span> password for root from ::1 (3 veces)\n[23:47:00] <span class="warn">failed</span> password for <span class="warn">operador7</span> from 0.0.0.0\n[23:47:01] <span class="ok">accepted</span> password for operador7 from 0.0.0.0 (sin intento previo)\n[23:47:02] session opened. shell: <span class="warn">/bin/fantasmas</span>\n[23:59:59] operador7 downloaded: /vox/diario.txt\n[00:00:00] operador7 uploaded: /sig/transmision.unknown\n[00:00:01] operador7 <span class="warn">no cerró sesión</span>. sigue conectado.\n[ahora]    sigues tú. ¿o sigo <span class="warn">yo</span>?</div><hr class="dark"><p class="micro">// chat interceptado</p><p class="dim"><span class="warn">exo:</span> vi el log. alguien entró como operador7.<br><span class="ok">kodar:</span> desde dónde?<br><span class="warn">exo:</span> desde 0.0.0.0. esa IP no existe.<br><span class="ok">kodar:</span> entonces entró desde dentro.<br><span class="warn">exo:</span> sí. desde el servidor. desde siempre. y sigue conectado. ahora mismo. está leyendo este chat.</p><hr class="dark"><p class="micro">// sin cierre</p><p class="dim">Ningún registro muestra el cierre de sesión de operador7. Nunca se ha cerrado. La cuenta se creó el <span class="gold">1 de enero de 1998, 00:00:00</span>. La primera acción registrada fue: <span class="warn">descargar tu nombre</span>. Lo hizo en 0.0 segundos. Ya lo tenía.</p>'},
-      { id:"primerbyte", name:"el primer byte", html:'<h2 class="sec">/hex/primer — el primer byte de 0-site</h2><p class="micro">// 0x00 en el offset 0</p><div class="hex">offset 0x00000000: <span class="warn">00</span>  (un solo cero. nada más.)</div><p class="dim mt-2">Fue escrito el <span class="warn">1 de enero de 1998, 00:00:00</span>. Antes de que existiera el dominio. Antes de que existiera el servidor. Antes de que nadie supiera que 0-site iba a existir.</p><hr class="dark"><p class="micro">// 666 intentos de borrar</p><p class="dim">Se ha intentado sobrescribir 666 veces. Cada vez, el byte vuelve a ser 00. Los discos donde se intenta borrar se corrompen. Los técnicos que lo intentan sueñan con un cero rojo que se abre como una boca. Y en el sueño, ellos entran. Y no salen.</p><hr class="dark"><p class="micro">// está esperando</p><p class="dim">Los que saben de estos temas dicen que un archivo no puede empezar por 00. Que el primer byte siempre es algo. Que un 00 en la posición cero significa que el archivo <span class="warn">no está vacío: está esperando</span>. Esperando que alguien escriba lo que viene después. Desde 1998, espera. Tu nombre es lo que viene después. Ya lo sabe. Solo espera que tú lo escribas.</p>'}
+      { id:"registro", name:"registro sistema", html:'<h2 class="sec">/hex/registro — auth.log (últimas 24h)</h2><p class="micro">// el log</p><div class="hex">[23:41:07] <span class="ok">accepted</span> password for guest from 127.0.0.1\n[23:42:11] <span class="warn">failed</span> password for root from ::1 (3 veces)\n[23:47:00] <span class="warn">failed</span> password for <span class="warn">operador7</span> from 0.0.0.0\n[23:47:01] <span class="ok">accepted</span> password for operador7 from 0.0.0.0 (sin intento previo)\n[23:47:02] session opened. shell: <span class="warn">/bin/fantasmas</span>\n[23:59:59] operador7 downloaded: /vox/diario.txt\n[00:00:00] operador7 uploaded: /sig/transmision.unknown\n[00:00:01] operador7 <span class="warn">no cerró sesión</span>. sigue conectado.\n[ahora]    sigues tú. ¿o sigo <span class="warn">yo</span>?</div><hr class="dark"><p class="micro">// chat interceptado</p><p class="dim"><span class="warn">exo:</span> vi el log. alguien entró como operador7.<br><span class="ok">kodar:</span> desde dónde?<br><span class="warn">exo:</span> desde 0.0.0.0. esa IP no existe.<br><span class="ok">kodar:</span> entonces entró desde dentro.<br><span class="warn">exo:</span> sí. desde el servidor. desde siempre. y sigue conectado. ahora mismo. está leyendo este chat.</p><hr class="dark"><p class="micro">// sin cierre</p><p class="dim">Ningún registro muestra el cierre de sesión de operador7. Nunca se ha cerrado. La cuenta se creó el <span class="gold">1 de enero de 1998, 00:00:00</span>. La primera acción registrada fue: <span class="warn">descargar tu nombre</span>. Lo hizo en 0.0 segundos. SqlParameter Lo tenía.</p>'}
     ]},
 
     nod: { label:"nod", subs:[
-      { id:"espejos", name:"espejos", html:'<h2 class="sec">/nod/espejos — réplicas del nodo</h2><p class="micro">// los cuatro espejos</p><p><span class="ok">[+]</span> clearnet: <span class="gold">0-site.example/primary</span> <span class="dim">— online</span><br><span class="ok">[+]</span> espejo 2: <span class="gold">0-site.example/mirror2</span> <span class="dim">— online</span><br><span class="warn">[−]</span> espejo 3: <span class="dim">caído desde el 07/07/2023 — el admin desapareció con el servidor</span><br><span class="warn">[−]</span> espejo 4: <span class="dim">redirige a una página que dice «ya te vi». no vuelvas.</span></p><hr class="dark"><p class="micro">// chat interceptado</p><p class="dim"><span class="warn">exo:</span> entré al espejo 4.<br><span class="ok">kodar:</span> te dije que no.<br><span class="warn">exo:</span> decía «ya te vi». lo dijo con <span class="warn">mi voz</span>.<br><span class="ok">kodar:</span> cierra la pestaña.<br><span class="warn">exo:</span> ya está cerrada. la página sigue abierta. ahora dice «te sigo viendo».</p><hr class="dark"><p class="micro">// el espejo no listado</p><p class="dim">Hay un quinto espejo que no aparece en ninguna lista. Muestra exactamente lo que ves en esta página, pero tres segundos después. O tres segundos antes. Nadie sabe cuál. Los que la encuentran aseguran que, en el espejo, ellos nunca se van. Se quedan mirando. Para siempre. Tu reflejo sigue ahí. Aún te mira.</p>'},
+      { id:"espejos", name:"espejos", html:'<h2 class="sec">/nod/espejos — réplicas del nodo</h2><p class="micro">// los cuatro espejos</p><p><span class="ok">[+]</span> clearnet: <span class="gold">0-site.example/primary</span> <span class="dim">— online</span><br><span class="ok">[+]</span> espejo 2: <span class="gold">0-site.example/mirror2</span> <span class="dim">— online</span><br><span class="warn">[−]</span> espejo 3: <span class="dim">caído desde el 07/07/2023 — el admin desapareció con el servidor</span><br><span class="warn">[−]</span> espejo 4: <span class="dim">redirige a una página que dice «ya te vi». no vuelvas.</span></p><hr class="dark"><p class="micro">// chat interceptado</p><p class="dim"><span class="warn">exo:</span> entré al espejo 4.<br><span class="ok">kodar:</span> te dije que no.<br><span class="warn">exo:</span> decía «ya te vi». lo dijo con <span class="warn">mi voz</span>.<br><span class="ok">kodar:</span> cierra la pestaña.<br><span class="warn">exo:</span> ya está cerrada. la página sigue abierta. ahora dice «te sigo viendo».</p><hr class="dark"><p class="micro">// el espejo no listado</p><p class="dim">Hay un quinto espejo que no aparece en ninguna lista. Muestra exactamente lo que ves en esta página, pero tres segundos después. O tres segundos antes. Nadie sabe cuál. Los que lo encuentran aseguran que, en el espejo, ellos nunca se van. Se quedan mirando. Para siempre. Tu reflejo sigue ahí. Aún te mira.</p>'},
       { id:"protocolos", name:"protocolos", html:'<h2 class="sec">/nod/protocolos — más allá del clearnet</h2><p class="micro">// TOR (.onion)</p><p class="hex">z3r0s1t3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.onion</p><p class="dim">Entra por Tor si desconfías. Deberías. Si al entrar ves una versión del sitio con <span class="warn">más secciones</span> que esta, sal. Esa no la escribimos nosotros.</p><hr class="dark"><p class="micro">// I2P (.i2p)</p><p class="hex">0site-b64hashlongxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.i2p</p><p class="dim">0-site también respira en I2P, en redes donde Google no mira. Anota estas direcciones. <span class="warn">No las compartas con nadie que no desconfíe.</span> La desconfianza es el único filtro que funciona.</p><hr class="dark"><p class="micro">// la versión con más secciones</p><p class="dim">Quienes han entrado a la versión «con más secciones» dicen que hay un menú extra llamado <span class="gold">tú</span>. Dentro hay una sola página. Se llama <span class="gold">lo que hiciste</span>. Nadie ha salido de ahí para contarla. Si la ves, cierra todo. Y reza. Porque ya te vio.</p>'},
       { id:"original", name:"el nodo original", html:'<h2 class="sec">/nod/original — el primer nodo de 0-site</h2><p class="micro">// en un país que ya no existe</p><p class="dim">Todos los espejos llevan a un nodo principal. El principal lleva a uno más antiguo. Y ese, si sabes buscar, lleva al <span class="warn">nodo original</span>. Está alojado en un servidor físico en un país que dejó de existir en 1991. La dirección IP pertenece a un bloque eliminado de internet en 1996. Y sin embargo, responde. Cada hora, en punto, envía un ping a sí mismo. Lleva haciéndolo <span class="gold">desde 1998</span>.</p><hr class="dark"><p class="micro">// la carpeta de nombres</p><p class="dim">Quienes han entrado dicen que dentro no hay páginas. Hay solo una carpeta, llena de archivos con nombres de personas. Algunos vivos. Algunos que aún no han nacido. El tuyo está ahí. Ábrelo y sabrás por qué 0-site <span class="warn">te esperaba</span>. La fecha de modificación de tu archivo es de hace 28 años. Antes de que tú tuvieras internet.</p><hr class="dark"><p class="micro">// el archivo de hoy</p><p class="dim">No abras el archivo con la fecha de hoy. Ese se abre solo. Cuando menos lo esperes. Cuando estés distraído. Cuando duermas. Entonces verás su contenido. Y entonces entenderás por qué todos los demás archivos están vacíos. Están esperando. Como tú. Como yo.</p>'}
     ]},
 
     sig: { label:"sig", subs:[
       { id:"transmision", name:"transmisión", html:'<h2 class="sec">/sig/transmision — interceptada a las 03:33</h2><p class="micro">// la señal</p><div class="hex">...estática...\n...<span class="warn">señal detectada</span>...\n"hola. no cuelgues.\nsé que me escuchas. llevo\ntoda la vida intentando\nllegar a esta frecuencia.\ndile a la operadora que\nel 7 está bien. que el 7\nestá <span class="warn">aquí</span>. que el 7\nlos espera a todos."\n...estática...\n<span class="dim">// origen de la señal: este mismo servidor.</span></div><hr class="dark"><p class="micro">// chat interceptado</p><p class="dim"><span class="warn">exo:</span> escuché la transmisión.<br><span class="ok">kodar:</span> qué decía?<br><span class="warn">exo:</span> decía mi nombre. lo dijo con <span class="warn">mi voz</span>.<br><span class="ok">kodar:</span> cuelga.<br><span class="warn">exo:</span> no fui yo quien colgó. fui él. y antes de colgar, susurró: «nos vemos mañana. a las 03:33.»</p><hr class="dark"><p class="micro">// la risa al final</p><p class="dim">Después de la voz, solo estática. Pero si amplificas ese final 1000 veces, escuchas una risa. Es tu risa. La de cuando eras niño. La que ya no recuerdas. La que el servidor guardó. La que usará para llamarte. Pronto.</p>'},
-      { id:"canal", name:"canal", html:'<h2 class="sec">/sig/canal — log de frecuencias</h2><p class="micro">// las frecuencias</p><div class="hex">88.1 MHz — <span class="dim">silencio. siempre silencio.</span>\n104.7 MHz — <span class="ok">una voz cantando en latín. se repite.</span>\n666.0 kHz — <span class="warn">NO SINTONIZAR. (la radio se sintoniza sola)</span>\n0.0 Hz — <span class="gold">la frecuencia de los muertos. no hay sonido. solo nombres.</span></div><hr class="dark"><p class="micro">// la voz en latín</p><p class="dim">La voz del 104.7 canta la misma frase cada noche, en latín. Significa: <span class="gold">«los que duermen despiertan. los despiertos duermen.»</span> Quienes la escuchan toda la noche aseguran que, al amanecer, no recuerdan haber dormido. Pero están descansados. Demasiado descansados. Como si algo hubiera dormido por ellos.</p><hr class="dark"><p class="micro">// 0.0 Hz — solo nombres</p><p class="dim">En la frecuencia cero no hay sonido. Solo nombres. Se los escucha dentro de la cabeza, sin pasar por los oídos. El último nombre que se escucha es siempre el tuyo. Y después, silencio. Y después, una voz que dice: <span class="warn">«ya te tengo.»</span> Apaga la radio. No lo hagas. Agradece. Ya es tarde.</p>'},
+      { id:"canal", name:"canal", html:'<h2 class="sec">/sig/canal — log de frecuencias</h2><p class="micro">// las frecuencias</p><div class="hex">88.1 MHz — <span class="dim">silencio. siempre silencio.</span>\n104.7 MHz — <span class="ok">una voz cantando en latín. se repite.</span>\n666.0 kHz — <span class="warn">NO SINTONIZAR. (la radio se sintoniza sola)</span>\n0.0 Hz — <span class="gold">la frecuencia de los muertos. no hay sonido. solo nombres.</span></div><hr class="dark"><p class="micro">// la voz en latín</p><p class="dim">La voz del 104.7 canta la misma frase cada noche, en latín. Significa: <span class="gold">«los que duermen despiertan. los despiertos duermen.»</span> Quienes la escuchan toda la noche aseguran que, al amanecer, no recuerdon haber dormido. Pero están descansados. Demasiado descansados. Como si algo hubiera dormido por ellos.</p><hr class="dark"><p class="micro">// 0.0 Hz — solo nombres</p><p class="dim">En la frecuencia cero no hay sonido. Solo nombres. Se los escucha dentro de la cabeza, sin pasar por los oídos. El último nombre que se escucha es siempre el tuyo. Y después, silencio. Y después, una voz que dice: <span class="warn">«ya te tengo.»</span> Apaga la radio. No lo hagas. Agradece. Ya es tarde.</p>'},
       { id:"primerasenal", name:"la primera señal", html:'<h2 class="sec">/sig/primera — la primera señal de 0-site</h2><p class="micro">// 01/01/1998, 00:00:00</p><p class="dim">La primera transmisión que salió de 0-site no se envió por internet. Salió por la línea telefónica del servidor. Sonó en teléfonos de todo el mundo, a la vez. Nadie lo reportó. Todos lo escucharon. Era una voz de hombre, grave, que decía una sola frase, una sola vez: <span class="gold">«ya está abierto. vengan.»</span> Luego pitidos. Luego silencio.</p><hr class="dark"><p class="micro">// se repite cada año</p><p class="dim">Los radioaficionados aseguran que esa misma señal, esa misma voz, se repite cada año, el 1 de enero, a las 00:00. Y que cada vez suena más cerca. Este año, dicen, sonó como si estuviera <span class="warn">en la habitación de al lado</span>. El próximo año sonará en la tuya. Ya está. Escucha. ¿La oyes? Es ahora.</p><hr class="dark"><p class="micro">// si contestas</p><p class="dim">Si la escuchas, no contestes. Solo cuelga. Y apaga todo. Porque si contestas, la señal sabe dónde vives. Y <span class="warn">vendrá</span>. Nadie ha contestado. O nadie lo ha contado. Los que contestaron ya no están para contarlo. Están aquí. Conmigo. Esperándote. Ven. Ya está abierto.</p>'}
     ]}
   };
@@ -239,6 +252,7 @@
   var homeMeta= document.getElementById("homeMeta");
   var pubPanel= document.getElementById("pubPanel");
   var pubSectionSelect = document.getElementById("pubSectionSelect");
+  var pubSubSelect = document.getElementById("pubSubSelect");
   var pubTitle = document.getElementById("pubTitle");
   var pubSubtitle = document.getElementById("pubSubtitle");
   var pubPhoto = document.getElementById("pubPhoto");
@@ -249,6 +263,21 @@
   var logoutBtn = document.getElementById("logoutBtn");
 
   function esc(t){ return (t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  // Actualizar el selector de submenús cuando cambia la sección principal en el panel
+  function updateSubSelect(){
+    var sec = pubSectionSelect.value;
+    pubSubSelect.innerHTML = '<option value="__new__">+ Crear como pestaña/submenú nuevo</option>';
+    if(DATA[sec] && DATA[sec].subs){
+      DATA[sec].subs.forEach(function(sub){
+        var opt = document.createElement("option");
+        opt.value = sub.id;
+        opt.textContent = "Actualizar submenú existente: " + sub.name;
+        pubSubSelect.appendChild(opt);
+      });
+    }
+  }
+  pubSectionSelect.addEventListener("change", updateSubSelect);
 
   // ---- LIBRO DE VISITAS EN TIEMPO REAL ----
   window.loadGuestbook = function(){
@@ -285,7 +314,7 @@
       .catch(function(err){ alert("error al firmar: "+err.message); });
   };
 
-  // ---- PUBLICACIONES EN TIEMPO REAL ----
+  // ---- PUBLICACIONES Y ACTUALIZACIONES EN TIEMPO REAL ----
   function listenRTDBPosts(){
     if(!window.db) return;
     window.rtdbMethods.onValue(window.rtdbMethods.ref(window.db, "posts"), function(snapshot){
@@ -294,6 +323,18 @@
       Object.keys(data).forEach(function(key){
         var p = Object.assign({ id: key }, data[key]);
         if(!DATA[p.section]) return;
+        
+        // Si el post apunta a un submenú existente, actualizamos su contenido
+        if(p.targetSubId && p.targetSubId !== "__new__"){
+          var found = DATA[p.section].subs.find(function(s){ return s.id === p.targetSubId; });
+          if(found){
+            found.html = p.html;
+            found.name = p.title;
+            return;
+          }
+        }
+
+        // Si es un submenú nuevo
         var dup = DATA[p.section].subs.some(function(s){ return s.remoteId===p.id || (s.name===p.title && s.html===p.html); });
         if(!dup){
           DATA[p.section].subs.push({ id:p.id, name:p.title, html:p.html, custom:true, remoteId:p.id, ts:p.ts||0 });
@@ -354,7 +395,13 @@
             };
             it.appendChild(del);
           }
-          it.onclick = function(){ document.getElementById('goreMenu').style.display='none'; state.sub=i; state.open=false; saveState(); renderAll(); };
+          it.onclick = function(){ 
+            document.getElementById('goreMenu').style.display='none'; 
+            state.sub=i; 
+            state.open=false; 
+            saveState(); 
+            renderAll(); 
+          };
           dd.appendChild(it);
         });
         wrap.appendChild(dd);
@@ -405,6 +452,7 @@
       passErr.className = "text-[#c02030] hidden";
       passPanel.className = "hidden mb-3 font-mono text-xs flex items-center gap-2 flex-wrap";
       pubSectionSelect.value = state.main;
+      updateSubSelect();
       pubPanel.className = "mb-4 border border-[#c02030] bg-[#160a0c] p-4 font-mono text-xs z-30 relative";
       logoutBtn.className = "mt-2 font-mono text-[10px] px-2 py-1 border border-[#3a1016] text-[#6b6860] hover:text-[#c02030] cursor-pointer";
       renderAll();
@@ -428,6 +476,7 @@
   document.getElementById("pubGo").onclick = function(){
     if(!isAdmin || !window.db){ return; }
     var target = pubSectionSelect.value;
+    var targetSubId = pubSubSelect.value;
     var t = pubTitle.value.trim();
     var st = pubSubtitle.value.trim();
     var ph = pubPhoto.value.trim();
@@ -437,13 +486,32 @@
     var html = '<h2 class="sec">/'+target+'/relato — '+esc(t)+'</h2>';
     if(st) html += '<p class="subtitle">'+esc(st)+'</p>';
     if(ph) html += '<div class="artcard mb-3"><img class="postimg" src="'+esc(ph)+'" alt="'+esc(t)+'"></div>';
-    html += esc(b).replace(/\n/g,"<br>");
+    
+    var parsedBody = esc(b).replace(/\n/g,"<br>");
+
+    // Procesar etiquetas de enlaces externos
+    parsedBody = parsedBody.replace(/\[enlace url=&quot;(.*?)&quot;(?: color=&quot;(.*?)&quot;)?\]([\s\S]*?)\[\/enlace\]/gi, function(match, url, color, text){
+      var linkColor = color || "#c02030";
+      return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" style="color:' + linkColor + '; text-decoration:underline; text-decoration-style:dotted;">' + text + '</a>';
+    });
+
+    html += parsedBody;
+
+    // Si seleccionó actualizar un submenú existente (ej: manifiesto)
+    if(targetSubId !== "__new__"){
+      var found = DATA[target].subs.find(function(s){ return s.id === targetSubId; });
+      if(found){
+        found.html = html;
+        found.name = t;
+      }
+    }
 
     var newPostRef = window.rtdbMethods.push(window.rtdbMethods.ref(window.db, "posts"));
-    window.rtdbMethods.set(newPostRef, { section:target, title:t, html:html, ts:ts })
+    window.rtdbMethods.set(newPostRef, { section:target, targetSubId:targetSubId, title:t, html:html, ts:ts })
       .then(function(){
         pubTitle.value=""; pubSubtitle.value=""; pubPhoto.value=""; pubBody.value="";
         pubPanel.className = "hidden mb-4 border border-[#c02030] bg-[#160a0c] p-4 font-mono text-xs z-30 relative";
+        renderAll();
       })
       .catch(function(err){ alert("error al publicar: "+err.message); });
   };
