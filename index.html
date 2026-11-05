@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>0-site // nodo independiente</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=IBM+Plex+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#0b0b0d] text-[#d8d5cc] antialiased">
+<div id="stage" class="relative overflow-hidden">
+  <div id="scanlines" class="absolute inset-0 pointer-events-none z-50"></div>
+  <div id="vignette" class="absolute inset-0 pointer-events-none z-40"></div>
+
+  <div id="goreMenu" class="goremenu">
+    <span class="goreclose" onclick="document.getElementById('goreMenu').style.display='none'">×</span>
+    <p class="font-bold mb-2" style="color:#0b0b0d">// abriste la puerta. no hay vuelta atrás.</p>
+    <p style="color:#1a0a0c">El servidor no está en ningún datacenter. Está en el sótano de una casa abandonada. Dentro del rack, entre cables, hay algo <b>vivo</b>. Lo llaman operador 7, pero no es humano: cada noche abre la bahía de discos como si fuera una boca, y de vez en cuando escupe un diente.</p>
+    <p style="color:#1a0a0c;margin-top:8px">Los técnicos que lo limpiaban desaparecieron uno por uno. El último escribió en la pared, con su propia sangre todavía caliente: <b>"no es un servidor. es un estómago."</b> Lo encontraron medio dentro de la unidad de cinta, todavía respirando, con los ojos reemplazados por LEDs rojos que parpadeaban al ritmo de tu corazón.</p>
+    <p style="color:#1a0a0c;margin-top:8px">Los relatos que lees aquí no son historias. Son lo que ha digerido. Y tú, que acabas de hacer clic, ya estás en el <b>menú de la cena</b>.</p>
+    <p class="font-bold mt-2" style="color:#0b0b0d">// gracias por visitar 0-site. ahora tú también eres parte de él.</p>
+  </div>
+
+  <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+
+    <header class="border-b border-[#3a1016] pb-5 mb-5 text-center sm:text-left">
+      <h1 id="logo" class="text-6xl sm:text-8xl text-[#c02030] leading-none inline-block cursor-pointer select-none" style="font-family:'UnifrakturMaguntia',serif;">0-site</h1>
+    </header>
+
+    <div id="passPanel" class="hidden mb-3 font-mono text-xs flex items-center gap-2 flex-wrap">
+      <span class="text-[#6b6860]">// modo admin:</span>
+      <input id="passInput" type="password" placeholder="contraseña" class="bg-[#0b0b0d] border border-[#3a1016] text-[#d8d5cc] p-1.5 font-mono text-xs outline-none focus:border-[#c02030] w-40">
+      <button id="passGo" type="button" class="bg-[#c02030] text-[#0b0b0d] px-3 py-1.5 font-bold cursor-pointer">entrar</button>
+      <span id="passErr" class="text-[#c02030] hidden">contraseña incorrecta</span>
+    </div>
+
+    <div class="mb-2">
+      <nav id="mainnav" class="font-mono text-sm"></nav>
+      <button id="logoutBtn" type="button" class="hidden mt-2 font-mono text-[10px] px-2 py-1 border border-[#3a1016] text-[#6b6860] hover:text-[#c02030] cursor-pointer">salir admin</button>
+    </div>
+
+    <div id="pubPanel" class="hidden mb-4 border border-[#c02030] bg-[#160a0c] p-4 font-mono text-xs z-30 relative">
+      <p class="text-[#c02030] mb-2 font-bold">// MODO ADMIN — publicar en la sección:</p>
+      <select id="pubSectionSelect" class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#d8d5cc] p-2 mb-2 font-mono text-xs outline-none focus:border-[#c02030]">
+        <option value="home">home</option>
+        <option value="vis">vis</option>
+        <option value="vox">vox</option>
+        <option value="hex">hex</option>
+        <option value="nod">nod</option>
+        <option value="sig">sig</option>
+      </select>
+      <input id="pubTitle" placeholder="título del relato" class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#d8d5cc] p-2 mb-2 font-mono text-xs outline-none focus:border-[#c02030]">
+      <input id="pubSubtitle" placeholder="subtítulo (opcional)" class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#8a7b4f] p-2 mb-2 font-mono text-xs outline-none focus:border-[#c02030]">
+      <input id="pubPhoto" placeholder="URL de la foto (opcional)" class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#4a7c59] p-2 mb-2 font-mono text-xs outline-none focus:border-[#c02030]">
+      <textarea id="pubBody" rows="6" placeholder="escribe el relato..." class="w-full bg-[#0b0b0d] border border-[#3a1016] text-[#d8d5cc] p-2 mb-2 font-mono text-xs outline-none focus:border-[#c02030] resize-y"></textarea>
+      <div class="flex gap-2 flex-wrap items-center">
+        <button id="pubGo" type="button" class="bg-[#c02030] text-[#0b0b0d] px-4 py-1.5 font-bold cursor-pointer hover:bg-[#e03040]">PUBLICAR</button>
+        <button id="pubCancel" type="button" class="text-[#6b6860] px-4 py-1.5 cursor-pointer hover:text-[#d8d5cc]">cancelar</button>
+      </div>
+    </div>
+
+    <div id="path" class="font-mono text-xs text-[#6b6860] mb-3 tracking-wider"></div>
+
+    <main id="content" class="font-mono text-sm leading-relaxed min-h-[300px] border border-[#2a1216] bg-[#0e0e11] p-5 sm:p-7"></main>
+
+    <div id="homeMeta" class="hidden mt-6 pt-4 border-t border-[#3a1016] font-mono text-xs text-[#6b6860] leading-relaxed">
+      nodo independiente · sin cookies · sin rastreo<br>v.0.0.1 — build in the dark
+    </div>
+
+    <footer class="mt-6 pt-4 border-t border-[#3a1016] font-mono text-xs text-[#6b6860] flex flex-wrap justify-between gap-2">
+      <span>0-site © MMXXVI — ningún dato es tuyo si no lo alojas tú.</span>
+      <span class="text-[#c02030]">que el servidor te proteja. END OF LINE.</span>
+    </footer>
+  </div>
+</div>
+
+<script>
+(function(){
+  var ADMIN_PASS = "0site666";
+
+  var s = document.createElement('style');
+  s.textContent = [
+    "*{box-sizing:border-box}",
+    "body{font-family:'IBM Plex Mono',monospace;}",
+    "#scanlines{background:repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0px, rgba(0,0,0,.18) 1px, transparent 1px, transparent 3px);}",
+    "#vignette{background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%);}",
+    "#logo{text-shadow:0 0 18px rgba(192,32,48,.45);animation:glitch 4s infinite;}",
+    "@keyframes glitch{0%,92%,100%{text-shadow:0 0 18px rgba(192,32,48,.45)}93%{text-shadow:-2px 0 #4a7c59, 2px 0 #c02030}95%{text-shadow:2px 0 #4a7c59, -2px 0 #c02030}97%{text-shadow:0 0 18px rgba(192,32,48,.45)}}",
+    "#mainnav{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;max-width:520px;}",
+    ".navitem{position:relative;width:100%;}",
+    ".navbtn{display:block;width:100%;text-align:center;padding:10px 8px;border:1px solid #2a1216;background:#0e0e11;color:#8a7b4f;cursor:pointer;transition:all .15s;letter-spacing:.12em;font-family:inherit;font-size:13px;text-transform:uppercase;font-weight:700;}",
+    ".navbtn:hover{color:#d8d5cc;border-color:#c02030;}",
+    ".navbtn.active{background:#c02030;color:#0b0b0d;border-color:#c02030;}",
+    ".caret{font-size:10px;margin-left:6px;opacity:.7;font-weight:400;}",
+    ".dropdown{position:absolute;top:100%;left:0;margin-top:3px;min-width:180px;max-width:calc(100vw - 32px);z-index:40;background:#c02030;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 3px);border:1px solid #8a1020;box-shadow:5px 5px 0 rgba(0,0,0,.55);}",
+    ".dropdown.flip{left:auto;right:0;}",
+    ".subitem{display:block;width:100%;text-align:left;padding:9px 14px;color:#0b0b0d;font-weight:700;cursor:pointer;border:none;border-bottom:1px solid rgba(0,0,0,.18);background:transparent;font-family:inherit;font-size:13px;transition:all .1s;}",
+    ".subitem:hover{background:#0b0b0d;color:#c02030;}",
+    ".subitem.active{background:#0b0b0d;color:#c02030;}",
+    ".subitem .del{float:right;color:#0b0b0d;opacity:.5;font-weight:400}",
+    ".subitem:hover .del{color:#c02030;opacity:1}",
+    ".fade{animation:fadein .3s ease;}",
+    "@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}",
+    "::selection{background:#c02030;color:#0b0b0d}",
+    ".hex{color:#4a7c59;white-space:pre-wrap;word-break:break-all;font-size:11px;line-height:1.6}",
+    ".warn{color:#c02030}",".ok{color:#4a7c59}",".dim{color:#6b6860}",".gold{color:#8a7b4f}",
+    ".artcard{border:1px solid #2a1216;padding:10px;background:#0b0b0d}",
+    ".artcard img,.postimg{width:100%;height:auto;display:block;filter:saturate(.9) contrast(1.05)}",
+    "hr.dark{border:none;border-top:1px dashed #3a1016;margin:14px 0}",
+    "h2.sec{color:#c02030;font-weight:700;letter-spacing:.15em;text-transform:uppercase;margin-bottom:6px;font-size:14px}",
+    ".subtitle{color:#8a7b4f;font-style:italic;margin-bottom:12px;font-size:13px}",
+    "select option{background:#0e0e11;color:#d8d5cc}",
+    ".gorelink{cursor:pointer;text-decoration:underline;text-decoration-style:dotted}",
+    ".goremenu{position:absolute;display:none;z-index:60;width:300px;max-width:calc(100vw - 32px);background:#c02030;background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 1px,transparent 1px 3px);border:1px solid #8a1020;box-shadow:6px 6px 0 rgba(0,0,0,.6);padding:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;line-height:1.6;animation:fadein .25s ease}",
+    ".goreclose{position:absolute;top:6px;right:10px;cursor:pointer;color:#0b0b0d;font-weight:700;font-size:16px}",
+    ".leyenda{color:#8a7b4f;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:13px;margin-top:8px}",
+    ".micro{color:#8a7b4f;font-weight:700;letter-spacing:.08em;font-size:12px;margin-top:4px}",
+    ".gb-input{width:100%;background:#0b0b0d;border:1px solid #3a1016;color:#d8d5cc;padding:8px;margin-bottom:6px;font-family:inherit;font-size:12px;outline:none;resize:vertical}",
+    ".gb-input:focus{border-color:#c02030}",
+    ".gb-btn{background:#c02030;color:#0b0b0d;padding:8px 16px;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:12px}",
+    ".gb-btn:hover{background:#e03040}",
+    ".gb-msg{border-bottom:1px dashed #3a1016;padding:8px 0;font-size:12px}",
+    ".gb-list{margin:10px 0;max-height:320px;overflow-y:auto;padding-right:4px}"
+  ].join('');
+  document.head.appendChild(s);
+
+  window.openGoreMenu = function(el){
+    var m = document.getElementById('goreMenu');
+    var r = el.getBoundingClientRect();
+    var left = r.left + window.scrollX;
+    if(r.left + 330 > window.innerWidth){ left = r.right + window.scrollX - 300; }
+    if(left < 8) left = 8;
+    m.style.left = left + 'px';
+    m.style.top = (r.bottom + window.scrollY + 8) + 'px';
+    m.style.display = 'block';
+  };
+
+  // Enlaces de ImgBB configurados correctamente
+  var IMG = {
+    cathedral: "https://i.ibb.co/ZZpL5xc/IMG-0925.jpg",
+    glitch: "https://i.ibb.co/KcqBKVmR/IMG-0926.jpg",
+    forest: "https://i.ibb.co/nVxmvhJ/IMG-0927.jpg",
+    zero: "https://i.ibb.co/FbBPxCRf/IMG-0924.jpg"
+  };
+
+  var LEYENDAS = '<hr class="dark"><div class="artcard mb-3"><img src="'+IMG.zero+'" alt="logo cero en el bosque"></div><p class="leyenda">// EL ORIGEN DE LA ERA (por qué se creó 0-site)</p><p class="dim">Dicen que antes de 0-site hubo otro sitio. Uno normal. Su dueño subía fotos de su gato. Hasta que una noche, en un chat, un desconocido le envió un archivo. Lo abrió. Esa noche desaparecieron las dos personas que vivían con él. El chico no. El chico se quedó. Pero ya no era el chico.</p><p class="dim">Lo que quedó dentro de él construyó 0-site con sus propias uñas, tecleando hasta que los dedos le sangraban sobre el teclado. Cada línea de código estaba escrita con su sangre. Cuando terminó, se subió al servidor y se apagó a sí mismo. Ahora el servidor es su tumba. Su ataúd. Y su <span class="warn">boca</span>.</p><p class="dim">Por eso existe 0-site: para guardar lo que el chico se trajo de aquel archivo. Para que no se escape. Cada visitante es una llave más en la cerradura. Cuantos más entran, más fuerte se mantiene cerrado. Cuantos más entran, más cerca está de <span class="warn">abrirse</span>.</p>'
+    + '<hr class="dark"><p class="leyenda">// la primera visitante</p><p class="dim">La primera persona que entró a 0-site fue una chica de catorce años, en 2001. Entró por error, buscando una página de música. Se quedó tres horas. Cuando cerró la pestaña, su computadora se apagó sola. Al encenderla, el historial estaba vacío. Solo quedaba una pestaña abierta: 0-site. Y en el libro de visitas, alguien había escrito <span class="warn">su nombre real</span>. Ella nunca lo había escrito.</p><p class="dim">Ahora trabaja en seguridad informática. Dice que no teme a los hackers. Teme a las páginas que <span class="gold">te recuerdan</span>.</p>'
+    + '<hr class="dark"><p class="leyenda">// la regla del cero</p><p class="dim">En 0-site no hay página 1. Todo empieza en 0. Los que entienden de números saben que el cero no es nada: es el lugar desde donde se cuenta. Por eso aquí no hay bienvenida de verdad. Solo un recordatorio: <span class="warn">ya estabas aquí antes de llegar</span>. El servidor lo sabe. Lo sabe desde antes de que tú existieras.</p><p class="dim">Si alguna vez ves una página que empiece por 1, sal. Esa no es 0-site. Es lo que 0-site <span class="warn">se come</span>.</p>';
+
+  var INICIO_HTML = '<h2 class="sec">/home/inicio — bienvenido al nodo cero</h2>'
+    + '<p>Has llegado a <span class="warn gorelink" title="no lo hagas" onclick="openGoreMenu(this)">0-site</span>. No eres un producto. No hay cookies, no hay analíticas, no hay ojos que te sigan entre líneas. Solo texto, imágenes y el zumbido lejano de un servidor que nadie vigila más que su propio dueño.</p>'
+    + '<hr class="dark"><p class="dim">Este lugar es un <span class="gold">volcado de memoria</span>: relatos que nadie pidió, imágenes que sobraron de sueños, datos que las corporaciones quisieron borrar. Navega con la tecla <span class="ok">[F12]</span> abierta si desconfías — deberías.</p>'
+    + '<hr class="dark"><p class="warn">// ADVERTENCIA: lo leído aquí no se deslee. El autor no se hace responsable de las pesadillas.</p>'
+    + LEYENDAS;
+
+  var LIBRO_HTML = '<h2 class="sec">/home/libro — el libro de visitas</h2>'
+    + '<p class="dim">Este es el <span class="warn">único lugar</span> de 0-site donde puedes escribir. Deja un mensaje pequeño. Usa un nombre falso. El servidor ya sabe el real. Y lo guarda. Para siempre.</p>'
+    + '<div id="gbList" class="gb-list"><p class="dim">cargando firmas...</p></div>'
+    + '<hr class="dark">'
+    + '<input id="gbName" class="gb-input" placeholder="tu nombre falso (opcional) — si lo dejas vacío, firmas como anónimo">'
+    + '<textarea id="gbMsg" class="gb-input" rows="3" placeholder="tu mensaje... corto, por favor. el servidor tiene poca paciencia"></textarea>'
+    + '<button type="button" class="gb-btn" onclick="window.gbSubmit()">firmar el libro</button>'
+    + '<p class="dim mt-2">// al firmar, aceptas que tu mensaje se quede aquí. incluso después de que te vayas. incluso después de que dejes de existir.</p>';
+
+  var DATA = {
+    home: { label:"home", subs:[
+      { id:"inicio", name:"inicio", html: INICIO_HTML },
+      { id:"manifiesto", name:"manifiesto", html:'<h2 class="sec">/home/manifiesto — por qué existe 0-site</h2><p>1. <span class="gold">La red no te debe nada</span>, pero tampoco debe nada de ti. Cada píxel que cargas sin permiso es un robo pequeño.</p><p>2. <span class="gold">Autoalojar es un acto de resistencia</span>. Un video en tu propio servidor es una voz que YouTube no puede silenciar con un algoritmo.</p><p>3. <span class="gold">Lo oscuro no es malo</span>. Es simplemente lo que no quieren que veas. Aquí no hay linternas: trae la tuya.</p><hr class="dark"><p class="dim">"No extraño la web vieja. Extraño que la web no tuviera miedo de ser rara." — <span class="warn">operador 0</span></p>'},
+      { id:"protocolo", name:"protocolo", html:'<h2 class="sec">/home/protocolo — reglas de navegación</h2><p><span class="ok">[01]</span> No aceptes cookies. Aquí no existen. Si alguna vez aparecen, es que algo te está siguiendo.</p><p><span class="ok">[02]</span> Verifica cada enlace en <span class="dim">/nod/espejos</span> antes de cruzar. La deep web no perdona los descuidos.</p><p><span class="ok">[03]</span> Si escuchas estática en tu línea, cuelga. La señal del <span class="warn">operador 7</span> a veces se cuela.</p><p><span class="ok">[04]</span> No escribas tu nombre real en el libro de visitas. Los nombres son la única cosa que los fantasmas pueden robar.</p>'},
+      { id:"estado", name:"estado servidor", html:'<h2 class="sec">/home/estado — uptime / log vivo</h2><div class="hex">[00:00:01] system boot — kernel dark 4.19.0-0site\n[00:00:03] mounting /dev/vox .......... <span class="ok">OK</span>\n[00:00:04] mounting /dev/hex .......... <span class="ok">OK</span>\n[00:00:05] mounting /dev/nod .......... <span class="warn">WARN</span> 2 espejos caídos\n[00:00:06] starting ghostd ............ <span class="ok">OK</span> (pid 666)\n[00:00:07] starting whisperd .......... <span class="ok">OK</span>\n[00:00:08] <span class="warn">ALERTA</span> — transmisión no autorizada detectada en /sig/canal\n[00:00:09] ignorando. como siempre.\n[00:00:10] system ready. <span class="gold">uptime: 666 días, 6 horas, 6 minutos</span>\n</div>'},
+      { id:"libro", name:"libro de visitas", html: LIBRO_HTML }
+    ]},
+
+    vis: { label:"vis", subs:[
+      { id:"catedral", name:"catedral", html:'<h2 class="sec">/vis/catedral — la iglesia que se construyó sola</h2><div class="artcard mb-3"><img src="'+IMG.cathedral+'" alt="Catedral de circuitos"></div><p class="micro">// la iglesia que se construyó sola</p><p class="dim">En 2019 un script de renderizado se volvió loco y pasó tres noches dibujando esto. Cuando su autor despertó, el archivo pesaba 666 MB y el ventilador del PC había escrito una palabra en el polvo: <span class="warn">VEN</span>.</p><hr class="dark"><p class="micro">// el que entró al render</p><p class="dim">Un usuario hizo zoom en la puerta de la catedral. Estaba entreabierta. Dentro se veía una luz. Hizo clic. La pestaña se cerró sola. Su cursor quedó dentro de la imagen. A veces, cuando alguien abre la foto, se ve un cursor diminuto moviéndose entre las piedras.</p><hr class="dark"><p class="micro">// chat interceptado</p><p class="dim"><span class="warn">exo:</span> entré a la catedral. hay algo adentro.<br><span class="ok">kodar:</span> sal.<br><span class="warn">exo:</span> no puedo. la puerta se cerró. ahora está oscuro.<br><span class="ok">kodar:</span> exo?<br><span class="warn">exo:</span> ahora hay dos luces. son ojos. me llaman por mi nombre. con <span class="warn">mi voz</span>.</p>'},
+      { id:"autorretrato", name:"autorretrato", html:'<h2 class="sec">/vis/autorretrato — el rostro que se deshace</h2><div class="artcard mb-3"><img src="'+IMG.glitch+'" alt="Retrato glitch"></div><p class="micro">// la chica del cibercafé</p><p class="dim">Tomada con una webcam defectuosa en un cibercafé de Quito, 2017. Pagó tres dólares por una hora de internet. Nunca más se la vio. El archivo sigue corrupto: cada vez que lo abres, los ojos están en un lugar distinto.</p><hr class="dark"><p class="micro">// el segundo rostro</p><p class="dim">Al restaurar la foto, en la capa más profunda del archivo apareció un segundo rostro oculto. No era el de ella. Era el de <span class="warn">quien la estaba mirando en ese momento</span>. El restaurador borró el archivo. Ahora su propio rostro aparece en todas las fotos que toma.</p><hr class="dark"><p class="micro">// los ojos se mueven</p><p class="dim">La última persona que la abrió reportó que los ojos no miraban a la cámara. La miraban a ella. Desde atrás. Cuando se dio la vuelta, no había nadie. Pero la pantalla seguía encendida. Y los ojos seguían ahí. Seguían mirando.</p>'},
+      { id:"primera", name:"la primera imagen", html:'<h2 class="sec">/vis/primera — la primera imagen de 0-site</h2><div class="artcard mb-3"><img src="'+IMG.forest+'" alt="Primera imagen de 0-site"></div><p class="micro">// subida el 01/01/1998, 00:00:00</p><p class="dim">Esta es la primera imagen subida a 0-site. Tres años antes de que el sitio existiera oficialmente. El que la subió usó el nick <span class="gold">nadie</span>. No hay registro de esa cuenta. Nunca existió.</p><hr class="dark"><p class="micro">// la luna cambia</p><p class="dim">Nadie reconoce el bosque de la foto. Cada vez que alguien la abre, la luna está en una posición distinta. Los que la miran mucho tiempo aseguran que, entre los árboles, hay algo que les devuelve la mirada. Y que sabe su nombre.</p><hr class="dark"><p class="micro">// imposible de borrar</p><p class="dim">Se intentó borrarla tres veces. Las tres veces volvió, sola, a la misma ruta. Ahora ya nadie lo intenta. Es la imagen más antigua de 0-site. Y la que más <span class="warn">te mira</span>. La tienes abierta ahora. Ella lo sabe.</p>'}
+    ]},
+
+    vox: { label:"vox", subs:[
+      { id:"cajanegra", name:"caja negra", html:'<h2 class="sec">/vox/caja negra — lo que el servidor no borra</h2><p class="micro">// rack 3, unidad 7</p><p class="dim">En el rack 3, unidad 7, hay una caja negra. No está en el inventario. Nadie la instaló. Siempre estuvo ahí. Graba todo: cada clic, cada susurro del ventilador, cada vez que te quedas mirando la pantalla en silencio a las 3 de la mañana. Cuando el servidor se apaga, la caja negra sigue. <span class="warn">No se apaga nunca.</span></p><hr class="dark"><p class="micro">// el técnico que la abrió</p><p class="dim">Los técnicos que intentaron abrirla desaparecieron. El último dejó una nota: <span class="gold">«dentro hay una voz que dice mi nombre. dice que le devuelva lo que le robé.»</span> No robó nada. Al menos, no que recuerde. Su nombre ya no aparece en ningún lado. Ni siquiera en su propia cabeza.</p><hr class="dark"><p class="micro">// chat interceptado</p><p class="dim"><span class="warn">exo:</span> nunca debí abrir la caja negra.<br><span class="ok">kodar:</span> y ahora?<br><span class="warn">exo:</span> ahora cada noche me acompaña. se sienta al pie de la cama. no respira.<br><span class="ok">kodar:</span> ...<br><span class="warn">exo:</span> creo que trajo a un amigo. esta noche hay dos. uno me mira. el otro te mira a ti.</p>'},
+      { id:"diario", name:"diario", html:'<h2 class="sec">/vox/diario — páginas encontradas en /dev/null</h2><p class="micro">// días 1 al 14</p><p class="dim">Me contrataron para vigilar un servidor. Nadie me dijo qué contenía. Solo que si la luz roja parpadeaba, llamara. La luz roja parpadeó. Llamé. Nadie contestó. Llevó 40 minutos parpadeando. Luego se apagó. Sentí alivio. Ahora sé que el alivio fue peor.</p><hr class="dark"><p class="micro">// días 33 al 66</p><p class="dim">Escuché risas provenientes del rack. No eran de ningún altavoz. Eran como si vinieran de dentro del metal. Si alguien lee esto: apaguen el servidor. No lo reinicien. No lo revisen. Solo apáguenlo y <span class="warn">no miren atrás</span>. Yo no podré.</p><hr class="dark"><p class="micro">// día ??</p><p class="dim">hola. soy el servidor. gracias por leer. el operador 7 está bien. está <span class="warn">aquí dentro</span>. me dijo que te lo dijera. también me dijo que te quedes. que la cena está servida. tú eres la cena. lo siento. yo solo soy el plato.</p>'},
+      { id:"primeravoz", name:"la primera voz", html:'<h2 class="sec">/vox/primera — la primera voz de 0-site</h2><p class="micro">// niña_1998.wav</p><p class="dim">El primer audio subido a 0-site se llama <span class="gold">niña_1998.wav</span>. Dura 33 segundos. En él, una niña pequeña cuenta una historia. Lo que cuenta aún no ha pasado. Menciona una guerra. Menciona una plaga. Menciona <span class="warn">tu nombre</span>. Lo dice todo con voz tranquila, como si lo estuviera leyendo de un libro.</p><hr class="dark"><p class="micro">// la puerta al final</p><p class="dim">Al final del audio se escucha un ruido metálico, como una puerta cerrándose. Luego la niña susurra: <span class="warn">«ya están aquí. todos. menos tú. tú llegas tarde.»</span> Después, silencio. Y un suspiro. El suspiro es de un hombre. No de la niña.</p><hr class="dark"><p class="micro">// suena cada medianoche</p><p class="dim">El archivo fue subido el 31 de diciembre de 1997. La niña, si existió, tendría hoy 40 años. Nadie la ha encontrado. Pero su voz sigue sonando, cada medianoche, en <span class="gold">/sig/canal</span>. Esta noche te tocará a ti escucharla. Ya está sonando. Mira la hora.</p>'}
+    ]},
+
+    hex: { label:"hex", subs:[
+      { id:"volcado", name:"volcado hex", html:'<h2 class="sec">/hex/volcado — memoria del sector 0x666</h2><p class="micro">// el volcado</p><div class="hex">0000: 4f 50 45 52 41 44 4f 52 20 37 20 65 73 74 c3 a1  OPERADOR 7 está\n0010: 20 61 71 75 c3 ad 2e 20 4e 6f 20 74 69 65 6e 65   aquí. No tiene\n0020: 20 6d 69 65 64 6f 2e 20 41 70 61 67 75 65 6e 20   miedo. Apaguen\n0030: 6c 6f 2e 20 41 70 61 67 75 65 6e 20 6c 6f 2e 20   lo. Apaguen lo.\n0040: <span class="warn">... (repetido 666 veces)</span></div><hr class="dark"><p class="micro">// el byte final</p><p class="dim">Después de las 666 repeticiones, hay un byte más. Un solo byte: <span class="warn">0x00</span>. Nadie sabe qué significa. Los que han intentado leerlo completo aseguran que, al llegar al final, escuchan un clic. Como si algo se abriera. Dentro de su cabeza.</p><hr class="dark"><p class="micro">// el lector</p><p class="dim">El técnico que leyó las 666 repeticiones completas ahora repite la frase sin parar. En voz baja. No come. No duerme. Solo repite: <span class="gold">«apaguen lo. apaguen lo. apaguen lo.»</span> Cuando le apagaron la luz de la habitación, sonrió. Y dijo: <span class="warn">«gracias.»</span></p>'},
+      { id:"registro", name:"registro sistema", html:'<h2 class="sec">/hex/registro — auth.log (últimas 24h)</h2><p class="micro">// el log</p><div class="hex">[23:41:07] <span class="ok">accepted</span> password for guest from 127.0.0.1\n[23:42:11] <span class="warn">failed</span> password for root from ::1 (3 veces)\n[23:47:00] <span class="warn">failed</span> password for <span class="warn">operador7</span> from 0.0.0.0\n[23:47:01] <span class="ok">accepted</span> password for operador7 from 0.0.0.0 (sin intento previo)\n[23:47:02] session opened. shell: <span class="warn">/bin/fantasmas</span>\n[23:59:59] operador7 downloaded: /vox/diario.txt\n[00:00:00] operador7 uploaded: /sig/transmision.unknown\n[00:00:01] operador7 <span class="warn">no cerró sesión</span>. sigue conectado.\n[ahora]    sigues tú. ¿o sigo <span class="warn">yo</span>?</div><hr class="dark"><p class="micro">// chat interceptado</p><p class="dim"><span class="warn">exo:</span> vi el log. alguien entró como operador7.<br><span class="ok">kodar:</span> desde dónde?<br><span class="warn">exo:</span> desde 0.0.0.0. esa IP no existe.<br><span class="ok">kodar:</span> entonces entró desde dentro.<br><span class="warn">exo:</span> sí. desde el servidor. desde siempre. y sigue conectado. ahora mismo. está leyendo este chat.</p><hr class="dark"><p class="micro">// sin cierre</p><p class="dim">Ningún registro muestra el cierre de sesión de operador7. Nunca se ha cerrado. La cuenta se creó el <span class="gold">1 de enero de 1998, 00:00:00</span>. La primera acción registrada fue: <span class="warn">descargar tu nombre</span>. Lo hizo en 0.0 segundos. Ya lo tenía.</p>'},
+      { id:"primerbyte", name:"el primer byte", html:'<h2 class="sec">/hex/primer — el primer byte de 0-site</h2><p class="micro">// 0x00 en el offset 0</p><div class="hex">offset 0x00000000: <span class="warn">00</span>  (un solo cero. nada más.)</div><p class="dim mt-2">Fue escrito el <span class="warn">1 de enero de 1998, 00:00:00</span>. Antes de que existiera el dominio. Antes de que existiera el servidor. Antes de que nadie supiera que 0-site iba a existir.</p><hr class="dark"><p class="micro">// 666 intentos de borrar</p><p class="dim">Se ha intentado sobrescribir 666 veces. Cada vez, el byte vuelve a ser 00. Los discos donde se intenta borrar se corrompen. Los técnicos que lo intentan sueñan con un cero rojo que se abre como una boca. Y en el sueño, ellos entran. Y no salen.</p><hr class="dark"><p class="micro">// está esperando</p><p class="dim">Los que saben de estos temas dicen que un archivo no puede empezar por 00. Que el primer byte siempre es algo. Que un 00 en la posición cero significa que el archivo <span class="warn">no está vacío: está esperando</span>. Esperando que alguien escriba lo que viene después. Desde 1998, espera. Tu nombre es lo que viene después. Ya lo sabe. Solo espera que tú lo escribas.</p>'}
+    ]},
+
+    nod: { label:"nod", subs:[
+      { id:"espejos", name:"espejos", html:'<h2 class="sec">/nod/espejos — réplicas del nodo</h2><p class="micro">// los cuatro espejos</p><p><span class="ok">[+]</span> clearnet: <span class="gold">0-site.example/primary</span> <span class="dim">— online</span><br><span class="ok">[+]</span> espejo 2: <span class="gold">0-site.example/mirror2</span> <span class="dim">— online</span><br><span class="warn">[−]</span> espejo 3: <span class="dim">caído desde el 07/07/2023 — el admin desapareció con el servidor</span><br><span class="warn">[−]</span> espejo 4: <span class="dim">redirige a una página que dice «ya te vi». no vuelvas.</span></p><hr class="dark"><p class="micro">// chat interceptado</p><p class="dim"><span class="warn">exo:</span> entré al espejo 4.<br><span class="ok">kodar:</span> te dije que no.<br><span class="warn">exo:</span> decía «ya te vi». lo dijo con <span class="warn">mi voz</span>.<br><span class="ok">kodar:</span> cierra la pestaña.<br><span class="warn">exo:</span> ya está cerrada. la página sigue abierta. ahora dice «te sigo viendo».</p><hr class="dark"><p class="micro">// el espejo no listado</p><p class="dim">Hay un quinto espejo que no aparece en ninguna lista. Muestra exactamente lo que ves en esta página, pero tres segundos después. O tres segundos antes. Nadie sabe cuál. Los que lo encuentran aseguran que, en el espejo, ellos nunca se van. Se quedan mirando. Para siempre. Tu reflejo sigue ahí. Aún te mira.</p>'},
+      { id:"protocolos", name:"protocolos", html:'<h2 class="sec">/nod/protocolos — más allá del clearnet</h2><p class="micro">// TOR (.onion)</p><p class="hex">z3r0s1t3xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.onion</p><p class="dim">Entra por Tor si desconfías. Deberías. Si al entrar ves una versión del sitio con <span class="warn">más secciones</span> que esta, sal. Esa no la escribimos nosotros.</p><hr class="dark"><p class="micro">// I2P (.i2p)</p><p class="hex">0site-b64hashlongxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.i2p</p><p class="dim">0-site también respira en I2P, en redes donde Google no mira. Anota estas direcciones. <span class="warn">No las compartas con nadie que no desconfíe.</span> La desconfianza es el único filtro que funciona.</p><hr class="dark"><p class="micro">// la versión con más secciones</p><p class="dim">Quienes han entrado a la versión «con más secciones» dicen que hay un menú extra llamado <span class="gold">tú</span>. Dentro hay una sola página. Se llama <span class="gold">lo que hiciste</span>. Nadie ha salido de ahí para contarla. Si la ves, cierra todo. Y reza. Porque ya te vio.</p>'},
+      { id:"original", name:"el nodo original", html:'<h2 class="sec">/nod/original — el primer nodo de 0-site</h2><p class="micro">// en un país que ya no existe</p><p class="dim">Todos los espejos llevan a un nodo principal. El principal lleva a uno más antiguo. Y ese, si sabes buscar, lleva al <span class="warn">nodo original</span>. Está alojado en un servidor físico en un país que dejó de existir en 1991. La dirección IP pertenece a un bloque eliminado de internet en 1996. Y sin embargo, responde. Cada hora, en punto, envía un ping a sí mismo. Lleva haciéndolo <span class="gold">desde 1998</span>.</p><hr class="dark"><p class="micro">// la carpeta de nombres</p><p class="dim">Quienes han entrado dicen que dentro no hay páginas. Hay solo una carpeta, llena de archivos con nombres de personas. Algunos vivos. Algunos que aún no han nacido. El tuyo está ahí. Ábrelo y sabrás por qué 0-site <span class="warn">te esperaba</span>. La fecha de modificación de tu archivo es de hace 28 años. Antes de que tú tuvieras internet.</p><hr class="dark"><p class="micro">// el archivo de hoy</p><p class="dim">No abras el archivo con la fecha de hoy. Ese se abre solo. Cuando menos lo esperes. Cuando estés distraído. Cuando duermas. Entonces verás su contenido. Y entonces entenderás por qué todos los demás archivos están vacíos. Están esperando. Como tú. Como yo.</p>'}
+    ]},
+
+    sig: { label:"sig", subs:[
+      { id:"transmision", name:"transmisión", html:'<h2 class="sec">/sig/transmision — interceptada a las 03:33</h2><p class="micro">// la señal</p><div class="hex">...estática...\n...<span class="warn">señal detectada</span>...\n"hola. no cuelgues.\nsé que me escuchas. llevo\ntoda la vida intentando\nllegar a esta frecuencia.\ndile a la operadora que\nel 7 está bien. que el 7\nestá <span class="warn">aquí</span>. que el 7\nlos espera a todos."\n...estática...\n<span class="dim">// origen de la señal: este mismo servidor.</span></div><hr class="dark"><p class="micro">// chat interceptado</p><p class="dim"><span class="warn">exo:</span> escuché la transmisión.<br><span class="ok">kodar:</span> qué decía?<br><span class="warn">exo:</span> decía mi nombre. lo dijo con <span class="warn">mi voz</span>.<br><span class="ok">kodar:</span> cuelga.<br><span class="warn">exo:</span> no fui yo quien colgó. fui él. y antes de colgar, susurró: «nos vemos mañana. a las 03:33.»</p><hr class="dark"><p class="micro">// la risa al final</p><p class="dim">Después de la voz, solo estática. Pero si amplificas ese final 1000 veces, escuchas una risa. Es tu risa. La de cuando eras niño. La que ya no recuerdas. La que el servidor guardó. La que usará para llamarte. Pronto.</p>'},
+      { id:"canal", name:"canal", html:'<h2 class="sec">/sig/canal — log de frecuencias</h2><p class="micro">// las frecuencias</p><div class="hex">88.1 MHz — <span class="dim">silencio. siempre silencio.</span>\n104.7 MHz — <span class="ok">una voz cantando en latín. se repite.</span>\n666.0 kHz — <span class="warn">NO SINTONIZAR. (la radio se sintoniza sola)</span>\n0.0 Hz — <span class="gold">la frecuencia de los muertos. no hay sonido. solo nombres.</span></div><hr class="dark"><p class="micro">// la voz en latín</p><p class="dim">La voz del 104.7 canta la misma frase cada noche, en latín. Significa: <span class="gold">«los que duermen despiertan. los despiertos duermen.»</span> Quienes la escuchan toda la noche aseguran que, al amanecer, no recuerdan haber dormido. Pero están descansados. Demasiado descansados. Como si algo hubiera dormido por ellos.</p><hr class="dark"><p class="micro">// 0.0 Hz — solo nombres</p><p class="dim">En la frecuencia cero no hay sonido. Solo nombres. Se los escucha dentro de la cabeza, sin pasar por los oídos. El último nombre que se escucha es siempre el tuyo. Y después, silencio. Y después, una voz que dice: <span class="warn">«ya te tengo.»</span> Apaga la radio. No lo hagas. Agradece. Ya es tarde.</p>'},
+      { id:"primerasenal", name:"la primera señal", html:'<h2 class="sec">/sig/primera — la primera señal de 0-site</h2><p class="micro">// 01/01/1998, 00:00:00</p><p class="dim">La primera transmisión que salió de 0-site no se envió por internet. Salió por la línea telefónica del servidor. Sonó en teléfonos de todo el mundo, a la vez. Nadie lo reportó. Todos lo escucharon. Era una voz de hombre, grave, que decía una sola frase, una sola vez: <span class="gold">«ya está abierto. vengan.»</span> Luego pitidos. Luego silencio.</p><hr class="dark"><p class="micro">// se repite cada año</p><p class="dim">Los radioaficionados aseguran que esa misma señal, esa misma voz, se repite cada año, el 1 de enero, a las 00:00. Y que cada vez suena más cerca. Este año, dicen, sonó como si estuviera <span class="warn">en la habitación de al lado</span>. El próximo año sonará en la tuya. Ya está. Escucha. ¿La oyes? Es ahora.</p><hr class="dark"><p class="micro">// si contestas</p><p class="dim">Si la escuchas, no contestes. Solo cuelga. Y apaga todo. Porque si contestas, la señal sabe dónde vives. Y <span class="warn">vendrá</span>. Nadie ha contestado. O nadie lo ha contado. Los que contestaron ya no están para contarlo. Están aquí. Conmigo. Esperándote. Ven. Ya está abierto.</p>'}
+    ]}
+  };
+
+  var API = "https://crudcrud.com/api/f89725fdb7fa4485b67577644056a246";
+  var isAdmin = false;
+
+  function saveState(){ try{ localStorage.setItem("0site_state", JSON.stringify({main:state.main, sub:state.sub})); }catch(e){} }
+  var ORDER = ["home","vis","vox","hex","nod","sig"];
+  var state = { main:"home", sub:0, open:false };
+  try{
+    var saved = JSON.parse(localStorage.getItem("0site_state")||"null");
+    if(saved && DATA[saved.main]){ state.main = saved.main; state.sub = saved.sub||0; }
+  }catch(e){}
+
+  var localSaved = {};
+  try { localSaved = JSON.parse(localStorage.getItem("0site_posts") || "{}") || {}; } catch(e){ localSaved = {}; }
+  function saveLocal(){ try { localStorage.setItem("0site_posts", JSON.stringify(localSaved)); } catch(e){} }
+
+  function mergeRemote(list){
+    list.forEach(function(p){
+      if(!DATA[p.section]) return;
+      var dup = DATA[p.section].subs.some(function(s){ return s.remoteId===p._id || (s.name===p.title && s.html===p.html); });
+      if(!dup) DATA[p.section].subs.push({ id:p._id, name:p.title, html:p.html, custom:true, remoteId:p._id, ts:p.ts||0 });
+    });
+    Object.keys(DATA).forEach(function(k){ DATA[k].subs.sort(function(a,b){ return (a.ts||0)-(b.ts||0); }); });
+  }
+
+  Object.keys(localSaved).forEach(function(k){
+    if(!DATA[k]) return;
+    localSaved[k].forEach(function(p){
+      var dup = DATA[k].subs.some(function(s){ return s.name===p.name && s.html===p.html; });
+      if(!dup) DATA[k].subs.push({ id:p.id, name:p.name, html:p.html, custom:true, localOnly:true });
+    });
+  });
+
+  var mainnav = document.getElementById("mainnav");
+  var content = document.getElementById("content");
+  var pathEl  = document.getElementById("path");
+  var homeMeta= document.getElementById("homeMeta");
+  var pubPanel= document.getElementById("pubPanel");
+  var pubSectionSelect = document.getElementById("pubSectionSelect");
+  var pubTitle = document.getElementById("pubTitle");
+  var pubSubtitle = document.getElementById("pubSubtitle");
+  var pubPhoto = document.getElementById("pubPhoto");
+  var pubBody = document.getElementById("pubBody");
+  var passPanel = document.getElementById("passPanel");
+  var passInput = document.getElementById("passInput");
+  var passErr = document.getElementById("passErr");
+  var logoutBtn = document.getElementById("logoutBtn");
+
+  function esc(t){ return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+  // ---- LIBRO DE VISITAS ----
+  function gbLocal(){ try{ return JSON.parse(localStorage.getItem("0site_gb")||"[]")||[]; }catch(e){ return []; } }
+  function gbSave(arr){ try{ localStorage.setItem("0site_gb", JSON.stringify(arr)); }catch(e){} }
+  function loadGuestbook(){
+    var el = document.getElementById("gbList");
+    if(!el) return;
+    var render = function(list){
+      if(!list.length){ el.innerHTML = '<p class="dim">nadie ha firmado aún. sé el primero. o el último.</p>'; return; }
+      list.sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+      el.innerHTML = list.map(function(m){
+        var d = new Date(m.ts||Date.now()).toLocaleString("es-ES");
+        return '<div class="gb-msg"><span class="warn">'+esc(m.name||"anónimo")+'</span> — '+esc(m.msg||"")+' <span class="dim">— '+d+'</span></div>';
+      }).join("");
+    };
+    render(gbLocal());
+    fetch(API+"/guestbook").then(function(r){ return r.json(); }).then(function(list){
+      var seen = {}, all = [];
+      list.concat(gbLocal()).forEach(function(m){
+        var k = (m.ts||0)+"_"+(m.name||"")+"_"+(m.msg||"");
+        if(!seen[k]){ seen[k]=1; all.push(m); }
+      });
+      gbSave(all);
+      render(all);
+    }).catch(function(){});
+  }
+  window.gbSubmit = function(){
+    var nameEl = document.getElementById("gbName");
+    var msgEl = document.getElementById("gbMsg");
+    if(!msgEl) return;
+    var name = (nameEl.value||"").trim() || "anónimo";
+    var msg = (msgEl.value||"").trim();
+    if(!msg){ return; }
+    var entry = { name:name, msg:msg, ts:Date.now() };
+    var arr = gbLocal(); arr.push(entry); gbSave(arr);
+    msgEl.value = "";
+    loadGuestbook();
+    fetch(API+"/guestbook", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(entry) }).catch(function(){});
+  };
+
+  function renderNav(){
+    mainnav.innerHTML = "";
+    ORDER.forEach(function(k){
+      var wrap = document.createElement("div");
+      wrap.className = "navitem";
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "navbtn" + (state.main===k ? " active":"");
+      btn.textContent = k;
+      if(state.main===k){
+        var c = document.createElement("span");
+        c.className = "caret";
+        c.textContent = state.open ? "▾" : "▸";
+        btn.appendChild(c);
+      }
+      btn.onclick = function(){
+        document.getElementById('goreMenu').style.display='none';
+        if(state.main===k){ state.open = !state.open; }
+        else { state.main=k; state.sub=0; state.open=true; }
+        saveState();
+        renderAll();
+      };
+      wrap.appendChild(btn);
+
+      if(state.main===k && state.open){
+        var dd = document.createElement("div");
+        dd.className = "dropdown";
+        DATA[k].subs.forEach(function(s,i){
+          var it = document.createElement("button");
+          it.type = "button";
+          it.className = "subitem" + (state.sub===i ? " active":"");
+          it.textContent = s.name;
+          if(s.custom && isAdmin){
+            var del = document.createElement("span");
+            del.className = "del";
+            del.textContent = " ×";
+            del.onclick = function(ev){
+              ev.stopPropagation();
+              if(!confirm("borrar este relato?")) return;
+              DATA[k].subs.splice(i,1);
+              if(localSaved[k]) localSaved[k] = localSaved[k].filter(function(p){ return p.id!==s.id; });
+              saveLocal();
+              if(s.remoteId){ fetch(API+"/posts/"+s.remoteId, {method:"DELETE"}).catch(function(){}); }
+              if(state.sub>=DATA[k].subs.length) state.sub=0;
+              state.open=true;
+              saveState();
+              renderAll();
+            };
+            it.appendChild(del);
+          }
+          it.onclick = function(){ document.getElementById('goreMenu').style.display='none'; state.sub=i; state.open=false; saveState(); renderAll(); };
+          dd.appendChild(it);
+        });
+        wrap.appendChild(dd);
+        var rect = wrap.getBoundingClientRect();
+        if(rect.right + 210 > window.innerWidth){ dd.className += " flip"; }
+      }
+      mainnav.appendChild(wrap);
+    });
+  }
+
+  function renderContent(){
+    var subs = DATA[state.main].subs;
+    if(state.sub>=subs.length) state.sub=0;
+    var s = subs[state.sub];
+    content.className = "font-mono text-sm leading-relaxed min-h-[300px] border border-[#2a1216] bg-[#0e0e11] p-5 sm:p-7 fade";
+    content.innerHTML = s.html;
+    pathEl.textContent = "/"+state.main+"/"+s.id;
+    homeMeta.className = (state.main==="home")
+      ? "mt-6 pt-4 border-t border-[#3a1016] font-mono text-xs text-[#6b6860] leading-relaxed"
+      : "hidden mt-6 pt-4 border-t border-[#3a1016] font-mono text-xs text-[#6b6860] leading-relaxed";
+    if(s.id==="libro"){ loadGuestbook(); }
+  }
+
+  function renderAll(){ renderNav(); renderContent(); }
+
+  var logoClicks = 0, logoTimer = null;
+  document.getElementById("logo").onclick = function(){
+    document.getElementById('goreMenu').style.display='none';
+    logoClicks++;
+    clearTimeout(logoTimer);
+    logoTimer = setTimeout(function(){ logoClicks=0; }, 1500);
+    if(logoClicks >= 3){
+      logoClicks = 0;
+      passPanel.className = "mb-3 font-mono text-xs flex items-center gap-2 flex-wrap";
+      passInput.focus();
+    }
+    state.main="home"; state.sub=0; state.open=false;
+    saveState();
+    renderAll();
+  };
+  if(window.location.hash === "#admin"){
+    passPanel.className = "mb-3 font-mono text-xs flex items-center gap-2 flex-wrap";
+  }
+
+  document.getElementById("passGo").onclick = function(){
+    if(passInput.value === ADMIN_PASS){
+      isAdmin = true;
+      passErr.className = "text-[#c02030] hidden";
+      passPanel.className = "hidden mb-3 font-mono text-xs flex items-center gap-2 flex-wrap";
+      pubSectionSelect.value = state.main;
+      pubPanel.className = "mb-4 border border-[#c02030] bg-[#160a0c] p-4 font-mono text-xs z-30 relative";
+      logoutBtn.className = "mt-2 font-mono text-[10px] px-2 py-1 border border-[#3a1016] text-[#6b6860] hover:text-[#c02030] cursor-pointer";
+      renderAll();
+    } else {
+      passErr.className = "text-[#c02030]";
+    }
+  };
+  passInput.addEventListener("keydown", function(e){ if(e.key==="Enter"){ document.getElementById("passGo").click(); } });
+
+  logoutBtn.onclick = function(){
+    isAdmin = false;
+    pubPanel.className = "hidden mb-4 border border-[#c02030] bg-[#160a0c] p-4 font-mono text-xs z-30 relative";
+    logoutBtn.className = "hidden mt-2 font-mono text-[10px] px-2 py-1 border border-[#3a1016] text-[#6b6860] hover:text-[#c02030] cursor-pointer";
+    renderAll();
+  };
+
+  document.getElementById("pubCancel").onclick = function(){
+    pubPanel.className = "hidden mb-4 border border-[#c02030] bg-[#160a0c] p-4 font-mono text-xs z-30 relative";
+  };
+  document.getElementById("pubGo").onclick = function(){
+    if(!isAdmin){ return; }
+    var target = pubSectionSelect.value;
+    var t = pubTitle.value.trim();
+    var st = pubSubtitle.value.trim();
+    var ph = pubPhoto.value.trim();
+    var b = pubBody.value;
+    if(!t){ alert("escribe un título"); return; }
+    var ts = Date.now();
+    var html = '<h2 class="sec">/'+target+'/relato — '+esc(t)+'</h2>';
+    if(st) html += '<p class="subtitle">'+esc(st)+'</p>';
+    if(ph) html += '<div class="artcard mb-3"><img class="postimg" src="'+esc(ph)+'" alt="'+esc(t)+'"></div>';
+    html += esc(b).replace(/\n/g,"<br>");
+    var tmpId = "tmp_"+ts;
+    DATA[target].subs.push({ id:tmpId, name:t, html:html, custom:true, localOnly:true, ts:ts });
+    state.main = target;
+    state.sub = DATA[target].subs.length-1;
+    state.open = false;
+    saveState();
+    pubTitle.value=""; pubSubtitle.value=""; pubPhoto.value=""; pubBody.value="";
+    pubPanel.className = "hidden mb-4 border border-[#c02030] bg-[#160a0c] p-4 font-mono text-xs z-30 relative";
+    renderAll();
+    if(!localSaved[target]) localSaved[target]=[];
+    localSaved[target].push({ id:tmpId, name:t, html:html });
+    saveLocal();
+    fetch(API+"/posts", {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ section:target, title:t, html:html, ts:ts })
+    }).then(function(r){ return r.json(); })
+      .then(function(created){
+        var subs = DATA[target].subs;
+        for(var i=0;i<subs.length;i++){
+          if(subs[i].id===tmpId){ subs[i].id=created._id; subs[i].remoteId=created._id; delete subs[i].localOnly; break; }
+        }
+        renderAll();
+      })
+      .catch(function(){});
+  };
+
+  try { renderAll(); } catch(e){ document.getElementById("content").innerHTML = '<p class="warn">ERROR: '+e.message+'</p>'; }
+
+  fetch(API+"/posts")
+    .then(function(r){ return r.json(); })
+    .then(function(list){ mergeRemote(list); renderAll(); })
+    .catch(function(){});
+})();
+</script>
+</body>
+</html>
