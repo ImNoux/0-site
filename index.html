@@ -26,7 +26,18 @@ body{min-height:100vh;background:radial-gradient(ellipse at 50% 15%,rgba(100,100
 .home-image{width:100%;aspect-ratio:930/340;display:block;object-fit:cover;filter:grayscale(100%) brightness(.78) contrast(1.1);border:1px solid #292929;box-shadow:0 0 30px rgba(0,0,0,.8);cursor:pointer;transition:.3s}
 .home-image:hover{filter:grayscale(100%) brightness(.95) contrast(1.1)}
 .image-caption{text-align:center;color:#999;font-size:13px;letter-spacing:3px;margin-top:18px;margin-bottom:35px;font-style:italic}
-nav{display:flex;justify-content:flex-start;flex-wrap:wrap;gap:5px;border-top:1px solid #292929;border-bottom:1px solid #292929;padding:15px 0;margin-bottom:35px;font-family:monospace}
+nav{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:5px;
+    border-top:1px solid #292929;
+    border-bottom:1px solid #292929;
+    padding:15px 0;
+    margin-bottom:35px;
+    font-family:monospace;
+}
 .nav-item{position:relative}
 .nav-button{color:#888;border:1px solid transparent;background:transparent;padding:10px 13px;font-family:monospace;font-size:11px;letter-spacing:2px;transition:.3s;cursor:pointer}
 .nav-button:hover,.nav-button.active{color:#fff;background:rgba(255,255,255,.035);border-color:#333}
