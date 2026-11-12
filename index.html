@@ -127,6 +127,42 @@ nav{gap:2px}
 .admin-record{align-items:flex-start;flex-direction:column}
 .admin-record .admin-actions{width:100%}
 }
+
+
+
+/* FORMATO DE COLOR INDIVIDUAL */
+.editor-color-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 14px}
+.editor-color-tools label{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #333;background:#0b0b0b;color:#aaa;font:10px monospace;letter-spacing:1px}
+
+/* Selectores circulares compactos, también en Safari/iPhone */
+.editor-color-tools input[type="color"],
+.title-color-input{
+    -webkit-appearance:none;
+    appearance:none;
+    box-sizing:border-box;
+    width:24px;
+    min-width:24px;
+    height:24px;
+    padding:0;
+    border:1px solid #555;
+    border-radius:50%;
+    background:transparent;
+    overflow:hidden;
+    cursor:pointer;
+}
+.editor-color-tools input[type="color"]::-webkit-color-swatch-wrapper,
+.title-color-input::-webkit-color-swatch-wrapper{
+    padding:0;
+}
+.editor-color-tools input[type="color"]::-webkit-color-swatch,
+.title-color-input::-webkit-color-swatch{
+    border:0;
+    border-radius:50%;
+}
+.title-color-row{display:flex;align-items:center;gap:12px;margin:12px 0}
+.title-color-row label{font:10px monospace;color:#888;letter-spacing:1px}
+.title-color-input{flex-shrink:0}
+
 </style>
 </head>
 
@@ -331,6 +367,9 @@ let currentContentToken=0;
 let savedEditorRange=null;
 
 const sections={
+INICIO:[
+{title:"Portada",description:"Historias que pertenecen únicamente a la portada de El Último Jardín."}
+],
 HOME:[
 {title:"Manifestación",description:"Algo ha comenzado a tomar forma. No sabemos qué lo provocó."},
 {title:"Protocolo",description:"Existen reglas que no fueron escritas para ser cuestionadas."},
@@ -546,7 +585,7 @@ function startPresence(user){
 
 /* MENÚS */
 
-Object.keys(sections).forEach(section=>{
+Object.keys(sections).filter(section=>section!=="INICIO").forEach(section=>{
     const menu=document.getElementById("menu-"+section);
 
     sections[section].forEach(item=>{
@@ -836,10 +875,26 @@ function renderAdminGuestbook(){
 
 /* CONTENIDO HTML SEGURO */
 
+function validHexColor(value){
+    return typeof value==="string"&&/^#[0-9a-fA-F]{6}$/.test(value);
+}
+
+function safeInlineColor(value){
+    if(typeof value!=="string")return "";
+    if(/^#[0-9a-fA-F]{6}$/.test(value))return value;
+
+    const rgb=value.match(/^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i);
+    if(!rgb)return "";
+
+    const channels=rgb.slice(1).map(Number);
+    if(channels.some(channel=>channel<0||channel>255))return "";
+    return `rgb(${channels.join(",")})`;
+}
+
 function safeHtml(html){
     const parser=new DOMParser();
     const doc=parser.parseFromString(String(html||""),"text/html");
-    const allowed=["P","BR","B","STRONG","I","EM","U","A","UL","OL","LI","IMG"];
+    const allowed=["P","BR","B","STRONG","I","EM","U","A","SPAN","UL","OL","LI","IMG"];
 
     function clean(parent){
         [...parent.childNodes].forEach(node=>{
@@ -889,11 +944,20 @@ function safeHtml(html){
                 return;
             }
 
+            const savedColor=(node.tagName==="A"||node.tagName==="SPAN")
+                ?(node.style.color||"")
+                :"";
+
             [...node.attributes].forEach(attr=>{
-                if(node.tagName!=="A"||!["href","target","rel"].includes(attr.name.toLowerCase())){
-                    node.removeAttribute(attr.name);
-                }
+                const name=attr.name.toLowerCase();
+                const keepLinkAttribute=node.tagName==="A"&&["href","target","rel"].includes(name);
+                const keepColorStyle=(node.tagName==="A"||node.tagName==="SPAN")&&name==="style";
+                if(!keepLinkAttribute&&!keepColorStyle)node.removeAttribute(attr.name);
             });
+
+            node.removeAttribute("style");
+            const safeColor=safeInlineColor(savedColor);
+            if(safeColor)node.style.color=safeColor;
 
             if(node.tagName==="A"){
                 try{
@@ -1011,6 +1075,7 @@ async function showCategory(section,title,description){
 
             const h=document.createElement("h3");
             h.textContent=item.title||"Sin título";
+            if(validHexColor(item.titleColor))h.style.color=item.titleColor;
 
             const body=document.createElement("div");
             body.className="publication-body";
@@ -1099,50 +1164,42 @@ async function showCategory(section,title,description){
     }
 }
 
-function showHome(){
-    if(guestbookListener){
-        guestbookListener.off("value");
-        guestbookListener=null;
-        latestGuestbookSnapshot=null;
-    }
-
-    document.getElementById("content-area").innerHTML="";
-    currentContentToken++;
-
-    saveData("gardenCategory",JSON.stringify({
-        section:"HOME",
-        title:"",
-        description:""
-    }));
-
+function showInicio(){
     closeMenus();
+    showCategory("INICIO","Portada",sections.INICIO[0].description);
 }
 
-document.getElementById("home-logo").addEventListener("click",showHome);
+function showHome(){
+    showCategory("HOME","Manifestación",sections.HOME[0].description);
+}
+
+document.getElementById("home-logo").addEventListener("click",showInicio);
 
 function restoreCategory(){
+    const content=document.getElementById("content-area");
     const saved=getSaved("gardenCategory");
 
     if(!saved){
-        showHome();
+        content.innerHTML="";
         return;
     }
 
     try{
         const data=JSON.parse(saved);
 
-        if(data.section==="HOME"&&!data.title){
-            showHome();
+        // INICIO solo se abre al tocar la imagen; nunca se restaura automáticamente.
+        if(data.section==="INICIO"){
+            content.innerHTML="";
             return;
         }
 
         const valid=sections[data.section]?.find(item=>item.title===data.title);
 
         if(valid)showCategory(data.section,valid.title,valid.description);
-        else showHome();
+        else content.innerHTML="";
 
     }catch(e){
-        showHome();
+        content.innerHTML="";
     }
 }
 
@@ -1193,24 +1250,32 @@ function showHomeScreen(){
         setTimeout(()=>home.style.opacity="1",100);
 
         saveData("gardenEntered","yes");
-        restoreCategory();
+        showInicio();
 
     },1500);
 }
 
 function initializePage(){
-    if(getSaved("gardenEntered")==="yes"){
-        document.getElementById("letter-screen").style.display="none";
+    typingStarted=false;
+    transitionStarted=false;
 
-        const home=document.getElementById("home-screen");
+    const letter=document.getElementById("letter-screen");
+    const home=document.getElementById("home-screen");
+
+    // La carta aparece una sola vez en este navegador. Después, se entra directo a la portada.
+    if(getSaved("gardenEntered")==="yes"){
+        letter.style.display="none";
+        letter.style.opacity="0";
         home.style.display="block";
         home.style.opacity="1";
-
-        restoreCategory();
-
-    }else{
-        typeWriter();
+        showInicio();
+        return;
     }
+
+    letter.style.display="flex";
+    home.style.display="none";
+    home.style.opacity="0";
+    typeWriter();
 }
 
 /* ACCESO OCULTO */
@@ -1322,7 +1387,7 @@ document.querySelectorAll(".admin-tab").forEach(button=>{
 
 /* SELECTORES DE MENÚ Y CATEGORÍA */
 
-function menuOptions(selected="HOME"){
+function menuOptions(selected="INICIO"){
     return Object.keys(sections).map(key=>
         `<option value="${key}" ${key===selected?"selected":""}>${key}</option>`
     ).join("");
@@ -1340,7 +1405,7 @@ function fillCategorySelect(menuSelect,categorySelect,selected=""){
     categorySelect.innerHTML=categoryOptions(menuSelect.value,selected);
 }
 
-function addLocationSelectors(menuValue="HOME",categoryValue="Manifestación"){
+function addLocationSelectors(menuValue="INICIO",categoryValue="Portada"){
     return `
     <label class="admin-status">MENÚ DONDE SE PUBLICARÁ</label>
     <select class="admin-select" id="record-menu">${menuOptions(menuValue)}</select>
@@ -1363,6 +1428,12 @@ function editorToolbar(){
         <button type="button" id="insert-image">INSERTAR IMAGEN</button>
     </div>
 
+    <div class="editor-color-tools">
+        <label>COLOR DE TEXTO <input type="color" id="editor-text-color" value="#c5c5c5" aria-label="Elegir color de texto"></label>
+        <button type="button" id="apply-text-color">APLICAR A SELECCIÓN</button>
+    </div>
+
+    <div class="editor-help">Selecciona una palabra, frase o fragmento y elige un color. Solo cambiará el texto seleccionado, incluso si está dentro de un enlace. Para cambiar el título completo, usa el selector de color del título.</div>
     <div class="editor-help">Para insertar un enlace o una imagen, coloca el cursor donde quieras añadirlo. Para los enlaces, selecciona primero una palabra o frase. Para las imágenes, introduce una URL directa de imagen (JPG, PNG, GIF o WEBP).</div>
 
     <div class="rich-editor" id="rich-editor" contenteditable="true" spellcheck="true"></div>`;
@@ -1484,6 +1555,69 @@ function setupEditor(initialHtml=""){
         document.execCommand("unlink",false,null);
 
         saveSelection();
+    });
+
+    const colorButton=document.getElementById("apply-text-color");
+    const colorInput=document.getElementById("editor-text-color");
+
+    colorButton.addEventListener("mousedown",event=>event.preventDefault());
+    colorButton.addEventListener("click",()=>{
+        const color=colorInput.value;
+
+        if(!validHexColor(color))return;
+        if(!restoreSelection()){
+            alert("Primero selecciona una palabra, frase o fragmento dentro del texto.");
+            return;
+        }
+
+        const selection=window.getSelection();
+        if(!selection||selection.isCollapsed){
+            alert("Primero selecciona el texto al que quieres cambiar el color.");
+            return;
+        }
+
+        const range=selection.getRangeAt(0);
+        if(!editor.contains(range.commonAncestorContainer))return;
+
+        const walker=document.createTreeWalker(editor,NodeFilter.SHOW_TEXT);
+        const textNodes=[];
+        while(walker.nextNode()){
+            const node=walker.currentNode;
+            if(node.nodeValue&&node.nodeValue.length&&range.intersectsNode(node))textNodes.push(node);
+        }
+
+        const coloredSpans=[];
+        textNodes.forEach(node=>{
+            const originalLength=node.nodeValue.length;
+            let start=node===range.startContainer?range.startOffset:0;
+            let end=node===range.endContainer?range.endOffset:originalLength;
+            start=Math.max(0,Math.min(start,originalLength));
+            end=Math.max(0,Math.min(end,originalLength));
+            if(end<=start)return;
+
+            let selectedNode=node;
+            if(start>0)selectedNode=selectedNode.splitText(start);
+            if(end-start<selectedNode.nodeValue.length)selectedNode.splitText(end-start);
+
+            const span=document.createElement("span");
+            span.style.color=color;
+            selectedNode.parentNode.insertBefore(span,selectedNode);
+            span.appendChild(selectedNode);
+            coloredSpans.push(span);
+        });
+
+        if(!coloredSpans.length){
+            alert("No se pudo aplicar el color a esa selección.");
+            return;
+        }
+
+        const newRange=document.createRange();
+        newRange.setStartBefore(coloredSpans[0]);
+        newRange.setEndAfter(coloredSpans[coloredSpans.length-1]);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+        savedEditorRange=newRange.cloneRange();
+        editor.focus({preventScroll:true});
     });
 
     const imageButton=document.getElementById("insert-image");
@@ -1609,8 +1743,8 @@ function renderAdminTab(tab){
 function renderPublicationEditor(editData=null){
     const panel=document.getElementById("admin-panel-content");
 
-    const menu=editData?.menu||"HOME";
-    const category=editData?.category||"Manifestación";
+    const menu=editData?.menu||"INICIO";
+    const category=editData?.category||(menu==="INICIO"?"Portada":"Manifestación");
 
     panel.innerHTML=`
     <div class="admin-box">
@@ -1620,6 +1754,10 @@ function renderPublicationEditor(editData=null){
 
         <label class="admin-status">TÍTULO</label>
         <input class="admin-input" id="record-title" maxlength="120" placeholder="Título de la publicación">
+        <div class="title-color-row">
+            <label for="record-title-color">COLOR DE ESTE TÍTULO</label>
+            <input class="title-color-input" type="color" id="record-title-color" value="#cccccc" aria-label="Color del título">
+        </div>
 
         <label class="admin-status">CONTENIDO</label>
         ${editorToolbar()}
@@ -1649,6 +1787,7 @@ function renderPublicationEditor(editData=null){
 
     if(editData){
         document.getElementById("record-title").value=editData.title||"";
+        document.getElementById("record-title-color").value=validHexColor(editData.titleColor)?editData.titleColor:"#cccccc";
     }
 
     document.getElementById("record-cancel").addEventListener("click",()=>{
@@ -1658,6 +1797,7 @@ function renderPublicationEditor(editData=null){
 
     document.getElementById("record-save").addEventListener("click",async()=>{
         const title=document.getElementById("record-title").value.trim();
+        const titleColor=document.getElementById("record-title-color").value;
         const editor=document.getElementById("rich-editor");
         const bodyHtml=safeHtml(editor.innerHTML);
         const status=document.getElementById("record-status");
@@ -1682,6 +1822,7 @@ function renderPublicationEditor(editData=null){
             menu:newMenu,
             category:newCategory,
             title,
+            titleColor:validHexColor(titleColor)?titleColor:"#cccccc",
             bodyHtml,
             updatedAt:firebase.firestore.FieldValue.serverTimestamp()
         };
@@ -1859,8 +2000,8 @@ async function loadPublicationList(){
 function renderFileEditor(editData=null){
     const panel=document.getElementById("admin-panel-content");
 
-    const menu=editData?.menu||"HOME";
-    const category=editData?.category||"Manifestación";
+    const menu=editData?.menu||"INICIO";
+    const category=editData?.category||(menu==="INICIO"?"Portada":"Manifestación");
 
     panel.innerHTML=`
     <div class="admin-box">
@@ -2140,13 +2281,11 @@ function renderConfiguration(){
 
     panel.innerHTML=`
     <div class="admin-box">
-        <p class="admin-subtitle">CONFIGURACIÓN DEL SITIO</p>
-
+        <p class="admin-subtitle">OTRAS CONFIGURACIONES</p>
+        <p class="admin-hint">Los colores se ajustan individualmente al editar cada publicación: el título tiene su propio selector y el contenido permite colorear solo el texto seleccionado.</p>
         <input class="admin-input" id="config-key" placeholder="Nombre de la opción">
         <textarea class="admin-textarea" id="config-value" placeholder="Valor"></textarea>
-
         <button class="admin-button" id="config-save">GUARDAR CONFIGURACIÓN</button>
-
         <p class="admin-status" id="config-status"></p>
         <div id="config-list" class="admin-status">Cargando...</div>
     </div>`;
@@ -2168,10 +2307,8 @@ function renderConfiguration(){
                 value,
                 updatedAt:firebase.firestore.FieldValue.serverTimestamp()
             });
-
             status.textContent="Configuración guardada.";
             loadConfig();
-
         }catch(error){
             console.error(error);
             status.textContent="No se pudo guardar. Revisa las reglas de Firestore.";
@@ -2197,6 +2334,7 @@ async function loadConfig(){
         }
 
         snapshot.forEach(doc=>{
+            if(doc.id.startsWith("__colores"))return;
             const row=document.createElement("div");
             row.className="admin-record";
 
