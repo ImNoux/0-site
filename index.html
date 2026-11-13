@@ -1053,19 +1053,23 @@ async function showCategory(section,title,description){
     content.appendChild(loading);
 
     try{
-        const snapshot=await firestore.collection("publicaciones")
-            .where("menu","==",section).get();
+        const [snapshot,files]=await Promise.all([
+            firestore.collection("publicaciones")
+                .where("menu","==",section)
+                .where("category","==",title)
+                .get(),
+            firestore.collection("archivos")
+                .where("menu","==",section)
+                .where("category","==",title)
+                .get()
+        ]);
 
         if(token!==currentContentToken)return;
 
         const docs=[];
 
         snapshot.forEach(doc=>{
-            const data=doc.data();
-
-            if(data.category===title){
-                docs.push({id:doc.id,...data});
-            }
+            docs.push({id:doc.id,...doc.data()});
         });
 
         const orderedPublications=sortRecords(docs);
@@ -1088,17 +1092,10 @@ async function showCategory(section,title,description){
             content.appendChild(article);
         });
 
-        const files=await firestore.collection("archivos")
-            .where("menu","==",section).get();
-
-        if(token!==currentContentToken)return;
-
         const matchingFiles=[];
 
         files.forEach(doc=>{
-            const item={id:doc.id,...doc.data()};
-
-            if(item.category===title)matchingFiles.push(item);
+            matchingFiles.push({id:doc.id,...doc.data()});
         });
 
         const orderedFiles=sortRecords(matchingFiles);
