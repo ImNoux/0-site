@@ -32,19 +32,18 @@ nav{
     align-items:center;
     flex-wrap:wrap;
     gap:5px;
-    border-top:1px solid #292929;
-    border-bottom:1px solid #292929;
+    border:0;
     padding:15px 0;
     margin-bottom:35px;
     font-family:monospace;
 }
 .nav-item{position:relative}
-.nav-button{color:#888;border:1px solid transparent;background:transparent;padding:10px 13px;font-family:monospace;font-size:11px;letter-spacing:2px;transition:.3s;cursor:pointer}
-.nav-button:hover,.nav-button.active{color:#fff;background:rgba(255,255,255,.035);border-color:#333}
+.nav-button{color:#aaa;border:1px solid #555;background:#292929;padding:10px 13px;font-family:monospace;font-size:11px;letter-spacing:2px;transition:.3s;cursor:pointer}
+.nav-button:hover,.nav-button.active{color:#fff;background:#414141;border-color:#777}
 .dropdown{display:none;position:absolute;top:calc(100% + 5px);left:0;width:205px;max-width:75vw;background:rgba(5,5,5,.98);border:1px solid #303030;box-shadow:0 12px 30px rgba(0,0,0,.9);z-index:50}
 #menu-OBL,#menu-ARC{left:auto;right:0}
 .dropdown.open{display:block;animation:appear .2s ease}
-.dropdown button{display:block;width:100%;padding:11px 12px;text-align:left;background:transparent;border:none;border-bottom:1px solid #202020;color:#999;font-family:Georgia,serif;font-size:11px;cursor:pointer}
+.dropdown button{display:block;width:100%;padding:11px 12px;text-align:left;background:transparent;border:0;color:#999;font-family:Georgia,serif;font-size:11px;cursor:pointer}
 .dropdown button:last-child{border-bottom:none}
 .dropdown button:hover{background:#151515;color:#eee}
 .content-area{min-height:180px;padding:5px 0 55px;text-align:left;animation:appear .5s ease}
@@ -52,7 +51,7 @@ nav{
 .content-description{color:#888;font-size:11px;line-height:1.9;max-width:600px}
 .content-area a{color:#c5a4a4;text-decoration:underline;text-underline-offset:3px}
 .content-area a:hover{color:#fff}
-.publication{max-width:700px;margin-top:25px;padding:20px 0;border-top:1px solid #292929}
+.publication{max-width:700px;margin-top:25px;padding:20px 0;border:0}
 .publication h3{font-size:14px;font-weight:normal;letter-spacing:1px;color:#ccc;margin-bottom:15px}
 .publication-body{font-size:12px;color:#999;line-height:1.9;white-space:normal;overflow-wrap:anywhere}
 .publication-body p{margin:0 0 12px}
@@ -88,10 +87,13 @@ nav{
 .admin-input,.admin-textarea,.admin-select{margin-top:12px}
 .admin-select{appearance:auto;color:#aaa}
 .admin-select option{background:#080808}
-.admin-nav{display:flex;flex-wrap:wrap;gap:7px;margin:20px 0;border-bottom:1px solid #292929;padding-bottom:15px}
-.admin-tab{background:transparent;border:1px solid #333;color:#888;padding:10px 13px;font-family:monospace;font-size:10px;cursor:pointer}
-.admin-tab.active,.admin-tab:hover{color:#fff;border-color:#888}
-.admin-record{padding:14px 0;border-bottom:1px solid #292929;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.admin-nav{display:flex;flex-wrap:wrap;gap:7px;margin:20px 0;border:0;padding-bottom:15px}
+.admin-tab{background:#292929;border:1px solid #555;color:#aaa;padding:10px 13px;font-family:monospace;font-size:10px;cursor:pointer}
+.admin-tab.active,.admin-tab:hover{color:#fff;border-color:#888;background:#414141}
+.admin-record{padding:14px 0;border:0;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.publication-group,.publication-category{border:1px solid #333;margin:8px 0;padding:10px;background:#090909}
+.publication-group>summary,.publication-category>summary{cursor:pointer;color:#bbb;font:11px monospace;letter-spacing:1px;padding:5px}
+.publication-category{margin-left:12px;background:#0d0d0d}
 .admin-record span{font-size:12px;color:#bbb;overflow-wrap:anywhere;min-width:0}
 .admin-record .admin-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:0;flex-shrink:0}
 .admin-record button{background:transparent;border:1px solid #444;color:#999;padding:7px 10px;font-size:10px;cursor:pointer}
@@ -105,6 +107,8 @@ nav{
 .editor-toolbar{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
 .editor-toolbar button{background:#111;border:1px solid #444;color:#aaa;padding:9px 12px;font-family:monospace;font-size:10px;cursor:pointer}
 .editor-toolbar button:hover{border-color:#888;color:#fff}
+.editor-size-control{display:flex;align-items:center;gap:5px;color:#888;font:9px monospace}
+.editor-size-control select{background:#080808;border:1px solid #444;color:#bbb;padding:7px;font:10px monospace}
 .rich-editor{min-height:180px;padding:14px;background:#080808;border:1px solid #333;color:#bbb;font-size:13px;line-height:1.8;outline:none;overflow-wrap:anywhere}
 .rich-editor:focus{border-color:#777}
 .rich-editor a{color:#c5a4a4;text-decoration:underline}
@@ -1180,7 +1184,7 @@ function restoreCategory(){
     const saved=getSaved("gardenCategory");
 
     if(!saved){
-        content.innerHTML="";
+        showInicio();
         return;
     }
 
@@ -1250,7 +1254,7 @@ function showHomeScreen(){
         setTimeout(()=>home.style.opacity="1",100);
 
         saveData("gardenEntered","yes");
-        showInicio();
+        restoreCategory();
 
     },1500);
 }
@@ -1268,7 +1272,7 @@ function initializePage(){
         letter.style.opacity="0";
         home.style.display="block";
         home.style.opacity="1";
-        showInicio();
+        restoreCategory();
         return;
     }
 
@@ -1426,6 +1430,8 @@ function editorToolbar(){
         <button type="button" id="insert-link">INSERTAR LINK</button>
         <button type="button" id="remove-link">QUITAR LINK</button>
         <button type="button" id="insert-image">INSERTAR IMAGEN</button>
+        <label class="editor-size-control">TAMAÑO TEXTO <select id="editor-font-size"><option value="12">12 px</option><option value="14" selected>14 px</option><option value="16">16 px</option><option value="18">18 px</option><option value="22">22 px</option><option value="28">28 px</option></select></label>
+        <label class="editor-size-control">TAMAÑO IMAGEN <select id="editor-image-size"><option value="auto">Original</option><option value="50%">50%</option><option value="70%">70%</option><option value="100%">100%</option></select></label>
     </div>
 
     <div class="editor-color-tools">
@@ -1443,6 +1449,28 @@ function setupEditor(initialHtml=""){
     const editor=document.getElementById("rich-editor");
 
     editor.innerHTML=safeHtml(initialHtml);
+    let selectedEditorImage=null;
+    editor.addEventListener("click",event=>{
+        if(event.target&&event.target.tagName==="IMG")selectedEditorImage=event.target;
+    });
+    const fontSizeControl=document.getElementById("editor-font-size");
+    fontSizeControl?.addEventListener("change",()=>{
+        editor.focus();
+        const selection=window.getSelection();
+        if(selection&&selection.rangeCount&&editor.contains(selection.anchorNode)){
+            document.execCommand("fontSize",false,"7");
+            editor.querySelectorAll('font[size="7"]').forEach(font=>{
+                const span=document.createElement("span");span.style.fontSize=fontSizeControl.value+"px";
+                span.innerHTML=font.innerHTML;font.replaceWith(span);
+            });
+        }else editor.style.fontSize=fontSizeControl.value+"px";
+    });
+    document.getElementById("editor-image-size")?.addEventListener("change",event=>{
+        if(!selectedEditorImage){alert("Selecciona primero una imagen del contenido.");return;}
+        selectedEditorImage.style.width=event.target.value;
+        selectedEditorImage.style.maxWidth="100%";
+        selectedEditorImage.style.height="auto";
+    });
     savedEditorRange=null;
 
     function saveSelection(){
@@ -1769,12 +1797,7 @@ function renderPublicationEditor(editData=null){
 
         <p class="admin-status" id="record-status"></p>
     </div>
-
-    <div class="admin-box">
-        <p class="admin-subtitle">PUBLICACIONES EXISTENTES</p>
-        <p class="admin-hint">Usa ↑ y ↓ para cambiar la posición de una publicación dentro de su categoría.</p>
-        <div id="record-list" class="admin-status">Cargando...</div>
-    </div>`;
+`;
 
     const menuSelect=document.getElementById("record-menu");
     const categorySelect=document.getElementById("record-category");
@@ -1867,7 +1890,7 @@ function renderPublicationEditor(editData=null){
 
             saveButton.textContent="PUBLICAR";
 
-            await loadPublicationList();
+            refreshPublicationManagement();
 
         }catch(error){
             console.error(error);
@@ -1878,122 +1901,61 @@ function renderPublicationEditor(editData=null){
         }
     });
 
-    loadPublicationList();
 }
 
 async function loadPublicationList(){
-    const list=document.getElementById("record-list");
-
+    const list=document.getElementById("publication-config-list");
     if(!list)return;
-
     try{
         const snapshot=await firestore.collection("publicaciones").get();
-
-        if(!document.getElementById("record-list"))return;
-
+        if(!document.getElementById("publication-config-list"))return;
         list.innerHTML="";
-
-        if(snapshot.empty){
-            list.textContent="No hay publicaciones todavía.";
-            return;
-        }
-
+        if(snapshot.empty){list.textContent="No hay publicaciones todavía.";return;}
         const docs=[];
-
-        snapshot.forEach(doc=>{
-            docs.push({id:doc.id,...doc.data()});
-        });
-
-        docs.sort((a,b)=>{
-            const groupA=(a.menu||"")+"|"+(a.category||"");
-            const groupB=(b.menu||"")+"|"+(b.category||"");
-
-            if(groupA!==groupB)return groupA.localeCompare(groupB);
-
-            return compareRecords(a,b);
-        });
-
-        const groupPositions={};
-
+        snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
+        const sectionsOrder=["INICIO","HOME","SHA","SEC","OBL","ARC"];
+        const categories={};
         docs.forEach(item=>{
-            const groupKey=(item.menu||"")+"|"+(item.category||"");
-
-            if(!groupPositions[groupKey]){
-                groupPositions[groupKey]=sortRecords(
-                    docs.filter(record=>
-                        record.menu===item.menu&&
-                        record.category===item.category
-                    )
-                );
-            }
-
-            const group=groupPositions[groupKey];
-            const position=group.findIndex(record=>record.id===item.id);
-
-            const row=document.createElement("div");
-            row.className="admin-record";
-
-            const label=document.createElement("span");
-            label.textContent=`${item.menu||""} / ${item.category||""} — ${item.title||"Sin título"}`;
-
-            const actions=document.createElement("div");
-            actions.className="admin-actions";
-
-            const up=document.createElement("button");
-            up.className="move-button";
-            up.textContent="↑";
-            up.title="Mover hacia arriba";
-            up.disabled=position===0;
-
-            up.addEventListener("click",()=>{
-                moveRecord("publicaciones",group,position,-1,loadPublicationList);
-            });
-
-            const down=document.createElement("button");
-            down.className="move-button";
-            down.textContent="↓";
-            down.title="Mover hacia abajo";
-            down.disabled=position===group.length-1;
-
-            down.addEventListener("click",()=>{
-                moveRecord("publicaciones",group,position,1,loadPublicationList);
-            });
-
-            const edit=document.createElement("button");
-            edit.textContent="EDITAR";
-
-            edit.addEventListener("click",()=>{
-                editingId=item.id;
-                renderPublicationEditor(item);
-            });
-
-            const remove=document.createElement("button");
-            remove.textContent="ELIMINAR";
-            remove.className="admin-danger";
-
-            remove.addEventListener("click",async()=>{
-                if(!confirm("¿Eliminar esta publicación?"))return;
-
-                try{
-                    await firestore.collection("publicaciones").doc(item.id).delete();
-                    loadPublicationList();
-
-                }catch(error){
-                    console.error(error);
-                    alert("No se pudo eliminar.");
-                }
-            });
-
-            actions.append(up,down,edit,remove);
-            row.append(label,actions);
-            list.appendChild(row);
+            const section=item.menu||"SIN SECCIÓN";
+            const category=item.category||"Sin categoría";
+            categories[section]??={};
+            categories[section][category]??=[];
+            categories[section][category].push(item);
         });
-
-    }catch(error){
-        console.error(error);
-        list.textContent="No se pudieron cargar las publicaciones. Revisa las reglas de Firestore.";
-    }
+        [...new Set([...sectionsOrder,...Object.keys(categories)])].forEach(section=>{
+            if(!categories[section])return;
+            const sectionBox=document.createElement("details");
+            sectionBox.className="publication-group";
+            const sectionTitle=document.createElement("summary");
+            sectionTitle.textContent=section;
+            sectionBox.appendChild(sectionTitle);
+            Object.keys(categories[section]).sort((a,b)=>a.localeCompare(b)).forEach(category=>{
+                const categoryBox=document.createElement("details");
+                categoryBox.className="publication-category";
+                const categoryTitle=document.createElement("summary");
+                categoryTitle.textContent=category;
+                categoryBox.appendChild(categoryTitle);
+                sortRecords(categories[section][category]).forEach(item=>{
+                    const row=document.createElement("div");row.className="admin-record";
+                    const label=document.createElement("span");label.textContent=item.title||"Sin título";
+                    const actions=document.createElement("div");actions.className="admin-actions";
+                    const edit=document.createElement("button");edit.textContent="EDITAR";
+                    edit.addEventListener("click",()=>{editingId=item.id;renderPublicationEditor(item);});
+                    const remove=document.createElement("button");remove.textContent="ELIMINAR";remove.className="admin-danger";
+                    remove.addEventListener("click",async()=>{
+                        if(!confirm("¿Eliminar esta publicación?"))return;
+                        try{await firestore.collection("publicaciones").doc(item.id).delete();loadPublicationList();}
+                        catch(error){console.error(error);alert("No se pudo eliminar.");}
+                    });
+                    actions.append(edit,remove);row.append(label,actions);categoryBox.appendChild(row);
+                });
+                sectionBox.appendChild(categoryBox);
+            });
+            list.appendChild(sectionBox);
+        });
+    }catch(error){console.error(error);list.textContent="No se pudieron cargar las publicaciones. Revisa las reglas de Firestore.";}
 }
+function refreshPublicationManagement(){if(document.getElementById("publication-config-list"))loadPublicationList();}
 
 /* ARCHIVOS */
 
@@ -2288,9 +2250,15 @@ function renderConfiguration(){
         <button class="admin-button" id="config-save">GUARDAR CONFIGURACIÓN</button>
         <p class="admin-status" id="config-status"></p>
         <div id="config-list" class="admin-status">Cargando...</div>
+    </div>
+    <div class="admin-box">
+        <p class="admin-subtitle">GESTIÓN DE PUBLICACIONES</p>
+        <p class="admin-hint">Abre una sección y después una categoría para editar o eliminar sus publicaciones. Los archivos permanecen en ARCHIVOS.</p>
+        <div id="publication-config-list" class="admin-status">Cargando publicaciones...</div>
     </div>`;
 
     loadConfig();
+    loadPublicationList();
 
     document.getElementById("config-save").addEventListener("click",async()=>{
         const key=document.getElementById("config-key").value.trim();
