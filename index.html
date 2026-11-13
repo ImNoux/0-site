@@ -368,7 +368,7 @@ let savedEditorRange=null;
 
 const sections={
 INICIO:[
-{title:"Portada",description:"Historias que pertenecen únicamente a la portada de El Último Jardín."}
+{title:"Portada",description:"La desconfianza es tu única protección. No todo lo que encuentres aquí quiere ser encontrado."}
 ],
 HOME:[
 {title:"Manifestación",description:"Algo ha comenzado a tomar forma. No sabemos qué lo provocó."},
@@ -1034,15 +1034,18 @@ async function showCategory(section,title,description){
 
     content.innerHTML="";
 
-    const heading=document.createElement("h2");
-    heading.className="content-title";
-    heading.textContent=title;
-
     const desc=document.createElement("p");
     desc.className="content-description";
     desc.textContent=description;
 
-    content.append(heading,desc);
+    if(section!=="INICIO"){
+        const heading=document.createElement("h2");
+        heading.className="content-title";
+        heading.textContent=title;
+        content.append(heading,desc);
+    }else{
+        content.appendChild(desc);
+    }
 
     const loading=document.createElement("p");
     loading.className="admin-status";
