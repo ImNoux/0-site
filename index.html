@@ -1191,9 +1191,9 @@ function restoreCategory(){
     try{
         const data=JSON.parse(saved);
 
-        // INICIO solo se abre al tocar la imagen; nunca se restaura automáticamente.
+        // Si la última sección guardada es INICIO, mostrar siempre la portada.
         if(data.section==="INICIO"){
-            content.innerHTML="";
+            showInicio();
             return;
         }
 
