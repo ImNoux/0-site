@@ -1099,6 +1099,34 @@ async function showCategory(section,title,description,updateUrl=false){
         content.appendChild(desc);
     }
 
+    if(section==="HOME"&&title==="Reglas"){
+        const rules=document.createElement("div");
+        rules.className="publication";
+        rules.style.marginTop="18px";
+        rules.style.padding="15px";
+        rules.style.border="1px solid #303030";
+        rules.style.background="#090909";
+        rules.innerHTML=`
+            
+            <h3 style="font-size:15px;font-weight:normal;letter-spacing:1px;color:#d0d0d0;margin:0 0 10px">REGLAS DE PERMANENCIA</h3>
+            <p style="font-size:12px;line-height:1.7;color:#999;margin:0 0 15px">Lee cada instrucción antes de continuar. No todas las reglas fueron escritas para protegerte.</p>
+            <ol style="margin:0;padding-left:20px;color:#aaa;font-size:12px;line-height:1.8">
+                <li style="padding:0 0 12px 4px">Si aparece un nuevo menú que no estaba allí antes, no lo abras. Cierra la página y espera unos minutos. Debería desaparecer.</li>
+                <li style="padding:0 0 12px 4px">Si escuchas un sonido mientras navegas por el archivo, no intentes localizar su origen.</li>
+                <li style="padding:0 0 12px 4px">Si una publicación aparece con fecha de mañana, no intentes actualizar la página.</li>
+                <li style="padding:0 0 12px 4px">Si encuentras tu propio nombre en la sección Rastros, abandona esa sección inmediatamente.</li>
+                <li style="padding:0 0 12px 4px">Si una puerta aparece dos veces en el mismo menú, no abras ninguna de las dos.</li>
+                <li style="padding:0 0 12px 4px">Si una publicación desaparece mientras la estás leyendo, no intentes buscarla nuevamente.</li>
+                <li style="padding:0 0 12px 4px">Si encuentras una sección llamada «El último jardín», recuerda que ya estás dentro.</li>
+                <li style="padding:0 0 12px 4px">Si encuentras una historia titulada «El espejo 4», no la leas. Nunca fue publicada.</li>
+                <li style="padding:0 0 0 4px">Si ninguna de las reglas anteriores parece tener sentido, no significa que estés a salvo.</li>
+            </ol>
+            
+        `;
+        content.appendChild(rules);
+        return;
+    }
+
     if(section==="ARC"&&title==="Rutas caducadas"){
         const archive=document.createElement("div");
         archive.className="publication";
