@@ -1111,16 +1111,15 @@ async function showCategory(section,title,description,updateUrl=false){
             <h3 style="font-size:15px;font-weight:normal;letter-spacing:1px;color:#d0d0d0;margin:0 0 10px">REGISTRO DE CONEXIÓN PERDIDO</h3>
             <p style="font-size:12px;line-height:1.7;color:#999;margin:0 0 15px">Algunos destinos dejaron de responder. Otros desaparecieron sin dejar rastro. Solo quedan direcciones incompletas y nombres almacenados en registros antiguos.</p>
             <div style="border-top:1px solid #292929;padding-top:12px;margin-top:10px">
-                <p style="font:10px monospace;letter-spacing:1px;color:#888;margin:0 0 7px">TOR / ONION — DIRECCIÓN FICTICIA</p>
-                <code style="display:block;overflow-wrap:anywhere;color:#bdbdbd;font-size:11px;line-height:1.7">nbeox5nr6owgw4fic3tfom2g3xo5sr4523zlkw3ird3isohb3mkbevrn.onion</code>
+                <p style="display:flex;align-items:center;gap:7px;font:10px monospace;letter-spacing:1px;color:#888;margin:0 0 7px"><img src="https://i.ibb.co/bj8644FP/IMG-1108.webp" alt="" width="14" height="14" style="width:14px;height:14px;object-fit:contain;display:block"> TOR / ONION</p>
+                <a href="http://nbeox5nr6owgw4fic3tfom2g3xo5sr4523zlkw3ird3isohb3mkbevrn.onion" target="_blank" rel="noopener noreferrer" style="display:block;overflow-wrap:anywhere;color:#bdbdbd;font-size:11px;line-height:1.7;text-decoration:underline;text-decoration-color:#555">nbeox5nr6owgw4fic3tfom2g3xo5sr4523zlkw3ird3isohb3mkbevrn.onion</a>
                 <p style="font:10px monospace;color:#777;margin:7px 0 0">ESTADO: DESTINO NO VERIFICADO</p>
             </div>
             <div style="border-top:1px solid #292929;padding-top:12px;margin-top:12px">
-                <p style="font:10px monospace;letter-spacing:1px;color:#888;margin:0 0 7px">I2P / EEPSITE — DESTINO FICTICIO</p>
-                <code style="display:block;overflow-wrap:anywhere;color:#bdbdbd;font-size:11px;line-height:1.7">archivo-perdido.i2p</code>
+                <p style="display:flex;align-items:center;gap:7px;font:10px monospace;letter-spacing:1px;color:#888;margin:0 0 7px"><img src="https://i.ibb.co/6JZkzTqQ/IMG-1109.png" alt="" width="14" height="14" style="width:14px;height:14px;object-fit:contain;display:block"> I2P / EEPSITE</p>
+                <a href="http://archivo-perdido.i2p" target="_blank" rel="noopener noreferrer" style="display:block;overflow-wrap:anywhere;color:#bdbdbd;font-size:11px;line-height:1.7;text-decoration:underline;text-decoration-color:#555">archivo-perdido.i2p</a>
                 <p style="font:10px monospace;color:#777;margin:7px 0 0">ESTADO: REGISTRO INACTIVO</p>
             </div>
-            <p style="font:9px monospace;color:#666;margin:15px 0 0">NOTA: DIRECCIONES DE EJEMPLO. NO CORRESPONDEN A SERVICIOS REALES.</p>
         `;
         content.appendChild(archive);
     }
@@ -1228,7 +1227,7 @@ async function showCategory(section,title,description,updateUrl=false){
             content.appendChild(article);
         });
 
-        if(!docs.length&&!matchingFiles.length){
+        if(!docs.length&&!matchingFiles.length&&!(section==="ARC"&&title==="Rutas caducadas")){
             const empty=document.createElement("p");
             empty.className="admin-status";
             empty.textContent="No hay publicaciones en esta sección.";
