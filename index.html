@@ -168,6 +168,12 @@ nav{gap:2px}
     border:0;
     border-radius:50%;
 }
+.title-format-toolbar{display:flex;gap:10px;margin:-4px 0 12px}
+.title-format-toolbar button{width:54px;height:48px;background:#101010;border:1px solid #444;color:#bbb;font-size:20px;cursor:pointer}
+.title-format-toolbar button:active{background:#242424;border-color:#888}
+.title-format-toolbar select{height:48px;background:#101010;border:1px solid #444;color:#bbb;padding:0 10px;font:10px monospace;letter-spacing:.5px}
+#record-title:empty:before{content:attr(data-placeholder);color:#666}
+#record-title{font-family:Arial,Helvetica,sans-serif;font-size:17px;line-height:1.5}
 .title-color-row{display:flex;align-items:center;gap:12px;margin:12px 0}
 .title-color-row label{font:10px monospace;color:#888;letter-spacing:1px}
 .title-color-input{flex-shrink:0}
@@ -187,12 +193,7 @@ nav{gap:2px}
 .publication-font-modern .publication-body p,
 .publication-font-modern .publication-body li{font-family:Arial,Helvetica,sans-serif}
 .publication-font-modern .publication-body{font-size:17px;line-height:1.62;color:#bdbdbd}
-.publication-font-modern h3{font-family:Arial,Helvetica,sans-serif;font-size:21px;line-height:1.35;letter-spacing:.2px;margin-bottom:10px;color:#d0d0d0}
-.publication-font-normal .publication-body,
-.publication-font-normal .publication-body p,
-.publication-font-normal .publication-body li{font-family:Georgia,"Times New Roman",serif}
-.publication-font-normal .publication-body{font-size:12px;line-height:1.65;color:#999}
-.publication-font-normal h3{font-family:Georgia,"Times New Roman",serif;font-size:14px;line-height:normal;letter-spacing:1px;margin-bottom:5px;color:#ccc}
+.publication-font-modern h3{font-family:Arial,Helvetica,sans-serif;font-size:21px;line-height:1.35;letter-spacing:.2px;margin-bottom:4px;color:#d0d0d0}
 @media(max-width:600px){.content-area{max-width:560px;width:100%}}
 </style>
 </head>
@@ -1206,11 +1207,12 @@ async function showCategory(section,title,description,updateUrl=false){
 
         orderedPublications.forEach(item=>{
             const article=document.createElement("article");
-            article.className="publication "+(item.fontStyle==="normal"?"publication-font-normal":"publication-font-modern");
+            article.className="publication publication-font-modern";
 
             if(item.title){
                 const h=document.createElement("h3");
-                h.textContent=item.title;
+                if(item.titleHtml)h.innerHTML=safeHtml(item.titleHtml);
+                else h.textContent=item.title;
                 if(validHexColor(item.titleColor))h.style.color=item.titleColor;
                 article.appendChild(h);
             }
@@ -2008,17 +2010,26 @@ function renderPublicationEditor(editData=null){
         ${addLocationSelectors(menu,category)}
 
         <label class="admin-status">TÍTULO (OPCIONAL SI PUBLICAS UNA IMAGEN)</label>
-        <input class="admin-input" id="record-title" maxlength="120" placeholder="Título de la publicación">
+        <div class="admin-input" id="record-title" contenteditable="true" role="textbox" aria-label="Título de la publicación" data-placeholder="Título de la publicación" style="min-height:44px;overflow-wrap:anywhere"></div>
+        <div class="title-format-toolbar" aria-label="Formato del título">
+            <button type="button" data-title-command="bold"><b>B</b></button>
+            <button type="button" data-title-command="italic"><i>I</i></button>
+            <button type="button" data-title-command="underline"><u>U</u></button>
+            <label class="editor-size-control">TAMAÑO
+                <select id="title-font-size" aria-label="Tamaño del título">
+                    <option value="14">Pequeño</option>
+                    <option value="17" selected>Normal</option>
+                    <option value="20">Grande</option>
+                    <option value="24">Muy grande</option>
+                    <option value="28">Extra grande</option>
+                    <option value="32">Máximo</option>
+                </select>
+            </label>
+        </div>
         <div class="title-color-row">
             <label for="record-title-color">COLOR DE ESTE TÍTULO</label>
             <input class="title-color-input" type="color" id="record-title-color" value="#cccccc" aria-label="Color del título">
         </div>
-
-        <label class="admin-status" for="record-font-style">TIPOGRAFÍA DE ESTA PUBLICACIÓN</label>
-        <select class="admin-select" id="record-font-style">
-            <option value="modern" selected>Sans Serif moderno (predeterminado)</option>
-            <option value="normal">Normal</option>
-        </select>
 
         <label class="admin-status">CONTENIDO</label>
         ${editorToolbar()}
@@ -2049,11 +2060,54 @@ function renderPublicationEditor(editData=null){
 
     setupEditor(editData?.bodyHtml||"");
 
+    const titleEditor=document.getElementById("record-title");
     if(editData){
-        document.getElementById("record-title").value=editData.title||"";
+        titleEditor.innerHTML=editData.titleHtml?safeHtml(editData.titleHtml):String(editData.title||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
         document.getElementById("record-title-color").value=validHexColor(editData.titleColor)?editData.titleColor:"#cccccc";
-        document.getElementById("record-font-style").value=editData.fontStyle==="normal"?"normal":"modern";
     }
+    let savedTitleRange=null;
+    function rememberTitleSelection(){
+        const selection=window.getSelection();
+        if(selection&&selection.rangeCount&&titleEditor.contains(selection.anchorNode))savedTitleRange=selection.getRangeAt(0).cloneRange();
+    }
+    titleEditor.addEventListener("keyup",rememberTitleSelection);
+    titleEditor.addEventListener("mouseup",rememberTitleSelection);
+    titleEditor.addEventListener("touchend",()=>setTimeout(rememberTitleSelection,80));
+    document.querySelectorAll("[data-title-command]").forEach(button=>{
+        button.addEventListener("mousedown",event=>event.preventDefault());
+        button.addEventListener("click",()=>{
+            if(savedTitleRange){
+                titleEditor.focus();
+                const selection=window.getSelection();
+                selection.removeAllRanges();selection.addRange(savedTitleRange);
+            }else titleEditor.focus();
+            document.execCommand(button.dataset.titleCommand,false,null);
+            rememberTitleSelection();
+        });
+    });
+    const titleSizeSelect=document.getElementById("title-font-size");
+    titleSizeSelect.addEventListener("mousedown",event=>event.stopPropagation());
+    titleSizeSelect.addEventListener("change",()=>{
+        titleEditor.focus();
+        const selection=window.getSelection();
+        const range=savedTitleRange&&titleEditor.contains(savedTitleRange.commonAncestorContainer)
+            ? savedTitleRange.cloneRange()
+            : document.createRange();
+        if(!(savedTitleRange&&titleEditor.contains(savedTitleRange.commonAncestorContainer))){
+            range.selectNodeContents(titleEditor);
+        }else if(range.collapsed){
+            range.selectNodeContents(titleEditor);
+        }
+        if(range.collapsed)return;
+        const span=document.createElement("span");
+        span.style.fontSize=titleSizeSelect.value+"px";
+        span.appendChild(range.extractContents());
+        range.insertNode(span);
+        const newRange=document.createRange();
+        newRange.selectNodeContents(span);
+        selection.removeAllRanges();selection.addRange(newRange);
+        savedTitleRange=newRange.cloneRange();
+    });
 
     document.getElementById("record-cancel").addEventListener("click",()=>{
         editingId=null;
@@ -2061,9 +2115,10 @@ function renderPublicationEditor(editData=null){
     });
 
     document.getElementById("record-save").addEventListener("click",async()=>{
-        const title=document.getElementById("record-title").value.trim();
+        const titleEditor=document.getElementById("record-title");
+        const title=titleEditor.innerText.trim();
+        const titleHtml=safeHtml(titleEditor.innerHTML);
         const titleColor=document.getElementById("record-title-color").value;
-        const fontStyle=document.getElementById("record-font-style").value==="normal"?"normal":"modern";
         const editor=document.getElementById("rich-editor");
         const bodyHtml=safeHtml(editor.innerHTML);
         const status=document.getElementById("record-status");
@@ -2090,8 +2145,8 @@ function renderPublicationEditor(editData=null){
             menu:newMenu,
             category:newCategory,
             title,
+            titleHtml,
             titleColor:validHexColor(titleColor)?titleColor:"#cccccc",
-            fontStyle,
             bodyHtml,
             updatedAt:firebase.firestore.FieldValue.serverTimestamp()
         };
@@ -2130,7 +2185,7 @@ function renderPublicationEditor(editData=null){
 
             editingId=null;
 
-            document.getElementById("record-title").value="";
+            document.getElementById("record-title").innerHTML="";
             editor.innerHTML="";
             savedEditorRange=null;
 
