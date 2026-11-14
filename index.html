@@ -46,15 +46,15 @@ nav{
 .dropdown button{display:block;width:100%;padding:11px 12px;text-align:left;background:transparent;border:0;color:#999;font-family:Georgia,serif;font-size:11px;cursor:pointer}
 .dropdown button:last-child{border-bottom:none}
 .dropdown button:hover{background:#151515;color:#eee}
-.content-area{min-height:180px;padding:5px 0 55px;text-align:left;animation:appear .5s ease}
+.content-area{min-height:180px;padding:5px 0 32px;text-align:left;animation:appear .5s ease}
 .content-title{color:#d5d5d5;font-size:15px;font-weight:normal;letter-spacing:1px;margin-bottom:12px}
 .content-description{color:#888;font-size:11px;line-height:1.9;max-width:600px}
 .content-area a{color:#c5a4a4;text-decoration:underline;text-underline-offset:3px}
 .content-area a:hover{color:#fff}
-.publication{max-width:700px;margin-top:25px;padding:20px 0;border:0}
-.publication h3{font-size:14px;font-weight:normal;letter-spacing:1px;color:#ccc;margin-bottom:15px}
-.publication-body{font-size:12px;color:#999;line-height:1.9;white-space:normal;overflow-wrap:anywhere}
-.publication-body p{margin:0 0 12px}
+.publication{max-width:700px;margin-top:14px;padding:12px 0;border:0}
+.publication h3{font-size:14px;font-weight:normal;letter-spacing:1px;color:#ccc;margin-bottom:8px}
+.publication-body{font-size:12px;color:#999;line-height:1.65;white-space:normal;overflow-wrap:anywhere}
+.publication-body p{margin:0 0 6px}
 .publication-body ul,.publication-body ol{padding-left:25px;margin:10px 0}
 .publication-body a{color:#c5a4a4;text-decoration:underline}
 .publication-body img{display:block;max-width:100%;width:auto;height:auto;max-height:650px;object-fit:contain;margin:18px 0;border:1px solid #292929}
@@ -239,7 +239,6 @@ nav{gap:2px}
         <div class="admin-nav">
             <button class="admin-tab active" data-admin-tab="publicaciones">PUBLICACIONES</button>
             <button class="admin-tab" data-admin-tab="archivos">ARCHIVOS</button>
-            <button class="admin-tab" data-admin-tab="configuracion">CONFIGURACIÓN</button>
             <button class="admin-tab" data-admin-tab="inicio">INICIO</button>
         </div>
         <div id="admin-panel-content"></div>
@@ -354,6 +353,17 @@ const auth=firebase.auth();
 const database=firebase.database();
 const firestore=firebase.firestore();
 const ADMIN_UID="CLFuoan5IpXSp2LRSMPlsIaYMbB3";
+const ADMIN_EMAIL_KEY="0site_admin_email";
+
+function syncAdminEmailField(){
+    const emailInput=document.getElementById("admin-email");
+    const rememberedEmail=localStorage.getItem(ADMIN_EMAIL_KEY)||"";
+    emailInput.value=rememberedEmail;
+    emailInput.style.display=rememberedEmail?"none":"block";
+    emailInput.required=!rememberedEmail;
+    document.getElementById("admin-password").placeholder=
+        rememberedEmail?"Contraseña":"Contraseña del administrador";
+}
 
 let currentUser=null;
 let gardenOnlineCount=0;
@@ -556,6 +566,22 @@ auth.onAuthStateChanged(async user=>{
         try{await auth.signInAnonymously()}
         catch(error){console.error("Error de autenticación anónima:",error)}
         return;
+    }
+
+    if(user.uid===ADMIN_UID && sessionStorage.getItem("0site_admin_panel_open")==="1"){
+        const adminScreen=document.getElementById("admin-screen");
+        document.getElementById("admin-login").style.display="none";
+        document.getElementById("admin-dashboard").style.display="block";
+        adminScreen.style.display="block";
+
+        const savedTab=localStorage.getItem("0site_admin_tab")||"publicaciones";
+        const allowedTabs=["publicaciones","archivos","inicio"];
+        const tab=allowedTabs.includes(savedTab)?savedTab:"publicaciones";
+
+        document.querySelectorAll(".admin-tab").forEach(button=>{
+            button.classList.toggle("active",button.dataset.adminTab===tab);
+        });
+        renderAdminTab(tab);
     }
 
     startPresence(user);
@@ -1301,12 +1327,26 @@ document.getElementById("home-logo").addEventListener("click",()=>{
 });
 
 function openAdmin(){
+    sessionStorage.setItem("0site_admin_panel_open","1");
     document.getElementById("admin-screen").style.display="block";
     document.getElementById("admin-login-status").textContent="";
     document.getElementById("admin-password").value="";
-    document.getElementById("admin-email").value="";
-    document.getElementById("admin-login").style.display="block";
-    document.getElementById("admin-dashboard").style.display="none";
+    syncAdminEmailField();
+
+    if(currentUser && currentUser.uid===ADMIN_UID){
+        document.getElementById("admin-login").style.display="none";
+        document.getElementById("admin-dashboard").style.display="block";
+        const savedTab=localStorage.getItem("0site_admin_tab")||"publicaciones";
+        const allowedTabs=["publicaciones","archivos","inicio"];
+        const tab=allowedTabs.includes(savedTab)?savedTab:"publicaciones";
+        document.querySelectorAll(".admin-tab").forEach(button=>{
+            button.classList.toggle("active",button.dataset.adminTab===tab);
+        });
+        renderAdminTab(tab);
+    }else{
+        document.getElementById("admin-login").style.display="block";
+        document.getElementById("admin-dashboard").style.display="none";
+    }
 
     if(guestbookListener){
         guestbookListener.off("value");
@@ -1317,6 +1357,7 @@ function openAdmin(){
 /* CERRAR PANEL ADMINISTRATIVO */
 
 document.getElementById("admin-close").addEventListener("click",()=>{
+    sessionStorage.removeItem("0site_admin_panel_open");
     document.getElementById("admin-screen").style.display="none";
 
     /*
@@ -1342,13 +1383,14 @@ document.getElementById("admin-close").addEventListener("click",()=>{
 /* LOGIN ADMINISTRADOR */
 
 document.getElementById("admin-login-button").addEventListener("click",async()=>{
-    const email=document.getElementById("admin-email").value.trim();
+    const rememberedEmail=localStorage.getItem(ADMIN_EMAIL_KEY)||"";
+    const email=rememberedEmail||document.getElementById("admin-email").value.trim();
     const password=document.getElementById("admin-password").value;
     const status=document.getElementById("admin-login-status");
     const button=document.getElementById("admin-login-button");
 
-    if(!email||!password){
-        status.textContent="Introduce correo y contraseña.";
+    if((!email&&!rememberedEmail)||!password){
+        status.textContent=rememberedEmail?"Introduce la contraseña.":"Introduce correo y contraseña.";
         return;
     }
 
@@ -1356,6 +1398,7 @@ document.getElementById("admin-login-button").addEventListener("click",async()=>
     status.textContent="Verificando acceso...";
 
     try{
+        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         const credential=await auth.signInWithEmailAndPassword(email,password);
 
         if(credential.user.uid!==ADMIN_UID){
@@ -1364,9 +1407,14 @@ document.getElementById("admin-login-button").addEventListener("click",async()=>
             return;
         }
 
+        localStorage.setItem(ADMIN_EMAIL_KEY,email);
+        sessionStorage.setItem("0site_admin_panel_open","1");
+        syncAdminEmailField();
+
         document.getElementById("admin-login").style.display="none";
         document.getElementById("admin-dashboard").style.display="block";
 
+        localStorage.setItem("0site_admin_tab","publicaciones");
         renderAdminTab("publicaciones");
 
     }catch(error){
@@ -1384,6 +1432,7 @@ document.querySelectorAll(".admin-tab").forEach(button=>{
 
         button.classList.add("active");
         editingId=null;
+        localStorage.setItem("0site_admin_tab",button.dataset.adminTab);
 
         renderAdminTab(button.dataset.adminTab);
     });
