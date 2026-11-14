@@ -174,27 +174,26 @@ nav{gap:2px}
 
 
 
-/* PREFERENCIAS DE LECTURA Y ESPACIADO */
-.display-settings{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:9px;margin:-18px auto 18px;padding:0 10px;color:#777;font:9px monospace;letter-spacing:1px}
-.display-settings label{display:flex;align-items:center;gap:6px}
-.display-settings select{background:#090909;border:1px solid #333;border-radius:0;color:#bbb;padding:6px 7px;font:10px monospace;max-width:145px}
-body.reading-modern,.reading-modern .section-category{font-family:Arial,Helvetica,sans-serif}
-body.reading-modern .publication-body,body.reading-modern .publication-body p,body.reading-modern .publication-body li{font-family:Arial,Helvetica,sans-serif}
-body.reading-modern .publication-body{font-size:17px;line-height:1.62;color:#bdbdbd}
-body.reading-modern .publication h3{font-family:Arial,Helvetica,sans-serif;font-size:21px;line-height:1.35;letter-spacing:.2px;margin-bottom:10px;color:#d0d0d0}
-body.reading-modern .content-title{font-family:Arial,Helvetica,sans-serif;font-size:20px;letter-spacing:.3px}
-body.reading-modern .content-description{font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.65}
-body.reading-example .content-area{max-width:560px;margin-left:auto;margin-right:auto}
-body.reading-example .publication{max-width:560px}
-body.reading-example .publication-body{max-width:560px}
-/* Separación reducida entre publicaciones, párrafos e imágenes */
-.publication{margin-top:6px;padding:6px 0}
+/* DISEÑO DE LECTURA: COLUMNA ESTRECHA Y ESPACIADO COMPACTO */
+.content-area{max-width:560px;margin-left:auto;margin-right:auto}
+.publication{max-width:560px;margin-top:6px;padding:6px 0}
 .publication h3{margin-bottom:5px}
+.publication-body{max-width:560px}
 .publication-body p{margin:0 0 3px}
 .publication-body img,.file-image{margin:2px 0}
 .publication-body ul,.publication-body ol{margin:5px 0}
-@media(max-width:600px){.display-settings{gap:7px;margin:-15px auto 15px}.display-settings label{gap:4px}.display-settings select{max-width:132px;padding:6px 5px}body.reading-modern .publication-body{font-size:17px;line-height:1.62}}
-
+/* Tipografía predeterminada: Sans Serif moderno */
+.publication-font-modern .publication-body,
+.publication-font-modern .publication-body p,
+.publication-font-modern .publication-body li{font-family:Arial,Helvetica,sans-serif}
+.publication-font-modern .publication-body{font-size:17px;line-height:1.62;color:#bdbdbd}
+.publication-font-modern h3{font-family:Arial,Helvetica,sans-serif;font-size:21px;line-height:1.35;letter-spacing:.2px;margin-bottom:10px;color:#d0d0d0}
+.publication-font-normal .publication-body,
+.publication-font-normal .publication-body p,
+.publication-font-normal .publication-body li{font-family:Georgia,"Times New Roman",serif}
+.publication-font-normal .publication-body{font-size:12px;line-height:1.65;color:#999}
+.publication-font-normal h3{font-family:Georgia,"Times New Roman",serif;font-size:14px;line-height:normal;letter-spacing:1px;margin-bottom:5px;color:#ccc}
+@media(max-width:600px){.content-area{max-width:560px;width:100%}}
 </style>
 </head>
 
@@ -241,21 +240,6 @@ body.reading-example .publication-body{max-width:560px}
             <div class="dropdown" id="menu-ARC"></div>
         </div>
     </nav>
-
-    <div class="display-settings" aria-label="Preferencias de lectura">
-        <label>TIPOGRAFÍA
-            <select id="reading-font">
-                <option value="normal">Normal</option>
-                <option value="modern">Sans serif</option>
-            </select>
-        </label>
-        <label>ANCHO DE PÁGINA
-            <select id="reading-width">
-                <option value="normal">Normal</option>
-                <option value="example">Ejemplo S-Config</option>
-            </select>
-        </label>
-    </div>
 
     <section class="content-area" id="content-area"></section>
 
@@ -1222,7 +1206,7 @@ async function showCategory(section,title,description,updateUrl=false){
 
         orderedPublications.forEach(item=>{
             const article=document.createElement("article");
-            article.className="publication";
+            article.className="publication "+(item.fontStyle==="normal"?"publication-font-normal":"publication-font-modern");
 
             if(item.title){
                 const h=document.createElement("h3");
@@ -2030,6 +2014,12 @@ function renderPublicationEditor(editData=null){
             <input class="title-color-input" type="color" id="record-title-color" value="#cccccc" aria-label="Color del título">
         </div>
 
+        <label class="admin-status" for="record-font-style">TIPOGRAFÍA DE ESTA PUBLICACIÓN</label>
+        <select class="admin-select" id="record-font-style">
+            <option value="modern" selected>Sans Serif moderno (predeterminado)</option>
+            <option value="normal">Normal</option>
+        </select>
+
         <label class="admin-status">CONTENIDO</label>
         ${editorToolbar()}
 
@@ -2062,6 +2052,7 @@ function renderPublicationEditor(editData=null){
     if(editData){
         document.getElementById("record-title").value=editData.title||"";
         document.getElementById("record-title-color").value=validHexColor(editData.titleColor)?editData.titleColor:"#cccccc";
+        document.getElementById("record-font-style").value=editData.fontStyle==="normal"?"normal":"modern";
     }
 
     document.getElementById("record-cancel").addEventListener("click",()=>{
@@ -2072,6 +2063,7 @@ function renderPublicationEditor(editData=null){
     document.getElementById("record-save").addEventListener("click",async()=>{
         const title=document.getElementById("record-title").value.trim();
         const titleColor=document.getElementById("record-title-color").value;
+        const fontStyle=document.getElementById("record-font-style").value==="normal"?"normal":"modern";
         const editor=document.getElementById("rich-editor");
         const bodyHtml=safeHtml(editor.innerHTML);
         const status=document.getElementById("record-status");
@@ -2099,6 +2091,7 @@ function renderPublicationEditor(editData=null){
             category:newCategory,
             title,
             titleColor:validHexColor(titleColor)?titleColor:"#cccccc",
+            fontStyle,
             bodyHtml,
             updatedAt:firebase.firestore.FieldValue.serverTimestamp()
         };
@@ -2595,21 +2588,5 @@ initializePage();
 }
 </script>
 
-<script>
-(function(){
-    const font=document.getElementById('reading-font');
-    const width=document.getElementById('reading-width');
-    if(!font||!width)return;
-    function apply(){
-        document.body.classList.toggle('reading-modern',font.value==='modern');
-        document.body.classList.toggle('reading-example',width.value==='example');
-        try{localStorage.setItem('0site-reading-font',font.value);localStorage.setItem('0site-reading-width',width.value)}catch(e){}
-    }
-    try{font.value=localStorage.getItem('0site-reading-font')||'normal';width.value=localStorage.getItem('0site-reading-width')||'normal'}catch(e){}
-    font.addEventListener('change',apply);
-    width.addEventListener('change',apply);
-    apply();
-})();
-</script>
 </body>
 </html>
