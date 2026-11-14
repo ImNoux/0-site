@@ -1846,7 +1846,15 @@ function renderPublicationEditor(editData=null){
 
         <p class="admin-status" id="record-status"></p>
     </div>
+
+    <div class="admin-box">
+        <p class="admin-subtitle">GESTIÓN DE PUBLICACIONES</p>
+        <p class="admin-hint">Abre una sección y después una categoría para editar o eliminar sus publicaciones. Los archivos permanecen en ARCHIVOS.</p>
+        <div id="publication-config-list" class="admin-status">Cargando publicaciones...</div>
+    </div>
 `;
+
+    loadPublicationList();
 
     const menuSelect=document.getElementById("record-menu");
     const categorySelect=document.getElementById("record-category");
