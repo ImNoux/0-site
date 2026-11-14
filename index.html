@@ -47,6 +47,11 @@ nav{
 .dropdown button:last-child{border-bottom:none}
 .dropdown button:hover{background:#151515;color:#eee}
 .content-area{min-height:180px;padding:5px 0 32px;text-align:left;animation:appear .5s ease}
+.section-category{display:block;width:100%;max-width:620px;margin-top:12px;padding:13px 14px;text-align:left;background:#101010;border:1px solid #303030;color:#c9c9c9;font-family:Georgia,"Times New Roman",serif;cursor:pointer}
+.section-category strong{display:block;font-size:13px;font-weight:normal;letter-spacing:.5px;margin-bottom:5px}
+.section-category span{display:block;color:#777;font-size:11px;line-height:1.6}
+.section-category:hover{background:#181818;border-color:#666;color:#fff}
+
 .content-title{color:#d5d5d5;font-size:15px;font-weight:normal;letter-spacing:1px;margin-bottom:12px}
 .content-description{color:#888;font-size:11px;line-height:1.9;max-width:600px}
 .content-area a{color:#c5a4a4;text-decoration:underline;text-underline-offset:3px}
@@ -385,31 +390,31 @@ INICIO:[
 {title:"Portada",description:"La desconfianza es tu única protección. No todo lo que encuentres aquí quiere ser encontrado."}
 ],
 HOME:[
-{title:"Manifestación",description:"Algo ha comenzado a tomar forma. No sabemos qué lo provocó."},
-{title:"Protocolo",description:"Existen reglas que no fueron escritas para ser cuestionadas."},
-{title:"Estado del servidor",description:"La conexión permanece activa. El origen sigue sin identificarse."},
-{title:"Libro de visitas",description:"Algunos dejaron constancia de su llegada. Otros nunca debieron hacerlo."}
+{title:"Entrada",legacyTitle:"Manifestación",description:"Algo ha comenzado a tomar forma. No sabemos qué lo provocó."},
+{title:"Reglas",legacyTitle:"Protocolo",description:"Existen reglas que no fueron escritas para ser cuestionadas."},
+{title:"Nodo",legacyTitle:"Estado del servidor",description:"La conexión permanece activa. El origen sigue sin identificarse."},
+{title:"Rastros",legacyTitle:"Libro de visitas",description:"Algunos dejaron constancia de su llegada. Otros nunca debieron hacerlo."}
 ],
 SHA:[
-{title:"Caminos ocultos",description:"No todos los caminos aparecen cuando los buscas."},
-{title:"El otro lado",description:"Hay algo al otro lado que parece estar esperando."},
+{title:"Desvíos",legacyTitle:"Caminos ocultos",description:"No todos los caminos aparecen cuando los buscas."},
+{title:"Frontera",legacyTitle:"El otro lado",description:"Hay algo al otro lado que parece estar esperando."},
 {title:"Reflejos",description:"A veces, lo que te observa no es tu reflejo."}
 ],
 SEC:[
 {title:"Registros borrados",description:"Información eliminada que todavía deja rastros."},
-{title:"Conexiones fantasmas",description:"Señales que permanecen activas sin un origen conocido."}
+{title:"Señales",legacyTitle:"Conexiones fantasmas",description:"Señales que permanecen activas sin un origen conocido."}
 ],
 OBL:[
-{title:"Foros muertos",description:"Conversaciones abandonadas que todavía reciben visitas."},
-{title:"Ubicaciones que no existen",description:"Lugares registrados en mapas que nunca fueron encontrados."},
-{title:"Registros que nadie borró",description:"Archivos que permanecieron intactos durante años."},
-{title:"Usuarios olvidados",description:"Cuentas sin actividad. Sus nombres siguen apareciendo."}
+{title:"Puerta negra",legacyTitle:"Foros muertos",description:"Conversaciones abandonadas que todavía reciben visitas."},
+{title:"Vacíos",legacyTitle:"Ubicaciones que no existen",description:"Lugares registrados en mapas que nunca fueron encontrados."},
+{title:"Voces Olvidadas",legacyTitle:"Registros que nadie borró",description:"Archivos que permanecieron intactos durante años."},
+{title:"Memorias muertas",legacyTitle:"Usuarios olvidados",description:"Cuentas sin actividad. Sus nombres siguen apareciendo."}
 ],
 ARC:[
-{title:"Restos de 0-Site",description:"Fragmentos de una estructura que dejó de existir."},
-{title:"Conexiones antiguas",description:"Vínculos con redes que ya no deberían estar disponibles."},
-{title:"Registros viejos",description:"Documentos recuperados de servidores olvidados."},
-{title:"Lo que sobrevivió",description:"No todo desapareció cuando el sistema cayó."}
+{title:"Restos",legacyTitle:"Restos de 0-Site",description:"Fragmentos de una estructura que dejó de existir."},
+{title:"Espejos",legacyTitle:"Conexiones antiguas",description:"Vínculos con redes que ya no deberían estar disponibles."},
+{title:"Rutas caducadas",legacyTitle:"Registros viejos",description:"Direcciones recuperadas de redes olvidadas. Algunas dejaron de responder; otras solo sobreviven en registros incompletos."},
+{title:"FAQ",legacyTitle:"Lo que sobrevivió",description:"No todo desapareció cuando el sistema cayó."}
 ]
 };
 
@@ -613,6 +618,16 @@ function startPresence(user){
     }
 }
 
+/* RUTAS COMPARTIBLES */
+function routeSlug(value){
+    return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+}
+function sectionPath(section){return "/"+String(section).toLowerCase();}
+function categoryPath(section,title){return "/"+routeSlug(title);}
+function changePublicUrl(path,replace=false){
+    if(location.pathname!==path){history[replace?"replaceState":"pushState"]({},"",path);}
+}
+
 /* MENÚS */
 
 Object.keys(sections).filter(section=>section!=="INICIO").forEach(section=>{
@@ -621,7 +636,7 @@ Object.keys(sections).filter(section=>section!=="INICIO").forEach(section=>{
     sections[section].forEach(item=>{
         const button=document.createElement("button");
         button.textContent=item.title;
-        button.addEventListener("click",()=>showCategory(section,item.title,item.description));
+        button.addEventListener("click",()=>showCategory(section,item.title,item.description,true));
         menu.appendChild(button);
     });
 });
@@ -664,11 +679,11 @@ function showGuestbook(){
     latestGuestbookSnapshot=null;
 
     content.innerHTML=`
-    <h2 class="content-title">Libro de visitas</h2>
+    <h2 class="content-title">Rastros</h2>
     <p class="content-description">Algunos dejaron constancia de su llegada. Otros nunca debieron hacerlo.</p>
 
     <div class="guest-entry">
-        <div class="guest-label">LIBRO DE VISITAS · REGISTRO FIJADO</div>
+        <div class="guest-label">RASTROS · REGISTRO FIJADO</div>
         <div class="guest-user">zurg</div>
         <div class="guest-name">Amalia Montenegro</div>
         <div class="guest-phrase">«Anoche soñé con este jardín. Hoy encontré esta página».</div>
@@ -1047,14 +1062,15 @@ function isImageUrl(rawUrl){
 
 /* MOSTRAR CATEGORÍAS */
 
-async function showCategory(section,title,description){
+async function showCategory(section,title,description,updateUrl=false){
     closeMenus();
+    if(updateUrl)changePublicUrl(categoryPath(section,title));
 
     saveData("gardenCategory",JSON.stringify({
         section,title,description
     }));
 
-    if(section==="HOME"&&title==="Libro de visitas"){
+    if(section==="HOME"&&(title==="Rastros"||title==="Libro de visitas")){
         showGuestbook();
         return;
     }
@@ -1083,30 +1099,57 @@ async function showCategory(section,title,description){
         content.appendChild(desc);
     }
 
+    if(section==="ARC"&&title==="Rutas caducadas"){
+        const archive=document.createElement("div");
+        archive.className="publication";
+        archive.style.marginTop="18px";
+        archive.style.padding="15px";
+        archive.style.border="1px solid #303030";
+        archive.style.background="#090909";
+        archive.innerHTML=`
+            <p style="font:10px monospace;letter-spacing:1.5px;color:#888;margin:0 0 12px">ARCHIVO 004 // RUTAS CADUCADAS</p>
+            <h3 style="font-size:15px;font-weight:normal;letter-spacing:1px;color:#d0d0d0;margin:0 0 10px">REGISTRO DE CONEXIÓN PERDIDO</h3>
+            <p style="font-size:12px;line-height:1.7;color:#999;margin:0 0 15px">Algunos destinos dejaron de responder. Otros desaparecieron sin dejar rastro. Solo quedan direcciones incompletas y nombres almacenados en registros antiguos.</p>
+            <div style="border-top:1px solid #292929;padding-top:12px;margin-top:10px">
+                <p style="font:10px monospace;letter-spacing:1px;color:#888;margin:0 0 7px">TOR / ONION — DIRECCIÓN FICTICIA</p>
+                <code style="display:block;overflow-wrap:anywhere;color:#bdbdbd;font-size:11px;line-height:1.7">nbeox5nr6owgw4fic3tfom2g3xo5sr4523zlkw3ird3isohb3mkbevrn.onion</code>
+                <p style="font:10px monospace;color:#777;margin:7px 0 0">ESTADO: DESTINO NO VERIFICADO</p>
+            </div>
+            <div style="border-top:1px solid #292929;padding-top:12px;margin-top:12px">
+                <p style="font:10px monospace;letter-spacing:1px;color:#888;margin:0 0 7px">I2P / EEPSITE — DESTINO FICTICIO</p>
+                <code style="display:block;overflow-wrap:anywhere;color:#bdbdbd;font-size:11px;line-height:1.7">archivo-perdido.i2p</code>
+                <p style="font:10px monospace;color:#777;margin:7px 0 0">ESTADO: REGISTRO INACTIVO</p>
+            </div>
+            <p style="font:9px monospace;color:#666;margin:15px 0 0">NOTA: DIRECCIONES DE EJEMPLO. NO CORRESPONDEN A SERVICIOS REALES.</p>
+        `;
+        content.appendChild(archive);
+    }
+
     const loading=document.createElement("p");
     loading.className="admin-status";
     loading.textContent="Consultando registros...";
     content.appendChild(loading);
 
     try{
-        const [snapshot,files]=await Promise.all([
-            firestore.collection("publicaciones")
-                .where("menu","==",section)
-                .where("category","==",title)
-                .get(),
-            firestore.collection("archivos")
-                .where("menu","==",section)
-                .where("category","==",title)
-                .get()
-        ]);
+        const legacyTitle=(sections[section]||[]).find(item=>item.title===title)?.legacyTitle;
+        const publicationQuery=legacyTitle
+            ? Promise.all([
+                firestore.collection("publicaciones").where("menu","==",section).where("category","==",title).get(),
+                firestore.collection("publicaciones").where("menu","==",section).where("category","==",legacyTitle).get()
+              ])
+            : Promise.all([firestore.collection("publicaciones").where("menu","==",section).where("category","==",title).get()]);
+        const fileQuery=legacyTitle
+            ? Promise.all([
+                firestore.collection("archivos").where("menu","==",section).where("category","==",title).get(),
+                firestore.collection("archivos").where("menu","==",section).where("category","==",legacyTitle).get()
+              ])
+            : Promise.all([firestore.collection("archivos").where("menu","==",section).where("category","==",title).get()]);
+        const [publicationSnapshots,fileSnapshots]=await Promise.all([publicationQuery,fileQuery]);
 
         if(token!==currentContentToken)return;
 
         const docs=[];
-
-        snapshot.forEach(doc=>{
-            docs.push({id:doc.id,...doc.data()});
-        });
+        publicationSnapshots.forEach(snapshot=>snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()})));
 
         const orderedPublications=sortRecords(docs);
 
@@ -1133,9 +1176,7 @@ async function showCategory(section,title,description){
 
         const matchingFiles=[];
 
-        files.forEach(doc=>{
-            matchingFiles.push({id:doc.id,...doc.data()});
-        });
+        fileSnapshots.forEach(snapshot=>snapshot.forEach(doc=>matchingFiles.push({id:doc.id,...doc.data()})));
 
         const orderedFiles=sortRecords(matchingFiles);
 
@@ -1203,13 +1244,81 @@ async function showCategory(section,title,description){
     }
 }
 
+function showSectionLanding(section,updateUrl=false){
+    closeMenus();
+    if(updateUrl)changePublicUrl(sectionPath(section));
+    saveData("gardenSection",section);
+    const content=document.getElementById("content-area");
+    if(guestbookListener){guestbookListener.off("value");guestbookListener=null;latestGuestbookSnapshot=null;}
+    ++currentContentToken;
+    content.innerHTML="";
+    const heading=document.createElement("h2");
+    heading.className="content-title";
+    heading.textContent=section+" // DIRECTORIO";
+    const description=document.createElement("p");
+    description.className="content-description";
+    description.textContent="Selecciona una categoría para abrir sus registros.";
+    content.append(heading,description);
+    (sections[section]||[]).forEach(item=>{
+        const button=document.createElement("button");
+        button.type="button";
+        button.className="section-category";
+        const name=document.createElement("strong");
+        name.textContent=item.title;
+        const detail=document.createElement("span");
+        detail.textContent=item.description;
+        button.append(name,detail);
+        button.addEventListener("click",()=>showCategory(section,item.title,item.description,true));
+        content.appendChild(button);
+    });
+}
+
+function renderRouteFromPath(){
+    const parts=location.pathname.split("/").filter(Boolean).map(part=>{try{return decodeURIComponent(part)}catch(e){return part}});
+    if(!parts.length)return false;
+    const slug=routeSlug(parts.join("/"));
+    const allCategories=Object.entries(sections).flatMap(([section,items])=>items.map(item=>({section,item})));
+
+    // URL pública corta: /rutas-caducadas
+    if(parts.length===1){
+        const direct=allCategories.find(({item})=>routeSlug(item.title)===slug || (item.legacyTitle && routeSlug(item.legacyTitle)===slug));
+        if(direct){
+            const letter=document.getElementById("letter-screen");
+            const home=document.getElementById("home-screen");
+            if(letter){letter.style.display="none";letter.style.opacity="0";}
+            if(home){home.style.display="block";home.style.opacity="1";}
+            saveData("gardenEntered","yes");
+            showCategory(direct.section,direct.item.title,direct.item.description,false);
+            return true;
+        }
+    }
+
+    // Compatibilidad con enlaces anteriores: /ARC/registros-viejos
+    const section=parts[0].toUpperCase();
+    if(!sections[section])return false;
+    const letter=document.getElementById("letter-screen");
+    const home=document.getElementById("home-screen");
+    if(letter){letter.style.display="none";letter.style.opacity="0";}
+    if(home){home.style.display="block";home.style.opacity="1";}
+    saveData("gardenEntered","yes");
+    if(parts.length===1){showSectionLanding(section,false);return true;}
+    const wanted=routeSlug(parts.slice(1).join("/"));
+    const category=(sections[section]||[]).find(item=>routeSlug(item.title)===wanted || (item.legacyTitle && routeSlug(item.legacyTitle)===wanted));
+    if(category){showCategory(section,category.title,category.description,false);return true;}
+    showSectionLanding(section,false);
+    return true;
+}
+window.addEventListener("popstate",()=>{
+    if(!renderRouteFromPath()&&(location.pathname==="/"||location.pathname==="/index.html"))restoreCategory();
+});
+
 function showInicio(){
     closeMenus();
     showCategory("INICIO","Portada",sections.INICIO[0].description);
 }
 
 function showHome(){
-    showCategory("HOME","Manifestación",sections.HOME[0].description);
+    showCategory("HOME","Entrada",sections.HOME[0].description);
 }
 
 document.getElementById("home-logo").addEventListener("click",showInicio);
@@ -1232,7 +1341,7 @@ function restoreCategory(){
             return;
         }
 
-        const valid=sections[data.section]?.find(item=>item.title===data.title);
+        const valid=sections[data.section]?.find(item=>item.title===data.title||item.legacyTitle===data.title);
 
         if(valid)showCategory(data.section,valid.title,valid.description);
         else content.innerHTML="";
@@ -1296,6 +1405,7 @@ function showHomeScreen(){
 
 function initializePage(){
     typingStarted=false;
+    if(renderRouteFromPath())return;
     transitionStarted=false;
 
     const letter=document.getElementById("letter-screen");
@@ -1457,7 +1567,7 @@ function menuOptions(selected="INICIO"){
 
 function categoryOptions(menu,selected=""){
     return sections[menu]
-        .filter(item=>!(menu==="HOME"&&item.title==="Libro de visitas"))
+        .filter(item=>!(menu==="HOME"&&item.title==="Rastros"))
         .map(item=>
             `<option value="${item.title}" ${item.title===selected?"selected":""}>${item.title}</option>`
         ).join("");
@@ -1840,7 +1950,7 @@ function renderPublicationEditor(editData=null){
     const panel=document.getElementById("admin-panel-content");
 
     const menu=editData?.menu||"INICIO";
-    const category=editData?.category||(menu==="INICIO"?"Portada":"Manifestación");
+    const category=editData?.category||(menu==="INICIO"?"Portada":"Entrada");
 
     panel.innerHTML=`
     <div class="admin-box">
@@ -2041,7 +2151,7 @@ function renderFileEditor(editData=null){
     const panel=document.getElementById("admin-panel-content");
 
     const menu=editData?.menu||"INICIO";
-    const category=editData?.category||(menu==="INICIO"?"Portada":"Manifestación");
+    const category=editData?.category||(menu==="INICIO"?"Portada":"Entrada");
 
     panel.innerHTML=`
     <div class="admin-box">
