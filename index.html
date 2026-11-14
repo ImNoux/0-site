@@ -57,8 +57,8 @@ nav{
 .publication-body p{margin:0 0 6px}
 .publication-body ul,.publication-body ol{padding-left:25px;margin:10px 0}
 .publication-body a{color:#c5a4a4;text-decoration:underline}
-.publication-body img{display:block;max-width:100%;width:auto;height:auto;max-height:650px;object-fit:contain;margin:18px 0;border:1px solid #292929}
-.file-image{display:block;width:auto;max-width:100%;max-height:650px;height:auto;object-fit:contain;margin:18px 0;border:1px solid #292929}
+.publication-body img{display:block;max-width:100%;width:auto;height:auto;max-height:650px;object-fit:contain;margin:4px 0;border:1px solid #292929}
+.file-image{display:block;width:auto;max-width:100%;max-height:650px;height:auto;object-fit:contain;margin:4px 0;border:1px solid #292929}
 .guest-entry{width:100%;max-width:540px;margin-top:25px;padding:19px;background:rgba(0,0,0,.55);border:1px solid #292929;animation:subtleBorder 3s infinite}
 @keyframes subtleBorder{0%,100%{border-color:#292929}50%{border-color:#666}}
 .guest-label{color:#777;font-family:monospace;font-size:9px;letter-spacing:1.5px;margin-bottom:20px}
@@ -112,7 +112,7 @@ nav{
 .rich-editor{min-height:180px;padding:14px;background:#080808;border:1px solid #333;color:#bbb;font-size:13px;line-height:1.8;outline:none;overflow-wrap:anywhere}
 .rich-editor:focus{border-color:#777}
 .rich-editor a{color:#c5a4a4;text-decoration:underline}
-.rich-editor img{display:block;max-width:100%;max-height:450px;height:auto;width:auto;margin:12px 0;border:1px solid #292929}
+.rich-editor img{display:block;max-width:100%;max-height:450px;height:auto;width:auto;margin:4px 0;border:1px solid #292929}
 .editor-help{font-size:10px;color:#666;line-height:1.8;margin:10px 0}
 .admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
 .admin-danger{border-color:#633!important;color:#c99!important}
@@ -963,6 +963,9 @@ function safeHtml(html){
                 }
 
                 const alt=node.getAttribute("alt")||"Imagen";
+                const rawWidth=node.style.width||node.getAttribute("width")||"auto";
+                const safeWidth=/^(?:auto|(?:[1-9]\d?|100)%)$/.test(String(rawWidth).trim())
+                    ?String(rawWidth).trim():"auto";
 
                 [...node.attributes].forEach(attr=>node.removeAttribute(attr.name));
 
@@ -970,6 +973,9 @@ function safeHtml(html){
                 node.setAttribute("alt",alt.slice(0,200));
                 node.setAttribute("loading","lazy");
                 node.setAttribute("referrerpolicy","no-referrer");
+                node.style.width=safeWidth;
+                node.style.maxWidth="100%";
+                node.style.height="auto";
 
                 return;
             }
@@ -1110,15 +1116,18 @@ async function showCategory(section,title,description){
             const article=document.createElement("article");
             article.className="publication";
 
-            const h=document.createElement("h3");
-            h.textContent=item.title||"Sin título";
-            if(validHexColor(item.titleColor))h.style.color=item.titleColor;
+            if(item.title){
+                const h=document.createElement("h3");
+                h.textContent=item.title;
+                if(validHexColor(item.titleColor))h.style.color=item.titleColor;
+                article.appendChild(h);
+            }
 
             const body=document.createElement("div");
             body.className="publication-body";
             body.innerHTML=safeHtml(item.bodyHtml||"");
 
-            article.append(h,body);
+            article.appendChild(body);
             content.appendChild(article);
         });
 
@@ -1500,8 +1509,13 @@ function setupEditor(initialHtml=""){
     editor.innerHTML=safeHtml(initialHtml);
     let selectedEditorImage=null;
     editor.addEventListener("click",event=>{
-        if(event.target&&event.target.tagName==="IMG")selectedEditorImage=event.target;
+        const image=event.target?.closest?.("img");
+        if(image&&editor.contains(image))selectedEditorImage=image;
     });
+    editor.addEventListener("touchend",event=>{
+        const image=event.target?.closest?.("img");
+        if(image&&editor.contains(image))selectedEditorImage=image;
+    },{passive:true});
     const fontSizeControl=document.getElementById("editor-font-size");
     fontSizeControl?.addEventListener("change",()=>{
         editor.focus();
@@ -1516,6 +1530,11 @@ function setupEditor(initialHtml=""){
     });
     document.getElementById("editor-image-size")?.addEventListener("change",event=>{
         if(!selectedEditorImage){alert("Selecciona primero una imagen del contenido.");return;}
+        if(!selectedEditorImage.isConnected||!editor.contains(selectedEditorImage)){
+            selectedEditorImage=null;
+            alert("Vuelve a tocar la imagen que deseas cambiar y después elige su tamaño.");
+            return;
+        }
         selectedEditorImage.style.width=event.target.value;
         selectedEditorImage.style.maxWidth="100%";
         selectedEditorImage.style.height="auto";
@@ -1829,7 +1848,7 @@ function renderPublicationEditor(editData=null){
 
         ${addLocationSelectors(menu,category)}
 
-        <label class="admin-status">TÍTULO</label>
+        <label class="admin-status">TÍTULO (OPCIONAL SI PUBLICAS UNA IMAGEN)</label>
         <input class="admin-input" id="record-title" maxlength="120" placeholder="Título de la publicación">
         <div class="title-color-row">
             <label for="record-title-color">COLOR DE ESTE TÍTULO</label>
@@ -1883,8 +1902,10 @@ function renderPublicationEditor(editData=null){
         const status=document.getElementById("record-status");
         const saveButton=document.getElementById("record-save");
 
-        if(!title||!editor.textContent.trim()&&!editor.querySelector("img")){
-            status.textContent="Escribe un título y contenido o inserta una imagen.";
+        const hasImage=!!editor.querySelector("img");
+        const hasText=!!editor.textContent.trim();
+        if((!title&&!hasImage)||(!hasText&&!hasImage)){
+            status.textContent="Añade un título y texto, o inserta una imagen para publicar sin texto.";
             return;
         }
 
