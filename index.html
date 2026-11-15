@@ -220,6 +220,53 @@ nav{gap:2px}
 .title-format-toolbar button{min-width:42px;width:42px;height:42px}
 .editor-toolbar button{min-height:34px}
 
+
+
+/* AJUSTE DEFINITIVO: CONTROLES COMPACTOS Y ESPACIADO UNIFORME */
+.admin-box{padding:14px;margin-bottom:14px}
+.title-format-toolbar{
+  display:flex;align-items:center;flex-wrap:nowrap;gap:4px;margin:6px 0 9px;
+  width:100%;min-width:0;
+}
+.title-format-toolbar button{
+  flex:0 0 30px;min-width:30px;width:30px;height:30px;padding:0;
+  font-size:15px;line-height:1;background:#101010;border:1px solid #444;
+}
+.title-format-toolbar .editor-size-control{
+  display:flex;align-items:center;gap:3px;min-width:0;white-space:nowrap;
+  font:8px monospace;letter-spacing:0;color:#888;
+}
+.title-format-toolbar select{
+  width:68px;min-width:0;height:30px;padding:0 4px;font:9px monospace;
+  background:#101010;border:1px solid #444;color:#bbb;
+}
+.editor-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:6px 0}
+.editor-toolbar button{
+  min-height:27px;height:27px;padding:4px 7px;font:9px monospace;
+  background:#111;border:1px solid #444;color:#aaa;
+}
+.editor-toolbar .editor-size-control{display:flex;align-items:center;gap:3px;white-space:nowrap;font:8px monospace;color:#888}
+.editor-toolbar .editor-size-control select{height:27px;max-width:94px;padding:3px 5px;font:9px monospace}
+.admin-input,.admin-select,.admin-textarea{padding:8px 10px;font-size:12px}
+.rich-editor{min-height:150px;padding:10px;font-size:13px;line-height:1.55}
+
+/* Publicaciones: un espacio entre bloques y dos entre historias */
+.publication{max-width:560px;margin:0;padding:0;border:0}
+.publication + .publication{margin-top:1.5em !important}
+.publication h3{margin:0 0 .45em !important}
+.publication-body{max-width:560px;line-height:1.55}
+.publication-body p{margin:0 0 .45em !important;padding:0}
+.publication-body p:empty,.publication-body div:empty{display:none !important}
+.publication-body img,.publication-body .file-image,.file-image{margin:.45em 0 !important}
+.publication-body ul,.publication-body ol{margin:.45em 0 !important;padding-left:1.4em}
+@media(max-width:600px){
+  .title-format-toolbar{gap:3px}
+  .title-format-toolbar button{flex-basis:29px;width:29px;min-width:29px;height:29px}
+  .title-format-toolbar select{width:64px;height:29px;font-size:8px}
+  .title-format-toolbar .editor-size-control{font-size:7px;gap:2px}
+  .admin-box{padding:12px}
+}
+
 </style>
 </head>
 
@@ -1298,6 +1345,13 @@ async function showCategory(section,title,description,updateUrl=false){
             const body=document.createElement("div");
             body.className="publication-body";
             body.innerHTML=safeHtml(item.bodyHtml||"");
+            // Elimina párrafos vacíos que el editor móvil puede crear al pulsar Enter dos veces.
+            body.querySelectorAll("p, div").forEach(node=>{
+                const hasContent=node.querySelector("img, a, ul, ol, video, iframe");
+                if(!node.textContent.trim()&&!hasContent)node.remove();
+            });
+            // Reduce saltos BR consecutivos a uno solo.
+            body.querySelectorAll("br + br").forEach(br=>br.remove());
 
             article.appendChild(body);
             content.appendChild(article);
