@@ -195,6 +195,31 @@ nav{gap:2px}
 .publication-font-modern .publication-body{font-size:17px;line-height:1.62;color:#bdbdbd}
 .publication-font-modern h3{font-family:Arial,Helvetica,sans-serif;font-size:21px;line-height:1.35;letter-spacing:.2px;margin-bottom:4px;color:#d0d0d0}
 @media(max-width:600px){.content-area{max-width:560px;width:100%}}
+
+/* AJUSTES DE EDITOR Y ESPACIADO ENTRE HISTORIAS */
+.title-format-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin:8px 0}
+.title-format-toolbar button{width:46px;height:46px;padding:0;font-size:19px}
+.editor-toolbar{gap:5px;margin:8px 0}
+.editor-toolbar button{padding:7px 9px;font-size:10px}
+.editor-size-control select{padding:6px;font-size:10px}
+.admin-input,.admin-select,.admin-textarea{padding:10px 12px}
+.publication{margin-top:15px;margin-bottom:0;padding:0}
+.publication h3{margin-bottom:6px}
+.publication-body p{margin:0 0 6px}
+.publication-body img,.file-image{margin:6px 0}
+.publication-body ul,.publication-body ol{margin:6px 0}
+
+
+.category-order-list{display:flex;flex-direction:column;gap:7px;margin:12px 0}
+.category-order-row{display:grid;grid-template-columns:minmax(0,1fr) 38px 38px;gap:6px;align-items:center}
+.category-order-row .admin-input{margin:0;min-width:0;padding:8px 10px}
+.category-order-row button{height:36px;border:1px solid #444;background:#111;color:#bbb;font-size:17px}
+.category-order-row button:disabled{opacity:.25}
+
+
+.title-format-toolbar button{min-width:42px;width:42px;height:42px}
+.editor-toolbar button{min-height:34px}
+
 </style>
 </head>
 
@@ -268,6 +293,7 @@ nav{gap:2px}
             <button class="admin-tab active" data-admin-tab="publicaciones">PUBLICACIONES</button>
             <button class="admin-tab" data-admin-tab="archivos">ARCHIVOS</button>
             <button class="admin-tab" data-admin-tab="inicio">INICIO</button>
+            <button class="admin-tab" data-admin-tab="configuracion">CONFIGURACIÓN</button>
         </div>
         <div id="admin-panel-content"></div>
     </div>
@@ -441,6 +467,27 @@ ARC:[
 ]
 };
 
+/* CONFIGURACIÓN DE CATEGORÍAS: orden y nombres compartidos mediante Firestore */
+function cloneSectionSettings(){
+    const copy={};
+    Object.keys(sections).forEach(key=>{
+        copy[key]=sections[key].map(item=>({...item}));
+    });
+    return copy;
+}
+function applySectionSettings(value){
+    if(!value||typeof value!=="object")return;
+    Object.keys(sections).forEach(key=>{
+        if(!Array.isArray(value[key]))return;
+        const clean=value[key].filter(item=>item&&typeof item.title==="string"&&item.title.trim())
+            .map(item=>({
+                title:item.title.trim().slice(0,60),
+                description:typeof item.description==="string"?item.description.slice(0,240):"",
+                ...(typeof item.legacyTitle==="string"&&item.legacyTitle?{legacyTitle:item.legacyTitle.slice(0,60)}:{})
+            }));
+        if(clean.length)sections[key].splice(0,sections[key].length,...clean);
+    });
+}
 const messages=[
 `Nadie llega aquí por casualidad.
 
@@ -603,7 +650,7 @@ auth.onAuthStateChanged(async user=>{
         adminScreen.style.display="block";
 
         const savedTab=localStorage.getItem("0site_admin_tab")||"publicaciones";
-        const allowedTabs=["publicaciones","archivos","inicio"];
+        const allowedTabs=["publicaciones","archivos","inicio","configuracion"];
         const tab=allowedTabs.includes(savedTab)?savedTab:"publicaciones";
 
         document.querySelectorAll(".admin-tab").forEach(button=>{
@@ -652,17 +699,34 @@ function changePublicUrl(path,replace=false){
 }
 
 /* MENÚS */
-
-Object.keys(sections).filter(section=>section!=="INICIO").forEach(section=>{
-    const menu=document.getElementById("menu-"+section);
-
-    sections[section].forEach(item=>{
-        const button=document.createElement("button");
-        button.textContent=item.title;
-        button.addEventListener("click",()=>showCategory(section,item.title,item.description,true));
-        menu.appendChild(button);
+function buildPublicMenus(){
+    Object.keys(sections).filter(section=>section!=="INICIO").forEach(section=>{
+        const menu=document.getElementById("menu-"+section);
+        if(!menu)return;
+        menu.innerHTML="";
+        sections[section].forEach(item=>{
+            const button=document.createElement("button");
+            button.textContent=item.title;
+            button.addEventListener("click",()=>showCategory(section,item.title,item.description,true));
+            menu.appendChild(button);
+        });
     });
-});
+}
+buildPublicMenus();
+
+async function loadCategorySettings(){
+    try{
+        const doc=await firestore.collection("configuracion").doc("__categorias").get();
+        if(doc.exists&&doc.data()?.sections){
+            applySectionSettings(doc.data().sections);
+            buildPublicMenus();
+            if(location.pathname.split("/").filter(Boolean).length)renderRouteFromPath();
+        }
+    }catch(error){
+        console.warn("Se mantienen las categorías predeterminadas:",error);
+    }
+}
+loadCategorySettings();
 
 document.querySelectorAll(".nav-button").forEach(button=>{
     button.addEventListener("click",event=>{
@@ -947,6 +1011,16 @@ function validHexColor(value){
     return typeof value==="string"&&/^#[0-9a-fA-F]{6}$/.test(value);
 }
 
+function safeInlineFontFamily(value){
+    const allowed=["Arial","Verdana","Tahoma","Trebuchet MS","Georgia","Times New Roman","Garamond","Courier New"];
+    if(typeof value!=="string")return "";
+    return allowed.includes(value.replace(/["']/g,"").trim())?value.replace(/["']/g,"").trim():"";
+}
+function safeInlineFontSize(value){
+    if(typeof value!=="string")return "";
+    const match=value.match(/^([8-9]|[1-6][0-9]|7[0-2])px$/);
+    return match?match[0]:"";
+}
 function safeInlineColor(value){
     if(typeof value!=="string")return "";
     if(/^#[0-9a-fA-F]{6}$/.test(value))return value;
@@ -1018,20 +1092,24 @@ function safeHtml(html){
                 return;
             }
 
-            const savedColor=(node.tagName==="A"||node.tagName==="SPAN")
-                ?(node.style.color||"")
-                :"";
+            const savedColor=(node.tagName==="A"||node.tagName==="SPAN")?(node.style.color||""):"";
+            const savedFontFamily=node.tagName==="SPAN"?(node.style.fontFamily||""):"";
+            const savedFontSize=node.tagName==="SPAN"?(node.style.fontSize||""):"";
 
             [...node.attributes].forEach(attr=>{
                 const name=attr.name.toLowerCase();
                 const keepLinkAttribute=node.tagName==="A"&&["href","target","rel"].includes(name);
-                const keepColorStyle=(node.tagName==="A"||node.tagName==="SPAN")&&name==="style";
-                if(!keepLinkAttribute&&!keepColorStyle)node.removeAttribute(attr.name);
+                const keepSafeStyle=(node.tagName==="A"||node.tagName==="SPAN")&&name==="style";
+                if(!keepLinkAttribute&&!keepSafeStyle)node.removeAttribute(attr.name);
             });
 
             node.removeAttribute("style");
             const safeColor=safeInlineColor(savedColor);
+            const safeFamily=safeInlineFontFamily(savedFontFamily);
+            const safeSize=safeInlineFontSize(savedFontSize);
             if(safeColor)node.style.color=safeColor;
+            if(node.tagName==="SPAN"&&safeFamily)node.style.fontFamily=safeFamily;
+            if(node.tagName==="SPAN"&&safeSize)node.style.fontSize=safeSize;
 
             if(node.tagName==="A"){
                 try{
@@ -1507,7 +1585,7 @@ function openAdmin(){
         document.getElementById("admin-login").style.display="none";
         document.getElementById("admin-dashboard").style.display="block";
         const savedTab=localStorage.getItem("0site_admin_tab")||"publicaciones";
-        const allowedTabs=["publicaciones","archivos","inicio"];
+        const allowedTabs=["publicaciones","archivos","inicio","configuracion"];
         const tab=allowedTabs.includes(savedTab)?savedTab:"publicaciones";
         document.querySelectorAll(".admin-tab").forEach(button=>{
             button.classList.toggle("active",button.dataset.adminTab===tab);
@@ -1646,6 +1724,18 @@ function editorToolbar(){
         <button type="button" data-command="italic"><i>I</i></button>
         <button type="button" data-command="underline"><u>U</u></button>
         <button type="button" data-command="insertUnorderedList">LISTA</button>
+        <label class="editor-size-control">FUENTE
+            <select id="editor-font-family" aria-label="Fuente del texto">
+                <option value="Arial" selected>Arial</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Tahoma">Tahoma</option>
+                <option value="Trebuchet MS">Trebuchet MS</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Garamond">Garamond</option>
+                <option value="Courier New">Courier New</option>
+            </select>
+        </label>
         <button type="button" id="insert-link">INSERTAR LINK</button>
         <button type="button" id="remove-link">QUITAR LINK</button>
         <button type="button" id="insert-image">INSERTAR IMAGEN</button>
@@ -1668,7 +1758,25 @@ function setupEditor(initialHtml=""){
     const editor=document.getElementById("rich-editor");
 
     editor.innerHTML=safeHtml(initialHtml);
+    const fontPicker=document.getElementById("editor-font-family");
     let selectedEditorImage=null;
+    if(fontPicker){
+        fontPicker.addEventListener("change",()=>{
+            editor.focus();
+            const selection=window.getSelection();
+            const range=savedEditorRange&&editor.contains(savedEditorRange.commonAncestorContainer)
+                ?savedEditorRange.cloneRange():null;
+            if(!range||range.collapsed)return;
+            const span=document.createElement("span");
+            span.style.fontFamily=fontPicker.value;
+            span.appendChild(range.extractContents());
+            range.insertNode(span);
+            const next=document.createRange();
+            next.selectNodeContents(span);
+            selection.removeAllRanges();selection.addRange(next);
+            savedEditorRange=next.cloneRange();
+        });
+    }
     editor.addEventListener("click",event=>{
         const image=event.target?.closest?.("img");
         if(image&&editor.contains(image))selectedEditorImage=image;
@@ -2025,6 +2133,18 @@ function renderPublicationEditor(editData=null){
                     <option value="32">Máximo</option>
                 </select>
             </label>
+            <label class="editor-size-control">FUENTE
+                <select id="title-font-family" aria-label="Fuente del título">
+                    <option value="Arial" selected>Arial</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Tahoma">Tahoma</option>
+                    <option value="Trebuchet MS">Trebuchet MS</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Garamond">Garamond</option>
+                    <option value="Courier New">Courier New</option>
+                </select>
+            </label>
         </div>
         <div class="title-color-row">
             <label for="record-title-color">COLOR DE ESTE TÍTULO</label>
@@ -2085,6 +2205,26 @@ function renderPublicationEditor(editData=null){
             rememberTitleSelection();
         });
     });
+    const titleFontSelect=document.getElementById("title-font-family");
+    titleFontSelect.addEventListener("mousedown",event=>event.stopPropagation());
+    titleFontSelect.addEventListener("change",()=>{
+        titleEditor.focus();
+        const selection=window.getSelection();
+        let range=savedTitleRange&&titleEditor.contains(savedTitleRange.commonAncestorContainer)
+            ?savedTitleRange.cloneRange():document.createRange();
+        if(!(savedTitleRange&&titleEditor.contains(savedTitleRange.commonAncestorContainer))||range.collapsed){
+            range.selectNodeContents(titleEditor);
+        }
+        if(range.collapsed)return;
+        const span=document.createElement("span");
+        span.style.fontFamily=titleFontSelect.value;
+        span.appendChild(range.extractContents());
+        range.insertNode(span);
+        const next=document.createRange();next.selectNodeContents(span);
+        selection.removeAllRanges();selection.addRange(next);
+        savedTitleRange=next.cloneRange();
+    });
+
     const titleSizeSelect=document.getElementById("title-font-size");
     titleSizeSelect.addEventListener("mousedown",event=>event.stopPropagation());
     titleSizeSelect.addEventListener("change",()=>{
@@ -2544,6 +2684,22 @@ function renderConfiguration(){
 
     panel.innerHTML=`
     <div class="admin-box">
+        <p class="admin-subtitle">MENÚS Y CATEGORÍAS</p>
+        <p class="admin-hint">Cambia el nombre de las categorías, añade nuevas o modifica su posición. Los cambios se guardan para todos los visitantes.</p>
+        <label class="admin-status">MENÚ</label>
+        <select class="admin-select" id="category-menu-select">
+            ${Object.keys(sections).filter(key=>key!=="INICIO").map(key=>`<option value="${key}">${key}</option>`).join("")}
+        </select>
+        <div id="category-order-list" class="category-order-list"></div>
+        <label class="admin-status">NUEVA CATEGORÍA</label>
+        <input class="admin-input" id="new-category-name" maxlength="60" placeholder="Nombre de la categoría">
+        <button class="admin-button" id="add-category-button">AÑADIR CATEGORÍA</button>
+        <div class="admin-actions">
+            <button class="admin-button" id="save-category-settings">GUARDAR CAMBIOS</button>
+        </div>
+        <p class="admin-status" id="category-settings-status"></p>
+    </div>
+    <div class="admin-box">
         <p class="admin-subtitle">OTRAS CONFIGURACIONES</p>
         <p class="admin-hint">Los colores se ajustan individualmente al editar cada publicación: el título tiene su propio selector y el contenido permite colorear solo el texto seleccionado.</p>
         <input class="admin-input" id="config-key" placeholder="Nombre de la opción">
@@ -2560,6 +2716,82 @@ function renderConfiguration(){
 
     loadConfig();
     loadPublicationList();
+
+    let categoryDraft=cloneSectionSettings();
+    const menuPicker=document.getElementById("category-menu-select");
+    const categoryList=document.getElementById("category-order-list");
+    const categoryStatus=document.getElementById("category-settings-status");
+
+    function drawCategoryDraft(){
+        const menu=menuPicker.value;
+        categoryList.innerHTML="";
+        categoryDraft[menu].forEach((item,index)=>{
+            const row=document.createElement("div");
+            row.className="category-order-row";
+            const name=document.createElement("input");
+            name.className="admin-input";
+            name.maxLength=60;
+            name.value=item.title;
+            name.setAttribute("aria-label","Nombre de categoría");
+            name.addEventListener("input",()=>{item.title=name.value;});
+            const up=document.createElement("button");
+            up.type="button";up.textContent="↑";up.title="Subir";
+            up.disabled=index===0;
+            up.addEventListener("click",()=>{
+                [categoryDraft[menu][index-1],categoryDraft[menu][index]]=[categoryDraft[menu][index],categoryDraft[menu][index-1]];
+                drawCategoryDraft();
+            });
+            const down=document.createElement("button");
+            down.type="button";down.textContent="↓";down.title="Bajar";
+            down.disabled=index===categoryDraft[menu].length-1;
+            down.addEventListener("click",()=>{
+                [categoryDraft[menu][index+1],categoryDraft[menu][index]]=[categoryDraft[menu][index],categoryDraft[menu][index+1]];
+                drawCategoryDraft();
+            });
+            row.append(name,up,down);
+            categoryList.appendChild(row);
+        });
+    }
+    menuPicker.addEventListener("change",drawCategoryDraft);
+    document.getElementById("add-category-button").addEventListener("click",()=>{
+        const input=document.getElementById("new-category-name");
+        const title=input.value.trim();
+        const menu=menuPicker.value;
+        if(!title){categoryStatus.textContent="Escribe un nombre para la categoría.";return;}
+        if(categoryDraft[menu].some(item=>item.title.toLowerCase()===title.toLowerCase())){
+            categoryStatus.textContent="Esa categoría ya existe en este menú.";return;
+        }
+        categoryDraft[menu].push({title,description:""});
+        input.value="";
+        categoryStatus.textContent="Categoría añadida. Guarda los cambios para publicarla.";
+        drawCategoryDraft();
+    });
+    document.getElementById("save-category-settings").addEventListener("click",async()=>{
+        const invalid=Object.values(categoryDraft).some(list=>
+            list.some(item=>!item.title.trim())||
+            new Set(list.map(item=>item.title.trim().toLowerCase())).size!==list.length
+        );
+        if(invalid){categoryStatus.textContent="Revisa los nombres: no pueden estar vacíos ni repetidos.";return;}
+        try{
+            const clean={};
+            Object.keys(categoryDraft).forEach(key=>{
+                clean[key]=categoryDraft[key].map(item=>({...item,title:item.title.trim()}));
+            });
+            await firestore.collection("configuracion").doc("__categorias").set({
+                sections:clean,
+                updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+            });
+            applySectionSettings(clean);
+            buildPublicMenus();
+            categoryDraft=cloneSectionSettings();
+            drawCategoryDraft();
+            categoryStatus.textContent="Categorías y orden guardados correctamente.";
+        }catch(error){
+            console.error(error);
+            categoryStatus.textContent="No se pudo guardar. Comprueba los permisos de Firestore.";
+        }
+    });
+    drawCategoryDraft();
 
     document.getElementById("config-save").addEventListener("click",async()=>{
         const key=document.getElementById("config-key").value.trim();
