@@ -278,7 +278,108 @@ nav{gap:2px}
 }
 
 
-/* EDITOR WORD PARA 0-SITE */
+/* NUEVO EDITOR FORMATO (estilo app) */
+.formato-panel{
+  background:#1c1c1e;
+  border-radius:14px;
+  padding:14px 12px 16px;
+  margin:8px 0 14px;
+}
+.formato-panel h4{
+  font-size:16px;
+  font-weight:600;
+  color:#fff;
+  margin:0 0 12px;
+  font-family:system-ui,sans-serif;
+}
+.formato-select-row{
+  display:flex;
+  gap:8px;
+  margin-bottom:10px;
+}
+.formato-select-row select{
+  flex:1;
+  background:#2c2c2e;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  padding:11px 12px;
+  font-size:15px;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23aaa' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  cursor:pointer;
+}
+.formato-biu{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+}
+.formato-biu button{
+  flex:1;
+  background:#2c2c2e;
+  border:none;
+  border-radius:10px;
+  height:46px;
+  font-size:18px;
+  color:#fff;
+  cursor:pointer;
+}
+.formato-biu button:hover{background:#3a3a3c}
+.formato-divider{
+  height:1px;
+  background:#3a3a3c;
+  margin:10px 0 14px;
+}
+.formato-icons{
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+  margin-bottom:12px;
+}
+.formato-icons button{
+  background:none;
+  border:none;
+  width:46px;
+  height:46px;
+  border-radius:10px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#ddd;
+}
+.formato-icons button:hover{background:#2c2c2e}
+.formato-icons svg{
+  width:22px;
+  height:22px;
+  stroke:#ddd;
+  fill:none;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.formato-image-size{
+  width:100%;
+  background:#2c2c2e;
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  padding:13px 14px;
+  font-size:15px;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23aaa' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  cursor:pointer;
+}
+@media(max-width:600px){
+  .formato-panel{padding:12px 10px}
+  .formato-biu button{height:44px;font-size:17px}
+}
+
+/* EDITOR WORD PARA 0-SITE (legacy, se mantiene por si acaso) */
 .editor-toolbar-word{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px;background:#202226;border:1px solid #393c40;border-radius:5px;margin:8px 0 14px}
 .editor-toolbar-word button{min-height:34px;padding:7px 10px;background:#111;border:1px solid #45484d;color:#ddd;border-radius:3px;font:10px monospace;cursor:pointer}
 .editor-toolbar-word button:hover{background:#303238;border-color:#777}
@@ -1842,8 +1943,9 @@ function addLocationSelectors(menuValue="INICIO",categoryValue="Portada"){
 
 function editorToolbar(){
     return `
-    <div class="editor-toolbar editor-toolbar-word" aria-label="Herramientas de formato">
-        <label class="editor-size-control editor-dropdown">FUENTE
+    <div class="formato-panel" aria-label="Formato de texto">
+        <h4>Formato de texto</h4>
+        <div class="formato-select-row">
             <select id="editor-font-family" aria-label="Fuente">
                 <option value="Arial">Arial</option>
                 <option value="Verdana">Verdana</option>
@@ -1854,31 +1956,44 @@ function editorToolbar(){
                 <option value="Garamond">Garamond</option>
                 <option value="Courier New">Courier New</option>
             </select>
-        </label>
-        <label class="editor-size-control editor-dropdown">TAMAÑO
             <select id="editor-font-size" aria-label="Tamaño del texto">
-                <option value="12">12 px</option><option value="14">14 px</option>
-                <option value="16" selected>16 px</option><option value="18">18 px</option>
-                <option value="22">22 px</option><option value="28">28 px</option>
+                <option value="12">12 px</option>
+                <option value="14">14 px</option>
+                <option value="16" selected>16 px</option>
+                <option value="18">18 px</option>
+                <option value="22">22 px</option>
+                <option value="28">28 px</option>
                 <option value="32">32 px</option>
             </select>
-        </label>
-        <button type="button" data-command="bold" aria-label="Negrita"><b>B</b></button>
-        <button type="button" data-command="italic" aria-label="Cursiva"><i>I</i></button>
-        <button type="button" data-command="underline" aria-label="Subrayado"><u>U</u></button>
-        <label class="editor-color-picker" title="Color del texto">
-            <span>A</span><input type="color" id="editor-text-color" value="#c5c5c5" aria-label="Color del texto">
-        </label>
-        <button type="button" id="insert-link" title="Insertar enlace"><span class="tool-symbol">↗</span> LINK</button>
-        <button type="button" id="remove-link" title="Quitar enlace"><span class="tool-symbol">×</span> QUITAR</button>
-        <button type="button" id="insert-image" title="Insertar imagen">＋ IMAGEN</button>
-        <label class="editor-size-control editor-dropdown image-size-dropdown">IMAGEN
-            <select id="editor-image-size" aria-label="Tamaño de imagen">
-                <option value="auto">Original</option><option value="25%">25%</option>
-                <option value="50%">50%</option><option value="70%">70%</option>
-                <option value="100%">100%</option>
-            </select>
-        </label>
+        </div>
+        <div class="formato-biu">
+            <button type="button" data-command="bold" aria-label="Negrita"><b>B</b></button>
+            <button type="button" data-command="italic" aria-label="Cursiva"><i>I</i></button>
+            <button type="button" data-command="underline" aria-label="Subrayado"><u>U</u></button>
+        </div>
+        <div class="formato-divider"></div>
+        <div class="formato-icons">
+            <button type="button" title="Color del texto" id="color-trigger" style="position:relative;">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+                <input type="color" id="editor-text-color" value="#c5c5c5" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" aria-label="Color del texto">
+            </button>
+            <button type="button" id="insert-link" title="Insertar enlace">
+                <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+            </button>
+            <button type="button" id="remove-link" title="Quitar enlace">
+                <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/><line x1="4" y1="20" x2="20" y2="4"/></svg>
+            </button>
+            <button type="button" id="insert-image" title="Insertar imagen">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+            </button>
+        </div>
+        <select id="editor-image-size" class="formato-image-size" aria-label="Tamaño de imagen">
+            <option value="auto">Tamaño de imagen · Original</option>
+            <option value="25%">25%</option>
+            <option value="50%">50%</option>
+            <option value="70%">70%</option>
+            <option value="100%">100%</option>
+        </select>
     </div>`;
 }
 
@@ -1891,11 +2006,14 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
     const colorPicker=document.getElementById("editor-text-color");
     const imageSizePicker=document.getElementById("editor-image-size");
 
+    // Captura de selección más agresiva (mejor en móvil)
     function rememberSelection(editor=activeEditor){
         const selection=window.getSelection();
         if(!selection||!selection.rangeCount)return;
         const range=selection.getRangeAt(0);
-        if(editor.contains(range.commonAncestorContainer))savedRanges.set(editor,range.cloneRange());
+        if(editor.contains(range.commonAncestorContainer)){
+            savedRanges.set(editor,range.cloneRange());
+        }
     }
     function restoreSelection(editor=activeEditor){
         const range=savedRanges.get(editor);
@@ -1903,15 +2021,19 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
         if(!range)return false;
         try{
             const selection=window.getSelection();
-            selection.removeAllRanges();selection.addRange(range);
+            selection.removeAllRanges();
+            selection.addRange(range);
             return true;
         }catch(error){return false;}
     }
+
+    // Guardar selección en más eventos
     [titleEditor,bodyEditor].forEach(editor=>{
         editor.addEventListener("focus",()=>{activeEditor=editor;});
         editor.addEventListener("keyup",()=>rememberSelection(editor));
         editor.addEventListener("mouseup",()=>rememberSelection(editor));
-        editor.addEventListener("touchend",()=>setTimeout(()=>rememberSelection(editor),80));
+        editor.addEventListener("touchend",()=>setTimeout(()=>rememberSelection(editor),50));
+        editor.addEventListener("selectionchange",()=>rememberSelection(editor));
         editor.addEventListener("click",event=>{
             activeEditor=editor;
             const image=event.target?.closest?.("img");
@@ -1977,23 +2099,36 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
     });
 
     const insertButton=document.getElementById("insert-link");
-    insertButton.addEventListener("mousedown",event=>event.preventDefault());
-    insertButton.addEventListener("click",()=>{
+    function handleInsertLink(event){
+        event.preventDefault();
+        event.stopPropagation();
         const editor=activeEditor;
         if(!restoreSelection(editor)){
-            alert("Selecciona primero la palabra o frase que quieres enlazar.");return;
+            alert("Selecciona primero la palabra o frase que quieres enlazar.");
+            return;
         }
         const selection=window.getSelection();
-        if(!selection||selection.isCollapsed){alert("Selecciona primero una palabra o frase.");return;}
+        if(!selection||selection.isCollapsed){
+            alert("Selecciona primero una palabra o frase.");
+            return;
+        }
         const raw=prompt("Introduce la dirección del enlace (https://...)");
         if(!raw)return;
         let url;
         try{url=new URL(raw.trim());}catch(e){alert("La dirección no es válida.");return;}
-        if(!["http:","https:","mailto:"].includes(url.protocol)){alert("Solo se permiten enlaces http, https o mailto.");return;}
+        if(!["http:","https:","mailto:"].includes(url.protocol)){
+            alert("Solo se permiten enlaces http, https o mailto.");
+            return;
+        }
         document.execCommand("createLink",false,url.href);
-        editor.querySelectorAll("a").forEach(a=>{a.target="_blank";a.rel="noopener noreferrer";});
+        editor.querySelectorAll("a").forEach(a=>{
+            a.target="_blank";
+            a.rel="noopener noreferrer";
+        });
         rememberSelection(editor);
-    });
+    }
+    insertButton.addEventListener("click",handleInsertLink);
+    insertButton.addEventListener("touchend",handleInsertLink);
     document.getElementById("remove-link").addEventListener("mousedown",event=>event.preventDefault());
     document.getElementById("remove-link").addEventListener("click",()=>{
         restoreSelection(activeEditor);document.execCommand("unlink",false,null);rememberSelection(activeEditor);
