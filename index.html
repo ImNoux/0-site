@@ -277,6 +277,55 @@ nav{gap:2px}
   .admin-box{padding:12px}
 }
 
+
+/* EDITOR WORD PARA 0-SITE */
+.editor-toolbar-word{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px;background:#202226;border:1px solid #393c40;border-radius:5px;margin:8px 0 14px}
+.editor-toolbar-word button{min-height:34px;padding:7px 10px;background:#111;border:1px solid #45484d;color:#ddd;border-radius:3px;font:10px monospace;cursor:pointer}
+.editor-toolbar-word button:hover{background:#303238;border-color:#777}
+.editor-dropdown{display:flex;flex-direction:column;align-items:flex-start;gap:4px;color:#999;font:8px monospace;letter-spacing:.5px}
+.editor-dropdown select{height:34px;min-width:90px;max-width:145px;padding:5px 20px 5px 7px;background:#111;border:1px solid #45484d;color:#ddd;font:11px Arial,sans-serif;border-radius:3px}
+.editor-color-picker{display:flex;align-items:center;justify-content:center;gap:5px;height:34px;padding:4px 8px;background:#111;border:1px solid #45484d;border-radius:3px;color:#eee;font:bold 15px Arial;cursor:pointer}
+.editor-color-picker input{width:23px;height:23px;padding:0;border:0;background:transparent}
+.editor-color-picker input::-webkit-color-swatch-wrapper{padding:0}
+.editor-color-picker input::-webkit-color-swatch{border:1px solid #777;border-radius:2px}
+.editor-size-control select{background:#080808;color:#ddd}
+.rich-editor{min-height:155px;padding:12px;background:#080808;border:1px solid #393c40;color:#c5c5c5;font-size:16px;line-height:1.55;outline:none;overflow-wrap:anywhere;border-radius:3px}
+.rich-editor:focus{border-color:#777}
+.rich-editor.title-editor{min-height:48px;margin-bottom:16px}
+.rich-editor:empty:before{content:attr(data-placeholder);color:#666}
+.rich-editor a{color:#c5a4a4;text-decoration:underline;cursor:pointer}
+.rich-editor img{display:block;max-width:100%;max-height:450px;height:auto;width:auto;margin:1em 0;border:1px solid #292929}
+.admin-box>label.admin-status{display:block;margin:13px 0 5px}
+.admin-box>.admin-input{margin-top:0}
+/* Espaciado: un Enter = párrafo normal; dos Enter = separación amplia.
+   La separación entre publicaciones se mantiene independiente. */
+.publication{max-width:560px;margin:0;padding:0;border:0}
+.publication + .publication{margin-top:2em !important}
+.publication h3{margin:0 0 1em !important}
+.publication-body{max-width:560px;line-height:1.55}
+.publication-body p,.publication-body>div{margin:0 0 .45em !important;padding:0}
+.publication-body p:empty,.publication-body div:empty{display:none !important}
+/* El bloque vacío que genera el segundo Enter se conserva como espacio extra. */
+.publication-body p:has(> br:only-child),
+.publication-body>div:has(> br:only-child){
+  display:block !important;
+  min-height:1.55em;
+  height:1.55em;
+  margin:0 !important;
+  padding:0;
+}
+.publication-body img,.publication-body .file-image,.file-image{margin:1em 0 !important}
+.publication-body ul,.publication-body ol{margin:1em 0 !important;padding-left:1.4em}
+.publication-body a{cursor:pointer;text-decoration:underline}
+@media(max-width:600px){
+ .editor-toolbar-word{gap:5px;padding:8px}
+ .editor-dropdown select{min-width:76px;max-width:118px;font-size:10px}
+ .editor-toolbar-word button{padding:7px 8px;font-size:9px}
+ .editor-color-picker{height:33px;padding:4px 6px}
+ .editor-color-picker input{width:21px;height:21px}
+ .admin-box{padding:12px}
+}
+
 </style>
 </head>
 
@@ -347,7 +396,8 @@ nav{gap:2px}
     <div id="admin-dashboard" style="display:none">
         <p class="admin-subtitle">DIRECTORIO DE ADMINISTRACIÓN</p>
         <div class="admin-nav">
-            <button class="admin-tab active" data-admin-tab="publicaciones">PUBLICACIONES</button>
+            <button class="admin-tab active" data-admin-tab="contenido">CONTENIDO</button>
+            <button class="admin-tab" data-admin-tab="gestor">GESTOR</button>
             <button class="admin-tab" data-admin-tab="archivos">ARCHIVOS</button>
             <button class="admin-tab" data-admin-tab="inicio">INICIO</button>
             <button class="admin-tab" data-admin-tab="configuracion">CONFIGURACIÓN</button>
@@ -706,9 +756,9 @@ auth.onAuthStateChanged(async user=>{
         document.getElementById("admin-dashboard").style.display="block";
         adminScreen.style.display="block";
 
-        const savedTab=localStorage.getItem("0site_admin_tab")||"publicaciones";
-        const allowedTabs=["publicaciones","archivos","inicio","configuracion"];
-        const tab=allowedTabs.includes(savedTab)?savedTab:"publicaciones";
+        const savedTab=localStorage.getItem("0site_admin_tab")||"contenido";
+        const allowedTabs=["contenido","gestor","archivos","inicio","configuracion"];
+        const tab=allowedTabs.includes(savedTab)?savedTab:(savedTab==="publicaciones"?"contenido":"contenido");
 
         document.querySelectorAll(".admin-tab").forEach(button=>{
             button.classList.toggle("active",button.dataset.adminTab===tab);
@@ -1093,7 +1143,7 @@ function safeInlineColor(value){
 function safeHtml(html){
     const parser=new DOMParser();
     const doc=parser.parseFromString(String(html||""),"text/html");
-    const allowed=["P","BR","B","STRONG","I","EM","U","A","SPAN","UL","OL","LI","IMG"];
+    const allowed=["P","DIV","BR","B","STRONG","I","EM","U","A","SPAN","UL","OL","LI","IMG"];
 
     function clean(parent){
         [...parent.childNodes].forEach(node=>{
@@ -1349,12 +1399,21 @@ async function showCategory(section,title,description,updateUrl=false){
                 if(item.titleHtml)h.innerHTML=safeHtml(item.titleHtml);
                 else h.textContent=item.title;
                 if(validHexColor(item.titleColor))h.style.color=item.titleColor;
+                const titleFont=safeInlineFontFamily(item.titleFontFamily||"");
+                const titleSize=safeInlineFontSize(item.titleFontSize||"");
+                if(titleFont)h.style.fontFamily=titleFont;
+                if(titleSize)h.style.fontSize=titleSize;
                 article.appendChild(h);
             }
 
             const body=document.createElement("div");
             body.className="publication-body";
             body.innerHTML=safeHtml(item.bodyHtml||"");
+            const bodyFont=safeInlineFontFamily(item.bodyFontFamily||"");
+            const bodySize=safeInlineFontSize(item.bodyFontSize||"");
+            if(bodyFont)body.style.fontFamily=bodyFont;
+            if(bodySize)body.style.fontSize=bodySize;
+            if(validHexColor(item.bodyColor))body.style.color=item.bodyColor;
             // Elimina párrafos vacíos que el editor móvil puede crear al pulsar Enter dos veces.
             body.querySelectorAll("p, div").forEach(node=>{
                 const hasContent=node.querySelector("img, a, ul, ol, video, iframe");
@@ -1648,9 +1707,9 @@ function openAdmin(){
     if(currentUser && currentUser.uid===ADMIN_UID){
         document.getElementById("admin-login").style.display="none";
         document.getElementById("admin-dashboard").style.display="block";
-        const savedTab=localStorage.getItem("0site_admin_tab")||"publicaciones";
-        const allowedTabs=["publicaciones","archivos","inicio","configuracion"];
-        const tab=allowedTabs.includes(savedTab)?savedTab:"publicaciones";
+        const savedTab=localStorage.getItem("0site_admin_tab")||"contenido";
+        const allowedTabs=["contenido","gestor","archivos","inicio","configuracion"];
+        const tab=allowedTabs.includes(savedTab)?savedTab:(savedTab==="publicaciones"?"contenido":"contenido");
         document.querySelectorAll(".admin-tab").forEach(button=>{
             button.classList.toggle("active",button.dataset.adminTab===tab);
         });
@@ -1726,8 +1785,8 @@ document.getElementById("admin-login-button").addEventListener("click",async()=>
         document.getElementById("admin-login").style.display="none";
         document.getElementById("admin-dashboard").style.display="block";
 
-        localStorage.setItem("0site_admin_tab","publicaciones");
-        renderAdminTab("publicaciones");
+        localStorage.setItem("0site_admin_tab","contenido");
+        renderAdminTab("contenido");
 
     }catch(error){
         console.error(error);
@@ -1779,18 +1838,14 @@ function addLocationSelectors(menuValue="INICIO",categoryValue="Portada"){
     <select class="admin-select" id="record-category">${categoryOptions(menuValue,categoryValue)}</select>`;
 }
 
-/* EDITOR Y ENLACES */
+/* EDITOR DE CONTENIDO: BARRA ÚNICA PARA TÍTULO Y CONTENIDO */
 
 function editorToolbar(){
     return `
-    <div class="editor-toolbar">
-        <button type="button" data-command="bold"><b>B</b></button>
-        <button type="button" data-command="italic"><i>I</i></button>
-        <button type="button" data-command="underline"><u>U</u></button>
-        <button type="button" data-command="insertUnorderedList">LISTA</button>
-        <label class="editor-size-control">FUENTE
-            <select id="editor-font-family" aria-label="Fuente del texto">
-                <option value="Arial" selected>Arial</option>
+    <div class="editor-toolbar editor-toolbar-word" aria-label="Herramientas de formato">
+        <label class="editor-size-control editor-dropdown">FUENTE
+            <select id="editor-font-family" aria-label="Fuente">
+                <option value="Arial">Arial</option>
                 <option value="Verdana">Verdana</option>
                 <option value="Tahoma">Tahoma</option>
                 <option value="Trebuchet MS">Trebuchet MS</option>
@@ -1800,657 +1855,348 @@ function editorToolbar(){
                 <option value="Courier New">Courier New</option>
             </select>
         </label>
-        <button type="button" id="insert-link">INSERTAR LINK</button>
-        <button type="button" id="remove-link">QUITAR LINK</button>
-        <button type="button" id="insert-image">INSERTAR IMAGEN</button>
-        <label class="editor-size-control">TAMAÑO TEXTO <select id="editor-font-size"><option value="12">12 px</option><option value="14" selected>14 px</option><option value="16">16 px</option><option value="18">18 px</option><option value="22">22 px</option><option value="28">28 px</option></select></label>
-        <label class="editor-size-control">TAMAÑO IMAGEN <select id="editor-image-size"><option value="auto">Original</option><option value="50%">50%</option><option value="70%">70%</option><option value="100%">100%</option></select></label>
-    </div>
-
-    <div class="editor-color-tools">
-        <label>COLOR DE TEXTO <input type="color" id="editor-text-color" value="#c5c5c5" aria-label="Elegir color de texto"></label>
-        <button type="button" id="apply-text-color">APLICAR A SELECCIÓN</button>
-    </div>
-
-    <div class="editor-help">Selecciona una palabra, frase o fragmento y elige un color. Solo cambiará el texto seleccionado, incluso si está dentro de un enlace. Para cambiar el título completo, usa el selector de color del título.</div>
-    <div class="editor-help">Para insertar un enlace o una imagen, coloca el cursor donde quieras añadirlo. Para los enlaces, selecciona primero una palabra o frase. Para las imágenes, introduce una URL directa de imagen (JPG, PNG, GIF o WEBP).</div>
-
-    <div class="rich-editor" id="rich-editor" contenteditable="true" spellcheck="true"></div>`;
+        <label class="editor-size-control editor-dropdown">TAMAÑO
+            <select id="editor-font-size" aria-label="Tamaño del texto">
+                <option value="12">12 px</option><option value="14">14 px</option>
+                <option value="16" selected>16 px</option><option value="18">18 px</option>
+                <option value="22">22 px</option><option value="28">28 px</option>
+                <option value="32">32 px</option>
+            </select>
+        </label>
+        <button type="button" data-command="bold" aria-label="Negrita"><b>B</b></button>
+        <button type="button" data-command="italic" aria-label="Cursiva"><i>I</i></button>
+        <button type="button" data-command="underline" aria-label="Subrayado"><u>U</u></button>
+        <label class="editor-color-picker" title="Color del texto">
+            <span>A</span><input type="color" id="editor-text-color" value="#c5c5c5" aria-label="Color del texto">
+        </label>
+        <button type="button" id="insert-link" title="Insertar enlace"><span class="tool-symbol">↗</span> LINK</button>
+        <button type="button" id="remove-link" title="Quitar enlace"><span class="tool-symbol">×</span> QUITAR</button>
+        <button type="button" id="insert-image" title="Insertar imagen">＋ IMAGEN</button>
+        <label class="editor-size-control editor-dropdown image-size-dropdown">IMAGEN
+            <select id="editor-image-size" aria-label="Tamaño de imagen">
+                <option value="auto">Original</option><option value="25%">25%</option>
+                <option value="50%">50%</option><option value="70%">70%</option>
+                <option value="100%">100%</option>
+            </select>
+        </label>
+    </div>`;
 }
 
-function setupEditor(initialHtml=""){
-    const editor=document.getElementById("rich-editor");
-
-    editor.innerHTML=safeHtml(initialHtml);
-    const fontPicker=document.getElementById("editor-font-family");
+function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
+    let activeEditor=titleEditor;
     let selectedEditorImage=null;
-    if(fontPicker){
-        fontPicker.addEventListener("change",()=>{
-            editor.focus();
-            const selection=window.getSelection();
-            const range=savedEditorRange&&editor.contains(savedEditorRange.commonAncestorContainer)
-                ?savedEditorRange.cloneRange():null;
-            if(!range||range.collapsed)return;
-            const span=document.createElement("span");
-            span.style.fontFamily=fontPicker.value;
-            span.appendChild(range.extractContents());
-            range.insertNode(span);
-            const next=document.createRange();
-            next.selectNodeContents(span);
-            selection.removeAllRanges();selection.addRange(next);
-            savedEditorRange=next.cloneRange();
-        });
-    }
-    editor.addEventListener("click",event=>{
-        const image=event.target?.closest?.("img");
-        if(image&&editor.contains(image))selectedEditorImage=image;
-    });
-    editor.addEventListener("touchend",event=>{
-        const image=event.target?.closest?.("img");
-        if(image&&editor.contains(image))selectedEditorImage=image;
-    },{passive:true});
-    const fontSizeControl=document.getElementById("editor-font-size");
-    fontSizeControl?.addEventListener("change",()=>{
-        editor.focus();
+    const savedRanges=new Map([[titleEditor,null],[bodyEditor,null]]);
+    const fontPicker=document.getElementById("editor-font-family");
+    const sizePicker=document.getElementById("editor-font-size");
+    const colorPicker=document.getElementById("editor-text-color");
+    const imageSizePicker=document.getElementById("editor-image-size");
+
+    function rememberSelection(editor=activeEditor){
         const selection=window.getSelection();
-        if(selection&&selection.rangeCount&&editor.contains(selection.anchorNode)){
-            document.execCommand("fontSize",false,"7");
-            editor.querySelectorAll('font[size="7"]').forEach(font=>{
-                const span=document.createElement("span");span.style.fontSize=fontSizeControl.value+"px";
-                span.innerHTML=font.innerHTML;font.replaceWith(span);
-            });
-        }else editor.style.fontSize=fontSizeControl.value+"px";
+        if(!selection||!selection.rangeCount)return;
+        const range=selection.getRangeAt(0);
+        if(editor.contains(range.commonAncestorContainer))savedRanges.set(editor,range.cloneRange());
+    }
+    function restoreSelection(editor=activeEditor){
+        const range=savedRanges.get(editor);
+        editor.focus();
+        if(!range)return false;
+        try{
+            const selection=window.getSelection();
+            selection.removeAllRanges();selection.addRange(range);
+            return true;
+        }catch(error){return false;}
+    }
+    [titleEditor,bodyEditor].forEach(editor=>{
+        editor.addEventListener("focus",()=>{activeEditor=editor;});
+        editor.addEventListener("keyup",()=>rememberSelection(editor));
+        editor.addEventListener("mouseup",()=>rememberSelection(editor));
+        editor.addEventListener("touchend",()=>setTimeout(()=>rememberSelection(editor),80));
+        editor.addEventListener("click",event=>{
+            activeEditor=editor;
+            const image=event.target?.closest?.("img");
+            if(image&&editor.contains(image))selectedEditorImage=image;
+        });
+        editor.addEventListener("touchend",event=>{
+            activeEditor=editor;
+            const image=event.target?.closest?.("img");
+            if(image&&editor.contains(image))selectedEditorImage=image;
+        },{passive:true});
     });
-    document.getElementById("editor-image-size")?.addEventListener("change",event=>{
-        if(!selectedEditorImage){alert("Selecciona primero una imagen del contenido.");return;}
-        if(!selectedEditorImage.isConnected||!editor.contains(selectedEditorImage)){
+    document.addEventListener("selectionchange",()=>{
+        [titleEditor,bodyEditor].forEach(editor=>rememberSelection(editor));
+    });
+
+    function applyInlineStyle(property,value){
+        const editor=activeEditor;
+        restoreSelection(editor);
+        const selection=window.getSelection();
+        const range=selection&&selection.rangeCount?selection.getRangeAt(0):null;
+        if(range&&!range.collapsed&&editor.contains(range.commonAncestorContainer)){
+            const span=document.createElement("span");
+            span.style[property]=value;
+            try{
+                span.appendChild(range.extractContents());
+                range.insertNode(span);
+                const next=document.createRange();next.selectNodeContents(span);
+                selection.removeAllRanges();selection.addRange(next);
+                savedRanges.set(editor,next.cloneRange());
+            }catch(error){console.error("No se pudo aplicar el formato",error);}
+        }else{
+            // Si no hay texto seleccionado, el formato queda como estilo predeterminado
+            // del campo activo y se guarda junto con la publicación.
+            editor.style[property]=value;
+            if(property==="color"&&editor===titleEditor){
+                const titleColor=document.getElementById("record-title-color");
+                if(titleColor&&/^#[0-9a-f]{6}$/i.test(value))titleColor.value=value;
+            }
+        }
+    }
+
+    document.querySelectorAll("[data-command]").forEach(button=>{
+        button.addEventListener("mousedown",event=>event.preventDefault());
+        button.addEventListener("click",()=>{
+            restoreSelection(activeEditor);
+            document.execCommand(button.dataset.command,false,null);
+            rememberSelection(activeEditor);
+        });
+    });
+    fontPicker.addEventListener("change",()=>applyInlineStyle("fontFamily",fontPicker.value));
+    sizePicker.addEventListener("change",()=>applyInlineStyle("fontSize",sizePicker.value+"px"));
+    colorPicker.addEventListener("input",()=>applyInlineStyle("color",colorPicker.value));
+
+    imageSizePicker.addEventListener("change",event=>{
+        if(!selectedEditorImage||!selectedEditorImage.isConnected||!([titleEditor,bodyEditor].some(editor=>editor.contains(selectedEditorImage)))){
             selectedEditorImage=null;
-            alert("Vuelve a tocar la imagen que deseas cambiar y después elige su tamaño.");
+            alert("Toca primero la imagen que quieres cambiar y después selecciona su tamaño.");
             return;
         }
         selectedEditorImage.style.width=event.target.value;
         selectedEditorImage.style.maxWidth="100%";
         selectedEditorImage.style.height="auto";
     });
-    savedEditorRange=null;
-
-    function saveSelection(){
-        const selection=window.getSelection();
-
-        if(!selection||selection.rangeCount===0)return;
-
-        const range=selection.getRangeAt(0);
-
-        if(editor.contains(range.commonAncestorContainer)){
-            savedEditorRange=range.cloneRange();
-        }
-    }
-
-    editor.addEventListener("keyup",saveSelection);
-    editor.addEventListener("mouseup",saveSelection);
-    editor.addEventListener("touchend",()=>setTimeout(saveSelection,100));
-
-    document.addEventListener("selectionchange",()=>{
-        saveSelection();
-    });
-
-    function restoreSelection(){
-        if(!savedEditorRange)return false;
-
-        try{
-            editor.focus();
-
-            const selection=window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(savedEditorRange);
-
-            return true;
-
-        }catch(error){
-            return false;
-        }
-    }
-
-    document.querySelectorAll("[data-command]").forEach(button=>{
-        button.addEventListener("mousedown",event=>event.preventDefault());
-
-        button.addEventListener("click",()=>{
-            restoreSelection();
-            editor.focus();
-
-            document.execCommand(button.dataset.command,false,null);
-
-            saveSelection();
-        });
-    });
 
     const insertButton=document.getElementById("insert-link");
-
     insertButton.addEventListener("mousedown",event=>event.preventDefault());
-
     insertButton.addEventListener("click",()=>{
-        if(!restoreSelection()){
-            alert("Primero selecciona la palabra o frase que quieres convertir en enlace.");
-            return;
+        const editor=activeEditor;
+        if(!restoreSelection(editor)){
+            alert("Selecciona primero la palabra o frase que quieres enlazar.");return;
         }
-
         const selection=window.getSelection();
-
-        if(!selection||selection.isCollapsed){
-            alert("Primero selecciona la palabra o frase que quieres convertir en enlace.");
-            return;
-        }
-
+        if(!selection||selection.isCollapsed){alert("Selecciona primero una palabra o frase.");return;}
         const raw=prompt("Introduce la dirección del enlace (https://...)");
-
         if(!raw)return;
-
         let url;
-
-        try{
-            url=new URL(raw.trim());
-
-        }catch(e){
-            alert("La dirección no es válida.");
-            return;
-        }
-
-        if(!["http:","https:","mailto:"].includes(url.protocol)){
-            alert("Solo se permiten enlaces http, https o mailto.");
-            return;
-        }
-
-        editor.focus();
-        restoreSelection();
-
+        try{url=new URL(raw.trim());}catch(e){alert("La dirección no es válida.");return;}
+        if(!["http:","https:","mailto:"].includes(url.protocol)){alert("Solo se permiten enlaces http, https o mailto.");return;}
         document.execCommand("createLink",false,url.href);
-
-        editor.querySelectorAll("a").forEach(a=>{
-            a.target="_blank";
-            a.rel="noopener noreferrer";
-        });
-
-        saveSelection();
+        editor.querySelectorAll("a").forEach(a=>{a.target="_blank";a.rel="noopener noreferrer";});
+        rememberSelection(editor);
     });
-
-    const removeButton=document.getElementById("remove-link");
-
-    removeButton.addEventListener("mousedown",event=>event.preventDefault());
-
-    removeButton.addEventListener("click",()=>{
-        restoreSelection();
-        editor.focus();
-
-        document.execCommand("unlink",false,null);
-
-        saveSelection();
+    document.getElementById("remove-link").addEventListener("mousedown",event=>event.preventDefault());
+    document.getElementById("remove-link").addEventListener("click",()=>{
+        restoreSelection(activeEditor);document.execCommand("unlink",false,null);rememberSelection(activeEditor);
     });
-
-    const colorButton=document.getElementById("apply-text-color");
-    const colorInput=document.getElementById("editor-text-color");
-
-    colorButton.addEventListener("mousedown",event=>event.preventDefault());
-    colorButton.addEventListener("click",()=>{
-        const color=colorInput.value;
-
-        if(!validHexColor(color))return;
-        if(!restoreSelection()){
-            alert("Primero selecciona una palabra, frase o fragmento dentro del texto.");
-            return;
-        }
-
-        const selection=window.getSelection();
-        if(!selection||selection.isCollapsed){
-            alert("Primero selecciona el texto al que quieres cambiar el color.");
-            return;
-        }
-
-        const range=selection.getRangeAt(0);
-        if(!editor.contains(range.commonAncestorContainer))return;
-
-        const walker=document.createTreeWalker(editor,NodeFilter.SHOW_TEXT);
-        const textNodes=[];
-        while(walker.nextNode()){
-            const node=walker.currentNode;
-            if(node.nodeValue&&node.nodeValue.length&&range.intersectsNode(node))textNodes.push(node);
-        }
-
-        const coloredSpans=[];
-        textNodes.forEach(node=>{
-            const originalLength=node.nodeValue.length;
-            let start=node===range.startContainer?range.startOffset:0;
-            let end=node===range.endContainer?range.endOffset:originalLength;
-            start=Math.max(0,Math.min(start,originalLength));
-            end=Math.max(0,Math.min(end,originalLength));
-            if(end<=start)return;
-
-            let selectedNode=node;
-            if(start>0)selectedNode=selectedNode.splitText(start);
-            if(end-start<selectedNode.nodeValue.length)selectedNode.splitText(end-start);
-
-            const span=document.createElement("span");
-            span.style.color=color;
-            selectedNode.parentNode.insertBefore(span,selectedNode);
-            span.appendChild(selectedNode);
-            coloredSpans.push(span);
-        });
-
-        if(!coloredSpans.length){
-            alert("No se pudo aplicar el color a esa selección.");
-            return;
-        }
-
-        const newRange=document.createRange();
-        newRange.setStartBefore(coloredSpans[0]);
-        newRange.setEndAfter(coloredSpans[coloredSpans.length-1]);
-        selection.removeAllRanges();
-        selection.addRange(newRange);
-        savedEditorRange=newRange.cloneRange();
-        editor.focus({preventScroll:true});
-    });
-
     const imageButton=document.getElementById("insert-image");
-
     imageButton.addEventListener("mousedown",event=>event.preventDefault());
-
     imageButton.addEventListener("click",()=>{
-        restoreSelection();
-
-        const raw=prompt("Pega la dirección directa de la imagen (https://...)");
-
+        const editor=activeEditor;restoreSelection(editor);
+        const raw=prompt("Pega la dirección directa de la imagen (JPG, PNG, GIF o WEBP)");
         if(!raw)return;
-
         let url;
-
-        try{
-            url=new URL(raw.trim());
-
-        }catch(e){
-            alert("La dirección no es válida.");
-            return;
-        }
-
-        if(!["http:","https:"].includes(url.protocol)){
-            alert("Solo se permiten direcciones http o https.");
-            return;
-        }
-
-        if(!/\.(avif|bmp|gif|jpe?g|png|svg|webp)$/i.test(url.pathname)){
-            const proceed=confirm("La dirección no termina en una extensión de imagen conocida. ¿Quieres intentar insertarla de todas formas?");
-            if(!proceed)return;
-        }
-
-        editor.focus();
-        restoreSelection();
-
-        const img=document.createElement("img");
-
-        img.src=url.href;
-        img.alt="Imagen";
-        img.loading="lazy";
-        img.referrerPolicy="no-referrer";
-
+        try{url=new URL(raw.trim());}catch(e){alert("La dirección no es válida.");return;}
+        if(!["http:","https:"].includes(url.protocol)){alert("Solo se permiten direcciones http o https.");return;}
+        if(!/\.(avif|bmp|gif|jpe?g|png|svg|webp)$/i.test(url.pathname)&&!confirm("La dirección no termina en una extensión de imagen conocida. ¿Quieres intentarlo de todas formas?"))return;
+        const img=document.createElement("img");img.src=url.href;img.alt="Imagen";img.loading="lazy";img.referrerPolicy="no-referrer";
         const selection=window.getSelection();
-
-        if(selection&&selection.rangeCount){
-            const range=selection.getRangeAt(0);
-
-            range.deleteContents();
-            range.insertNode(img);
-
-            const space=document.createTextNode(" ");
-            img.after(space);
-
-            range.setStartAfter(space);
-            range.collapse(true);
-
-            selection.removeAllRanges();
-            selection.addRange(range);
-
-        }else{
-            editor.appendChild(img);
-        }
-
-        savedEditorRange=null;
-        saveSelection();
+        if(selection&&selection.rangeCount&&editor.contains(selection.anchorNode)){
+            const range=selection.getRangeAt(0);range.deleteContents();range.insertNode(img);
+            const space=document.createTextNode(" ");img.after(space);range.setStartAfter(space);range.collapse(true);
+            selection.removeAllRanges();selection.addRange(range);
+        }else editor.appendChild(img);
+        selectedEditorImage=img;rememberSelection(editor);
     });
+
+    // Cargar los valores guardados de cada campo; no se pierden al volver a editar.
+    const titleFont=safeInlineFontFamily(editData?.titleFontFamily||"");
+    const titleSize=safeInlineFontSize(editData?.titleFontSize||"");
+    const bodyFont=safeInlineFontFamily(editData?.bodyFontFamily||"");
+    const bodySize=safeInlineFontSize(editData?.bodyFontSize||"");
+    if(titleFont)titleEditor.style.fontFamily=titleFont;
+    if(titleSize)titleEditor.style.fontSize=titleSize;
+    if(validHexColor(editData?.titleColor))titleEditor.style.color=editData.titleColor;
+    if(bodyFont)bodyEditor.style.fontFamily=bodyFont;
+    if(bodySize)bodyEditor.style.fontSize=bodySize;
+    if(validHexColor(editData?.bodyColor))bodyEditor.style.color=editData.bodyColor;
+    fontPicker.value=titleFont||bodyFont||"Arial";
+    sizePicker.value=(titleSize||bodySize||"16px").replace("px","");
+    colorPicker.value=validHexColor(titleEditor.style.color)?titleEditor.style.color:(validHexColor(bodyEditor.style.color)?bodyEditor.style.color:"#c5c5c5");
 }
 
 /* PANEL ADMINISTRATIVO */
 
 function renderAdminTab(tab){
     const panel=document.getElementById("admin-panel-content");
-
-    if(tab==="guestbook"){
-        renderAdminGuestbook();
-        return;
-    }
-
+    if(tab==="guestbook"){renderAdminGuestbook();return;}
     if(tab==="inicio"){
         panel.innerHTML=`
         <div class="admin-box">
             <p class="admin-subtitle">ESTADO DEL SISTEMA</p>
             <p class="admin-status">Firebase conectado.</p>
-
             <p class="admin-subtitle">VISITANTES EN LÍNEA</p>
             <div class="admin-count" id="admin-online-count">${gardenOnlineCount}</div>
-
             <p class="admin-hint">El conteo representa conexiones anónimas activas, no personas únicas.</p>
-
             <p class="admin-subtitle">LIBRO DE VISITAS</p>
             <button class="admin-button" id="admin-guestbook-button">MODERAR FIRMAS</button>
         </div>`;
-
         document.getElementById("admin-guestbook-button").addEventListener("click",()=>{
             renderAdminTab("guestbook");
-
-            document.querySelectorAll(".admin-tab").forEach(button=>{
-                button.classList.remove("active");
-            });
+            document.querySelectorAll(".admin-tab").forEach(button=>button.classList.remove("active"));
         });
-
         return;
     }
-
-    if(tab==="publicaciones"){
-        renderPublicationEditor();
-        return;
-    }
-
-    if(tab==="archivos"){
-        renderFileEditor();
-        return;
-    }
-
-    if(tab==="configuracion"){
-        renderConfiguration();
-    }
+    if(tab==="contenido"){renderPublicationEditor();return;}
+    if(tab==="gestor"){renderPublicationManager();return;}
+    if(tab==="archivos"){renderFileEditor();return;}
+    if(tab==="configuracion"){renderConfiguration();return;}
 }
 
 /* PUBLICACIONES */
 
 function renderPublicationEditor(editData=null){
     const panel=document.getElementById("admin-panel-content");
-
     const menu=editData?.menu||"INICIO";
     const category=editData?.category||(menu==="INICIO"?"Portada":"Entrada");
-
     panel.innerHTML=`
     <div class="admin-box">
         <p class="admin-subtitle">${editData?"EDITAR PUBLICACIÓN":"NUEVA PUBLICACIÓN"}</p>
-
         ${addLocationSelectors(menu,category)}
-
-        <label class="admin-status">TÍTULO (OPCIONAL SI PUBLICAS UNA IMAGEN)</label>
-        <div class="admin-input" id="record-title" contenteditable="true" role="textbox" aria-label="Título de la publicación" data-placeholder="Título de la publicación" style="min-height:44px;overflow-wrap:anywhere"></div>
-        <div class="title-format-toolbar" aria-label="Formato del título">
-            <button type="button" data-title-command="bold"><b>B</b></button>
-            <button type="button" data-title-command="italic"><i>I</i></button>
-            <button type="button" data-title-command="underline"><u>U</u></button>
-            <label class="editor-size-control">TAMAÑO
-                <select id="title-font-size" aria-label="Tamaño del título">
-                    <option value="14">Pequeño</option>
-                    <option value="17" selected>Normal</option>
-                    <option value="20">Grande</option>
-                    <option value="24">Muy grande</option>
-                    <option value="28">Extra grande</option>
-                    <option value="32">Máximo</option>
-                </select>
-            </label>
-            <label class="editor-size-control">FUENTE
-                <select id="title-font-family" aria-label="Fuente del título">
-                    <option value="Arial" selected>Arial</option>
-                    <option value="Verdana">Verdana</option>
-                    <option value="Tahoma">Tahoma</option>
-                    <option value="Trebuchet MS">Trebuchet MS</option>
-                    <option value="Georgia">Georgia</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                    <option value="Garamond">Garamond</option>
-                    <option value="Courier New">Courier New</option>
-                </select>
-            </label>
-        </div>
-        <div class="title-color-row">
-            <label for="record-title-color">COLOR DE ESTE TÍTULO</label>
-            <input class="title-color-input" type="color" id="record-title-color" value="#cccccc" aria-label="Color del título">
-        </div>
-
-        <label class="admin-status">CONTENIDO</label>
         ${editorToolbar()}
-
+        <label class="admin-status" for="record-title">TÍTULO</label>
+        <div class="admin-input rich-editor title-editor" id="record-title" contenteditable="true" role="textbox" aria-label="Título" data-placeholder="" style="min-height:48px;overflow-wrap:anywhere"></div>
+        <label class="admin-status" for="rich-editor">CONTENIDO</label>
+        <div class="rich-editor" id="rich-editor" contenteditable="true" role="textbox" aria-label="Contenido" spellcheck="true"></div>
         <div class="admin-actions">
             <button class="admin-button" id="record-save">${editData?"GUARDAR CAMBIOS":"PUBLICAR"}</button>
             <button class="admin-button" id="record-cancel">CANCELAR</button>
         </div>
-
         <p class="admin-status" id="record-status"></p>
-    </div>
-
-    <div class="admin-box">
-        <p class="admin-subtitle">GESTIÓN DE PUBLICACIONES</p>
-        <p class="admin-hint">Abre una sección y después una categoría para editar o eliminar sus publicaciones. Los archivos permanecen en ARCHIVOS.</p>
-        <div id="publication-config-list" class="admin-status">Cargando publicaciones...</div>
-    </div>
-`;
-
-    loadPublicationList();
+    </div>`;
 
     const menuSelect=document.getElementById("record-menu");
     const categorySelect=document.getElementById("record-category");
-
-    menuSelect.addEventListener("change",()=>{
-        fillCategorySelect(menuSelect,categorySelect);
-    });
-
-    setupEditor(editData?.bodyHtml||"");
-
+    menuSelect.addEventListener("change",()=>fillCategorySelect(menuSelect,categorySelect));
     const titleEditor=document.getElementById("record-title");
-    if(editData){
-        titleEditor.innerHTML=editData.titleHtml?safeHtml(editData.titleHtml):String(editData.title||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-        document.getElementById("record-title-color").value=validHexColor(editData.titleColor)?editData.titleColor:"#cccccc";
-    }
-    let savedTitleRange=null;
-    function rememberTitleSelection(){
-        const selection=window.getSelection();
-        if(selection&&selection.rangeCount&&titleEditor.contains(selection.anchorNode))savedTitleRange=selection.getRangeAt(0).cloneRange();
-    }
-    titleEditor.addEventListener("keyup",rememberTitleSelection);
-    titleEditor.addEventListener("mouseup",rememberTitleSelection);
-    titleEditor.addEventListener("touchend",()=>setTimeout(rememberTitleSelection,80));
-    document.querySelectorAll("[data-title-command]").forEach(button=>{
-        button.addEventListener("mousedown",event=>event.preventDefault());
-        button.addEventListener("click",()=>{
-            if(savedTitleRange){
-                titleEditor.focus();
-                const selection=window.getSelection();
-                selection.removeAllRanges();selection.addRange(savedTitleRange);
-            }else titleEditor.focus();
-            document.execCommand(button.dataset.titleCommand,false,null);
-            rememberTitleSelection();
-        });
-    });
-    const titleFontSelect=document.getElementById("title-font-family");
-    titleFontSelect.addEventListener("mousedown",event=>event.stopPropagation());
-    titleFontSelect.addEventListener("change",()=>{
-        titleEditor.focus();
-        const selection=window.getSelection();
-        let range=savedTitleRange&&titleEditor.contains(savedTitleRange.commonAncestorContainer)
-            ?savedTitleRange.cloneRange():document.createRange();
-        if(!(savedTitleRange&&titleEditor.contains(savedTitleRange.commonAncestorContainer))||range.collapsed){
-            range.selectNodeContents(titleEditor);
-        }
-        if(range.collapsed)return;
-        const span=document.createElement("span");
-        span.style.fontFamily=titleFontSelect.value;
-        span.appendChild(range.extractContents());
-        range.insertNode(span);
-        const next=document.createRange();next.selectNodeContents(span);
-        selection.removeAllRanges();selection.addRange(next);
-        savedTitleRange=next.cloneRange();
-    });
-
-    const titleSizeSelect=document.getElementById("title-font-size");
-    titleSizeSelect.addEventListener("mousedown",event=>event.stopPropagation());
-    titleSizeSelect.addEventListener("change",()=>{
-        titleEditor.focus();
-        const selection=window.getSelection();
-        const range=savedTitleRange&&titleEditor.contains(savedTitleRange.commonAncestorContainer)
-            ? savedTitleRange.cloneRange()
-            : document.createRange();
-        if(!(savedTitleRange&&titleEditor.contains(savedTitleRange.commonAncestorContainer))){
-            range.selectNodeContents(titleEditor);
-        }else if(range.collapsed){
-            range.selectNodeContents(titleEditor);
-        }
-        if(range.collapsed)return;
-        const span=document.createElement("span");
-        span.style.fontSize=titleSizeSelect.value+"px";
-        span.appendChild(range.extractContents());
-        range.insertNode(span);
-        const newRange=document.createRange();
-        newRange.selectNodeContents(span);
-        selection.removeAllRanges();selection.addRange(newRange);
-        savedTitleRange=newRange.cloneRange();
-    });
+    const bodyEditor=document.getElementById("rich-editor");
+    titleEditor.innerHTML=editData?.titleHtml?safeHtml(editData.titleHtml):String(editData?.title||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    bodyEditor.innerHTML=safeHtml(editData?.bodyHtml||"");
+    setupPublicationEditor(titleEditor,bodyEditor,editData);
 
     document.getElementById("record-cancel").addEventListener("click",()=>{
         editingId=null;
-        renderPublicationEditor();
+        document.querySelectorAll(".admin-tab").forEach(button=>button.classList.toggle("active",button.dataset.adminTab==="gestor"));
+        localStorage.setItem("0site_admin_tab","gestor");
+        renderAdminTab("gestor");
     });
 
     document.getElementById("record-save").addEventListener("click",async()=>{
-        const titleEditor=document.getElementById("record-title");
         const title=titleEditor.innerText.trim();
         const titleHtml=safeHtml(titleEditor.innerHTML);
-        const titleColor=document.getElementById("record-title-color").value;
-        const editor=document.getElementById("rich-editor");
-        const bodyHtml=safeHtml(editor.innerHTML);
+        const bodyHtml=safeHtml(bodyEditor.innerHTML);
         const status=document.getElementById("record-status");
         const saveButton=document.getElementById("record-save");
-
-        const hasImage=!!editor.querySelector("img");
-        const hasText=!!editor.textContent.trim();
+        const hasImage=!!bodyEditor.querySelector("img");
+        const hasText=!!bodyEditor.textContent.trim();
         if((!title&&!hasImage)||(!hasText&&!hasImage)){
-            status.textContent="Añade un título y texto, o inserta una imagen para publicar sin texto.";
-            return;
+            status.textContent="Completa el título y el contenido, o inserta una imagen en el contenido.";return;
         }
-
-        saveButton.disabled=true;
-        status.textContent="Guardando publicación...";
-
+        saveButton.disabled=true;status.textContent="Guardando publicación...";
         const newMenu=menuSelect.value;
         const newCategory=categorySelect.value;
-
-        const sameLocation=editData&&
-            editData.menu===newMenu&&
-            editData.category===newCategory;
-
+        const sameLocation=editData&&editData.menu===newMenu&&editData.category===newCategory;
         const data={
-            menu:newMenu,
-            category:newCategory,
-            title,
-            titleHtml,
-            titleColor:validHexColor(titleColor)?titleColor:"#cccccc",
+            menu:newMenu,category:newCategory,title,titleHtml,
+            titleColor:validHexColor(titleEditor.style.color)?titleEditor.style.color:"#cccccc",
+            titleFontFamily:safeInlineFontFamily(titleEditor.style.fontFamily)||"",
+            titleFontSize:safeInlineFontSize(titleEditor.style.fontSize)||"",
+            bodyColor:validHexColor(bodyEditor.style.color)?bodyEditor.style.color:"",
+            bodyFontFamily:safeInlineFontFamily(bodyEditor.style.fontFamily)||"",
+            bodyFontSize:safeInlineFontSize(bodyEditor.style.fontSize)||"",
             bodyHtml,
             updatedAt:firebase.firestore.FieldValue.serverTimestamp()
         };
-
         try{
             if(editingId){
-                if(sameLocation&&hasCustomOrder(editData)){
-                    data.order=editData.order;
-
-                }else{
-                    data.order=await prepareNextOrder(
-                        "publicaciones",
-                        newMenu,
-                        newCategory,
-                        editingId
-                    );
-                }
-
+                if(sameLocation&&hasCustomOrder(editData))data.order=editData.order;
+                else data.order=await prepareNextOrder("publicaciones",newMenu,newCategory,editingId);
                 await firestore.collection("publicaciones").doc(editingId).update(data);
-
-                status.textContent="Publicación actualizada.";
-
+                status.textContent="Publicación actualizada correctamente.";
             }else{
-                data.order=await prepareNextOrder(
-                    "publicaciones",
-                    newMenu,
-                    newCategory
-                );
-
+                data.order=await prepareNextOrder("publicaciones",newMenu,newCategory);
                 data.createdAt=firebase.firestore.FieldValue.serverTimestamp();
-
                 await firestore.collection("publicaciones").add(data);
-
-                status.textContent="Publicación creada.";
+                status.textContent="Publicación publicada correctamente.";
             }
-
             editingId=null;
-
-            document.getElementById("record-title").innerHTML="";
-            editor.innerHTML="";
-            savedEditorRange=null;
-
+            titleEditor.innerHTML="";bodyEditor.innerHTML="";
+            titleEditor.removeAttribute("style");bodyEditor.removeAttribute("style");
+            document.getElementById("editor-font-family").value="Arial";
+            document.getElementById("editor-font-size").value="16";
+            document.getElementById("editor-text-color").value="#c5c5c5";
+            document.getElementById("editor-image-size").value="auto";
             saveButton.textContent="PUBLICAR";
-
-            refreshPublicationManagement();
-
+            setTimeout(()=>{if(document.getElementById("record-status"))document.getElementById("record-status").textContent="";},3500);
         }catch(error){
-            console.error(error);
-            status.textContent="No se pudo guardar. Comprueba las reglas de Firestore.";
-
-        }finally{
-            saveButton.disabled=false;
-        }
+            console.error(error);status.textContent="No se pudo guardar. Comprueba las reglas de Firestore.";
+        }finally{saveButton.disabled=false;}
     });
+}
 
+async function renderPublicationManager(){
+    const panel=document.getElementById("admin-panel-content");
+    panel.innerHTML=`<div class="admin-box"><p class="admin-subtitle">GESTOR DE PUBLICACIONES</p><div id="gestor-publication-list" class="admin-status">Cargando publicaciones...</div></div>`;
+    await loadPublicationList();
 }
 
 async function loadPublicationList(){
-    const list=document.getElementById("publication-config-list");
+    const list=document.getElementById("gestor-publication-list");
     if(!list)return;
     try{
         const snapshot=await firestore.collection("publicaciones").get();
-        if(!document.getElementById("publication-config-list"))return;
+        if(!document.getElementById("gestor-publication-list"))return;
         list.innerHTML="";
         if(snapshot.empty){list.textContent="No hay publicaciones todavía.";return;}
-        const docs=[];
-        snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
+        const docs=[];snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
         const sectionsOrder=["INICIO","HOME","SHA","SEC","OBL","ARC"];
         const categories={};
         docs.forEach(item=>{
-            const section=item.menu||"SIN SECCIÓN";
-            const category=item.category||"Sin categoría";
-            categories[section]??={};
-            categories[section][category]??=[];
-            categories[section][category].push(item);
+            const section=item.menu||"SIN SECCIÓN";const category=item.category||"Sin categoría";
+            categories[section]??={};categories[section][category]??=[];categories[section][category].push(item);
         });
         [...new Set([...sectionsOrder,...Object.keys(categories)])].forEach(section=>{
             if(!categories[section])return;
-            const sectionBox=document.createElement("details");
-            sectionBox.className="publication-group";
-            const sectionTitle=document.createElement("summary");
-            sectionTitle.textContent=section;
-            sectionBox.appendChild(sectionTitle);
+            const sectionBox=document.createElement("details");sectionBox.className="publication-group";
+            const sectionTitle=document.createElement("summary");sectionTitle.textContent=section;sectionBox.appendChild(sectionTitle);
             Object.keys(categories[section]).sort((a,b)=>a.localeCompare(b)).forEach(category=>{
-                const categoryBox=document.createElement("details");
-                categoryBox.className="publication-category";
-                const categoryTitle=document.createElement("summary");
-                categoryTitle.textContent=category;
-                categoryBox.appendChild(categoryTitle);
+                const categoryBox=document.createElement("details");categoryBox.className="publication-category";
+                const categoryTitle=document.createElement("summary");categoryTitle.textContent=category;categoryBox.appendChild(categoryTitle);
                 sortRecords(categories[section][category]).forEach(item=>{
                     const row=document.createElement("div");row.className="admin-record";
                     const label=document.createElement("span");label.textContent=item.title||"Sin título";
                     const actions=document.createElement("div");actions.className="admin-actions";
                     const edit=document.createElement("button");edit.textContent="EDITAR";
-                    edit.addEventListener("click",()=>{editingId=item.id;renderPublicationEditor(item);});
+                    edit.addEventListener("click",()=>{
+                        editingId=item.id;
+                        document.querySelectorAll(".admin-tab").forEach(button=>button.classList.toggle("active",button.dataset.adminTab==="contenido"));
+                        localStorage.setItem("0site_admin_tab","contenido");
+                        renderPublicationEditor(item);
+                    });
                     const remove=document.createElement("button");remove.textContent="ELIMINAR";remove.className="admin-danger";
                     remove.addEventListener("click",async()=>{
-                        if(!confirm("¿Eliminar esta publicación?"))return;
-                        try{await firestore.collection("publicaciones").doc(item.id).delete();loadPublicationList();}
-                        catch(error){console.error(error);alert("No se pudo eliminar.");}
+                        if(!confirm("¿Eliminar esta publicación definitivamente?"))return;
+                        try{await firestore.collection("publicaciones").doc(item.id).delete();await loadPublicationList();}
+                        catch(error){console.error(error);alert("No se pudo eliminar. Comprueba las reglas de Firestore.");}
                     });
                     actions.append(edit,remove);row.append(label,actions);categoryBox.appendChild(row);
                 });
@@ -2460,7 +2206,8 @@ async function loadPublicationList(){
         });
     }catch(error){console.error(error);list.textContent="No se pudieron cargar las publicaciones. Revisa las reglas de Firestore.";}
 }
-function refreshPublicationManagement(){if(document.getElementById("publication-config-list"))loadPublicationList();}
+
+function refreshPublicationManagement(){if(document.getElementById("gestor-publication-list"))loadPublicationList();}
 
 /* ARCHIVOS */
 
@@ -2765,21 +2512,16 @@ function renderConfiguration(){
     </div>
     <div class="admin-box">
         <p class="admin-subtitle">OTRAS CONFIGURACIONES</p>
-        <p class="admin-hint">Los colores se ajustan individualmente al editar cada publicación: el título tiene su propio selector y el contenido permite colorear solo el texto seleccionado.</p>
+        <p class="admin-hint">El formato de títulos y contenido se controla desde la barra de herramientas de la pestaña CONTENIDO.</p>
         <input class="admin-input" id="config-key" placeholder="Nombre de la opción">
         <textarea class="admin-textarea" id="config-value" placeholder="Valor"></textarea>
         <button class="admin-button" id="config-save">GUARDAR CONFIGURACIÓN</button>
         <p class="admin-status" id="config-status"></p>
         <div id="config-list" class="admin-status">Cargando...</div>
     </div>
-    <div class="admin-box">
-        <p class="admin-subtitle">GESTIÓN DE PUBLICACIONES</p>
-        <p class="admin-hint">Abre una sección y después una categoría para editar o eliminar sus publicaciones. Los archivos permanecen en ARCHIVOS.</p>
-        <div id="publication-config-list" class="admin-status">Cargando publicaciones...</div>
-    </div>`;
+`;
 
     loadConfig();
-    loadPublicationList();
 
     let categoryDraft=cloneSectionSettings();
     const menuPicker=document.getElementById("category-menu-select");
