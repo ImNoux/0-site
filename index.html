@@ -259,6 +259,15 @@ nav{gap:2px}
 .publication-body p:empty,.publication-body div:empty{display:none !important}
 .publication-body img,.publication-body .file-image,.file-image{margin:.45em 0 !important}
 .publication-body ul,.publication-body ol{margin:.45em 0 !important;padding-left:1.4em}
+/* SOLO LOS CONTROLES DEL TITULO SE MANTIENEN COMPACTOS.
+   Los controles del contenido recuperan su tamaño original. */
+.editor-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0}
+.editor-toolbar button{
+  min-height:0;height:auto;padding:9px 12px;font-family:monospace;
+  font-size:10px;line-height:normal;background:#111;border:1px solid #444;color:#aaa;
+}
+.editor-toolbar .editor-size-control{display:flex;align-items:center;gap:5px;white-space:nowrap;color:#888;font:9px monospace}
+.editor-toolbar .editor-size-control select{height:auto;max-width:none;padding:7px;font:10px monospace;background:#080808;border:1px solid #444;color:#bbb}
 @media(max-width:600px){
   .title-format-toolbar{gap:3px}
   .title-format-toolbar button{flex-basis:29px;width:29px;min-width:29px;height:29px}
