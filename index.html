@@ -13,7 +13,7 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{min-height:100vh;background:radial-gradient(ellipse at center,#303030 0%,#1c1c1c 25%,#0d0d0d 55%,#000000 100%);background-attachment:fixed;color:#dedede;font-family:Georgia,"Times New Roman",serif;overflow-x:hidden}
+html,body{min-height:100vh;background:#0d0d0d;background:radial-gradient(ellipse at center,#303030 0%,#1c1c1c 25%,#0d0d0d 55%,#000000 100%);background-attachment:fixed;color:#dedede;font-family:Georgia,"Times New Roman",serif;overflow-x:hidden}
 #letter-screen{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:25px;transition:opacity 1.5s ease}
 .letter{width:100%;max-width:650px;padding:35px 30px;background:rgba(0,0,0,.78);border:1px solid #292929;box-shadow:0 0 40px rgba(0,0,0,.9)}
 .letter-header{display:flex;justify-content:space-between;gap:15px;color:#777;font-family:monospace;font-size:11px;margin-bottom:28px;letter-spacing:1px}
@@ -1970,6 +1970,17 @@ function editorToolbar(){
             <button type="button" data-command="bold" aria-label="Negrita"><b>B</b></button>
             <button type="button" data-command="italic" aria-label="Cursiva"><i>I</i></button>
             <button type="button" data-command="underline" aria-label="Subrayado"><u>U</u></button>
+        </div>
+        <div class="formato-biu" style="margin-top:6px;">
+            <button type="button" data-command="justifyLeft" title="Alinear izquierda">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+            </button>
+            <button type="button" data-command="justifyCenter" title="Centrar">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+            </button>
+            <button type="button" data-command="justifyRight" title="Alinear derecha">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>
+            </button>
         </div>
         <div class="formato-divider"></div>
         <div class="formato-icons">
