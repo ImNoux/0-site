@@ -401,20 +401,21 @@ nav{gap:2px}
 /* Espaciado: un Enter = párrafo normal; dos Enter = separación amplia.
    La separación entre publicaciones se mantiene independiente. */
 .publication{max-width:560px;margin:0;padding:0;border:0}
-.publication + .publication{margin-top:2em !important}
-.publication h3{margin:0 0 1em !important}
-.publication-body{max-width:560px;line-height:1.55}
-.publication-body p,.publication-body>div{margin:0 0 .45em !important;padding:0}
+.publication + .publication{margin-top:2.2em !important}
+.publication h3{margin:0 0 0.8em !important}
+.publication-body{max-width:560px;line-height:1.6}
+.publication-body p,.publication-body>div{margin:0 0 0.6em !important;padding:0}
 .publication-body p:empty,.publication-body div:empty{display:none !important}
-/* El bloque vacío que genera el segundo Enter se conserva como espacio extra. */
+/* Un Enter = espacio normal; dos Enter = espacio amplio dentro de la misma historia */
 .publication-body p:has(> br:only-child),
 .publication-body>div:has(> br:only-child){
   display:block !important;
-  min-height:1.55em;
-  height:1.55em;
+  min-height:1.6em;
+  height:1.6em;
   margin:0 !important;
   padding:0;
 }
+.publication-body p + p{margin-top:0.4em !important}
 .publication-body img,.publication-body .file-image,.file-image{margin:1em 0 !important}
 .publication-body ul,.publication-body ol{margin:1em 0 !important;padding-left:1.4em}
 .publication-body a{cursor:pointer;text-decoration:underline}
@@ -427,6 +428,8 @@ nav{gap:2px}
  .admin-box{padding:12px}
 }
 
+.rich-editor,.rich-editor.title-editor{color:#dedede !important;}
+.rich-editor *{color:inherit;}
 </style>
 </head>
 
@@ -641,6 +644,7 @@ let transitionStarted=false;
 let editingId=null;
 let currentContentToken=0;
 let savedEditorRange=null;
+let activeContentListeners=[];
 
 const sections={
 INICIO:[
@@ -1369,6 +1373,14 @@ function isImageUrl(rawUrl){
     }
 }
 
+
+function clearContentListeners(){
+    activeContentListeners.forEach(unsub=>{
+        try{unsub();}catch(e){}
+    });
+    activeContentListeners=[];
+}
+
 /* MOSTRAR CATEGORÍAS */
 
 async function showCategory(section,title,description,updateUrl=false){
@@ -1390,22 +1402,29 @@ async function showCategory(section,title,description,updateUrl=false){
         latestGuestbookSnapshot=null;
     }
 
+    clearContentListeners();
     const content=document.getElementById("content-area");
     const token=++currentContentToken;
 
     content.innerHTML="";
 
-    const desc=document.createElement("p");
-    desc.className="content-description";
-    desc.textContent=description;
+    // Solo mostrar título/descripción en casos especiales (INICIO, Reglas, Rastros, Rutas)
+    const showHeader = (section==="INICIO") || 
+                       (section==="HOME" && title==="Reglas") ||
+                       (section==="ARC" && title==="Rutas caducadas");
 
-    if(section!=="INICIO"){
-        const heading=document.createElement("h2");
-        heading.className="content-title";
-        heading.textContent=title;
-        content.append(heading,desc);
-    }else{
-        content.appendChild(desc);
+    if(showHeader){
+        const desc=document.createElement("p");
+        desc.className="content-description";
+        desc.textContent=description;
+        if(section!=="INICIO"){
+            const heading=document.createElement("h2");
+            heading.className="content-title";
+            heading.textContent=title;
+            content.append(heading,desc);
+        }else{
+            content.appendChild(desc);
+        }
     }
 
     if(section==="HOME"&&title==="Reglas"){
@@ -1467,126 +1486,129 @@ async function showCategory(section,title,description,updateUrl=false){
     content.appendChild(loading);
 
     try{
+        clearContentListeners();
         const legacyTitle=(sections[section]||[]).find(item=>item.title===title)?.legacyTitle;
-        const publicationQuery=legacyTitle
-            ? Promise.all([
-                firestore.collection("publicaciones").where("menu","==",section).where("category","==",title).get(),
-                firestore.collection("publicaciones").where("menu","==",section).where("category","==",legacyTitle).get()
-              ])
-            : Promise.all([firestore.collection("publicaciones").where("menu","==",section).where("category","==",title).get()]);
-        const fileQuery=legacyTitle
-            ? Promise.all([
-                firestore.collection("archivos").where("menu","==",section).where("category","==",title).get(),
-                firestore.collection("archivos").where("menu","==",section).where("category","==",legacyTitle).get()
-              ])
-            : Promise.all([firestore.collection("archivos").where("menu","==",section).where("category","==",title).get()]);
-        const [publicationSnapshots,fileSnapshots]=await Promise.all([publicationQuery,fileQuery]);
 
-        if(token!==currentContentToken)return;
+        function renderContent(pubDocs, fileDocs){
+            if(token!==currentContentToken)return;
+            // Clear previous dynamic content but keep special headers if any
+            const existingPubs = content.querySelectorAll(".publication:not([data-static])");
+            existingPubs.forEach(el => el.remove());
+            const existingLoading = content.querySelector(".admin-status");
+            if(existingLoading) existingLoading.remove();
 
-        const docs=[];
-        publicationSnapshots.forEach(snapshot=>snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()})));
-
-        const orderedPublications=sortRecords(docs);
-
-        loading.remove();
-
-        orderedPublications.forEach(item=>{
-            const article=document.createElement("article");
-            article.className="publication publication-font-modern";
-
-            if(item.title){
-                const h=document.createElement("h3");
-                if(item.titleHtml)h.innerHTML=safeHtml(item.titleHtml);
-                else h.textContent=item.title;
-                if(validHexColor(item.titleColor))h.style.color=item.titleColor;
-                const titleFont=safeInlineFontFamily(item.titleFontFamily||"");
-                const titleSize=safeInlineFontSize(item.titleFontSize||"");
-                if(titleFont)h.style.fontFamily=titleFont;
-                if(titleSize)h.style.fontSize=titleSize;
-                article.appendChild(h);
-            }
-
-            const body=document.createElement("div");
-            body.className="publication-body";
-            body.innerHTML=safeHtml(item.bodyHtml||"");
-            const bodyFont=safeInlineFontFamily(item.bodyFontFamily||"");
-            const bodySize=safeInlineFontSize(item.bodyFontSize||"");
-            if(bodyFont)body.style.fontFamily=bodyFont;
-            if(bodySize)body.style.fontSize=bodySize;
-            if(validHexColor(item.bodyColor))body.style.color=item.bodyColor;
-            // Elimina párrafos vacíos que el editor móvil puede crear al pulsar Enter dos veces.
-            body.querySelectorAll("p, div").forEach(node=>{
-                const hasContent=node.querySelector("img, a, ul, ol, video, iframe");
-                if(!node.textContent.trim()&&!hasContent)node.remove();
+            const orderedPublications=sortRecords(pubDocs);
+            orderedPublications.forEach(item=>{
+                const article=document.createElement("article");
+                article.className="publication publication-font-modern";
+                if(item.title){
+                    const h=document.createElement("h3");
+                    if(item.titleHtml)h.innerHTML=safeHtml(item.titleHtml);
+                    else h.textContent=item.title;
+                    if(validHexColor(item.titleColor))h.style.color=item.titleColor;
+                    const titleFont=safeInlineFontFamily(item.titleFontFamily||"");
+                    const titleSize=safeInlineFontSize(item.titleFontSize||"");
+                    if(titleFont)h.style.fontFamily=titleFont;
+                    if(titleSize)h.style.fontSize=titleSize;
+                    article.appendChild(h);
+                }
+                const body=document.createElement("div");
+                body.className="publication-body";
+                body.innerHTML=safeHtml(item.bodyHtml||"");
+                const bodyFont=safeInlineFontFamily(item.bodyFontFamily||"");
+                const bodySize=safeInlineFontSize(item.bodyFontSize||"");
+                if(bodyFont)body.style.fontFamily=bodyFont;
+                if(bodySize)body.style.fontSize=bodySize;
+                if(validHexColor(item.bodyColor))body.style.color=item.bodyColor;
+                body.querySelectorAll("p, div").forEach(node=>{
+                    const hasContent=node.querySelector("img, a, ul, ol, video, iframe");
+                    if(!node.textContent.trim()&&!hasContent)node.remove();
+                });
+                body.querySelectorAll("br + br").forEach(br=>br.remove());
+                article.appendChild(body);
+                content.appendChild(article);
             });
-            // Reduce saltos BR consecutivos a uno solo.
-            body.querySelectorAll("br + br").forEach(br=>br.remove());
 
-            article.appendChild(body);
-            content.appendChild(article);
-        });
-
-        const matchingFiles=[];
-
-        fileSnapshots.forEach(snapshot=>snapshot.forEach(doc=>matchingFiles.push({id:doc.id,...doc.data()})));
-
-        const orderedFiles=sortRecords(matchingFiles);
-
-        orderedFiles.forEach(item=>{
-            const article=document.createElement("article");
-            article.className="publication";
-
-            const h=document.createElement("h3");
-            h.textContent=item.title||"Archivo";
-
-            const p=document.createElement("p");
-            p.className="publication-body";
-            p.textContent=item.description||"";
-
-            article.append(h,p);
-
-            if(isImageUrl(item.url||"")){
-                const img=document.createElement("img");
-                img.className="file-image";
-                img.src=item.url;
-                img.alt=item.title||"Imagen";
-                img.loading="lazy";
-                img.referrerPolicy="no-referrer";
-
-                img.onerror=()=>{
-                    img.remove();
-
+            const orderedFiles=sortRecords(fileDocs);
+            orderedFiles.forEach(item=>{
+                const article=document.createElement("article");
+                article.className="publication";
+                const h=document.createElement("h3");
+                h.textContent=item.title||"Archivo";
+                const p=document.createElement("p");
+                p.className="publication-body";
+                p.textContent=item.description||"";
+                article.append(h,p);
+                if(isImageUrl(item.url||"")){
+                    const img=document.createElement("img");
+                    img.className="file-image";
+                    img.src=item.url;
+                    img.alt=item.title||"Imagen";
+                    img.loading="lazy";
+                    img.referrerPolicy="no-referrer";
+                    img.onerror=()=>{
+                        img.remove();
+                        const a=document.createElement("a");
+                        a.href=item.url;
+                        a.target="_blank";
+                        a.rel="noopener noreferrer";
+                        a.textContent=item.linkLabel||"Abrir archivo";
+                        article.appendChild(a);
+                    };
+                    article.appendChild(img);
+                }else{
                     const a=document.createElement("a");
-                    a.href=item.url;
+                    a.href=item.url||"#";
                     a.target="_blank";
                     a.rel="noopener noreferrer";
                     a.textContent=item.linkLabel||"Abrir archivo";
-
                     article.appendChild(a);
-                };
+                }
+                content.appendChild(article);
+            });
 
-                article.appendChild(img);
-
-            }else{
-                const a=document.createElement("a");
-                a.href=item.url||"#";
-                a.target="_blank";
-                a.rel="noopener noreferrer";
-                a.textContent=item.linkLabel||"Abrir archivo";
-
-                article.appendChild(a);
+            if(!pubDocs.length&&!fileDocs.length&&!(section==="ARC"&&title==="Rutas caducadas")){
+                const empty=document.createElement("p");
+                empty.className="admin-status";
+                empty.textContent="No hay publicaciones en esta sección.";
+                content.appendChild(empty);
             }
+        }
 
-            content.appendChild(article);
+        // Real-time listeners
+        const pubQuery = firestore.collection("publicaciones").where("menu","==",section).where("category","==",title);
+        const unsubPub = pubQuery.onSnapshot(snapshot=>{
+            const docs=[];
+            snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
+            // For simplicity re-fetch files or keep separate; here we call with current
+            renderContent(docs, window._currentFiles||[]);
+        }, err=>console.error(err));
+        activeContentListeners.push(unsubPub);
+
+        const fileQuery = firestore.collection("archivos").where("menu","==",section).where("category","==",title);
+        const unsubFile = fileQuery.onSnapshot(snapshot=>{
+            const files=[];
+            snapshot.forEach(doc=>files.push({id:doc.id,...doc.data()}));
+            window._currentFiles=files;
+            // Trigger re-render by getting pubs again if needed; simplified
+            pubQuery.get().then(snap=>{
+                const docs=[];
+                snap.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
+                renderContent(docs, files);
+            });
+        }, err=>console.error(err));
+        activeContentListeners.push(unsubFile);
+
+        // Initial load
+        Promise.all([pubQuery.get(), fileQuery.get()]).then(([pSnap, fSnap])=>{
+            const docs=[], files=[];
+            pSnap.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
+            fSnap.forEach(doc=>files.push({id:doc.id,...doc.data()}));
+            window._currentFiles=files;
+            renderContent(docs, files);
         });
 
-        if(!docs.length&&!matchingFiles.length&&!(section==="ARC"&&title==="Rutas caducadas")){
-            const empty=document.createElement("p");
-            empty.className="admin-status";
-            empty.textContent="No hay publicaciones en esta sección.";
-            content.appendChild(empty);
-        }
+        return; // skip old code
 
     }catch(error){
         console.error("Error cargando contenido:",error);
@@ -2009,6 +2031,32 @@ function editorToolbar(){
 }
 
 function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
+
+    // Forzar color blanco al pegar
+    function forceWhiteOnPaste(editor){
+        editor.addEventListener("paste", e=>{
+            e.preventDefault();
+            const text = (e.clipboardData || window.clipboardData).getData("text/plain");
+            document.execCommand("insertText", false, text);
+            // Asegurar color claro
+            const sel = window.getSelection();
+            if(sel && sel.rangeCount){
+                const range = sel.getRangeAt(0);
+                const span = document.createElement("span");
+                span.style.color = "#dedede";
+                try{
+                    range.surroundContents(span);
+                }catch(err){
+                    // fallback
+                    editor.style.color = "#dedede";
+                }
+            }
+            editor.style.color = "#dedede";
+        });
+    }
+    forceWhiteOnPaste(titleEditor);
+    forceWhiteOnPaste(bodyEditor);
+
     let activeEditor=titleEditor;
     let selectedEditorImage=null;
     const savedRanges=new Map([[titleEditor,null],[bodyEditor,null]]);
