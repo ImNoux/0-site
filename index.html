@@ -507,7 +507,7 @@ nav{gap:2px}
 <section id="letter-screen">
 <div class="letter">
     <div class="letter-header">
-        <span>De: Creador/Admin</span>
+        <span>De: zorg</span>
         <span id="local-time"></span>
     </div>
     <h2>MENSAJE DE INGRESO</h2>
@@ -2450,6 +2450,27 @@ async function loadPublicationList(){
                     const row=document.createElement("div");row.className="admin-record";
                     const label=document.createElement("span");label.textContent=item.title||"Sin título";
                     const actions=document.createElement("div");actions.className="admin-actions";
+                    const ordered = sortRecords(categories[section][category]);
+                    const pos = ordered.findIndex(r => r.id === item.id);
+
+                    const up=document.createElement("button");
+                    up.className="move-button";
+                    up.textContent="↑";
+                    up.title="Subir";
+                    up.disabled = pos === 0;
+                    up.addEventListener("click", () => {
+                        moveRecord("publicaciones", ordered, pos, -1, loadPublicationList);
+                    });
+
+                    const down=document.createElement("button");
+                    down.className="move-button";
+                    down.textContent="↓";
+                    down.title="Bajar";
+                    down.disabled = pos === ordered.length - 1;
+                    down.addEventListener("click", () => {
+                        moveRecord("publicaciones", ordered, pos, 1, loadPublicationList);
+                    });
+
                     const edit=document.createElement("button");edit.textContent="EDITAR";
                     edit.addEventListener("click",()=>{
                         editingId=item.id;
@@ -2463,7 +2484,7 @@ async function loadPublicationList(){
                         try{await firestore.collection("publicaciones").doc(item.id).delete();await loadPublicationList();}
                         catch(error){console.error(error);alert("No se pudo eliminar. Comprueba las reglas de Firestore.");}
                     });
-                    actions.append(edit,remove);row.append(label,actions);categoryBox.appendChild(row);
+                    actions.append(up, down, edit, remove);row.append(label,actions);categoryBox.appendChild(row);
                 });
                 sectionBox.appendChild(categoryBox);
             });
