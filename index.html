@@ -461,6 +461,44 @@ nav{gap:2px}
   line-height: 1.3 !important;
 }
 
+
+/* FIX DEFINITIVO SUPERPOSICIÓN */
+.publication-body,
+.publication-font-modern .publication-body {
+  font-size: 17px !important;
+  line-height: 1.7 !important;
+  color: #c8c8c8 !important;
+  white-space: normal !important;
+  word-break: break-word !important;
+}
+.publication-body p,
+.publication-body div,
+.publication-font-modern .publication-body p {
+  margin: 0 0 1em !important;
+  padding: 0 !important;
+  line-height: 1.7 !important;
+  display: block !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+.publication-body p:empty,
+.publication-body div:empty {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+}
+.publication + .publication {
+  margin-top: 2.5em !important;
+}
+.publication h3 {
+  margin: 0 0 0.8em !important;
+  line-height: 1.3 !important;
+  clear: both;
+}
+/* end fix */
+
 </style>
 </head>
 
