@@ -752,9 +752,7 @@ Ninguno encontró exactamente lo que esperaba.
 
 Si has llegado hasta aquí, continúa.`
 ];
-const signature="
-
-Con cariño: EL CREADOR";
+const signature="\n\nCon cariño: EL CREADOR";
 
 function getSaved(key){
     try{return localStorage.getItem(key)}catch(e){return null}
@@ -1806,8 +1804,7 @@ function typeWriter(){
             textElement.textContent+=character;
             index++;
 
-            setTimeout(type,character==="
-"?350:32);
+            setTimeout(type,character==="\n"?350:32);
 
         }else{
             cursor.style.display="none";
