@@ -138,13 +138,10 @@ nav{gap:2px}
 .admin-record .admin-actions{width:100%}
 }
 
-
-
 /* FORMATO DE COLOR INDIVIDUAL */
 .editor-color-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 14px}
 .editor-color-tools label{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #333;background:#0b0b0b;color:#aaa;font:10px monospace;letter-spacing:1px}
 
-/* Selectores circulares compactos, también en Safari/iPhone */
 .editor-color-tools input[type="color"],
 .title-color-input{
     -webkit-appearance:none;
@@ -179,8 +176,6 @@ nav{gap:2px}
 .title-color-row label{font:10px monospace;color:#888;letter-spacing:1px}
 .title-color-input{flex-shrink:0}
 
-
-
 /* DISEÑO DE LECTURA: COLUMNA ESTRECHA Y ESPACIADO COMPACTO */
 .content-area{max-width:560px;margin-left:auto;margin-right:auto}
 .publication{max-width:560px;margin-top:6px;padding:6px 0}
@@ -189,7 +184,6 @@ nav{gap:2px}
 .publication-body p{margin:0 0 3px}
 .publication-body img,.file-image{margin:2px 0}
 .publication-body ul,.publication-body ol{margin:5px 0}
-/* Tipografía predeterminada: Sans Serif moderno */
 .publication-font-modern .publication-body,
 .publication-font-modern .publication-body p,
 .publication-font-modern .publication-body li{font-family:Arial,Helvetica,sans-serif}
@@ -210,20 +204,20 @@ nav{gap:2px}
 .publication-body img,.file-image{margin:6px 0}
 .publication-body ul,.publication-body ol{margin:6px 0}
 
-
-.category-order-list{display:flex;flex-direction:column;gap:7px;margin:12px 0}
-.category-order-row{display:grid;grid-template-columns:minmax(0,1fr) 38px 38px;gap:6px;align-items:center}
+/* GESTIÓN DE CATEGORÍAS CON CHECKBOX DE OCULTAR Y ELIMINAR */
+.category-order-list{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.category-order-row{display:grid;grid-template-columns:minmax(0,1fr) auto 34px 34px 34px;gap:6px;align-items:center}
 .category-order-row .admin-input{margin:0;min-width:0;padding:8px 10px}
-.category-order-row button{height:36px;border:1px solid #444;background:#111;color:#bbb;font-size:17px}
-.category-order-row button:disabled{opacity:.25}
-
+.category-order-row button{height:36px;border:1px solid #444;background:#111;color:#bbb;font-size:15px;cursor:pointer}
+.category-order-row button:hover{border-color:#888;color:#fff}
+.category-order-row button:disabled{opacity:.25;cursor:not-allowed}
+.category-hidden-toggle{display:flex;align-items:center;gap:5px;padding:0 8px;height:36px;border:1px solid #383838;background:#101010;color:#999;font:9px monospace;letter-spacing:.5px;cursor:pointer;user-select:none;white-space:nowrap}
+.category-hidden-toggle input{accent-color:#888;cursor:pointer}
+.category-hidden-toggle.is-hidden{border-color:#633;color:#d8a4a4;background:#170c0c}
 
 .title-format-toolbar button{min-width:42px;width:42px;height:42px}
 .editor-toolbar button{min-height:34px}
 
-
-
-/* AJUSTE DEFINITIVO: CONTROLES COMPACTOS Y ESPACIADO UNIFORME */
 .admin-box{padding:14px;margin-bottom:14px}
 .title-format-toolbar{
   display:flex;align-items:center;flex-wrap:nowrap;gap:4px;margin:6px 0 9px;
@@ -251,7 +245,6 @@ nav{gap:2px}
 .admin-input,.admin-select,.admin-textarea{padding:8px 10px;font-size:12px}
 .rich-editor{min-height:150px;padding:10px;font-size:13px;line-height:1.55}
 
-/* Publicaciones: un espacio entre bloques y dos entre historias */
 .publication{max-width:560px;margin:0;padding:0;border:0}
 .publication + .publication{margin-top:1.5em !important}
 .publication h3{margin:0 0 .45em !important}
@@ -260,8 +253,6 @@ nav{gap:2px}
 .publication-body p:empty,.publication-body div:empty{display:none !important}
 .publication-body img,.publication-body .file-image,.file-image{margin:.45em 0 !important}
 .publication-body ul,.publication-body ol{margin:.45em 0 !important;padding-left:1.4em}
-/* SOLO LOS CONTROLES DEL TITULO SE MANTIENEN COMPACTOS.
-   Los controles del contenido recuperan su tamaño original. */
 .editor-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0}
 .editor-toolbar button{
   min-height:0;height:auto;padding:9px 12px;font-family:monospace;
@@ -275,8 +266,8 @@ nav{gap:2px}
   .title-format-toolbar select{width:64px;height:29px;font-size:8px}
   .title-format-toolbar .editor-size-control{font-size:7px;gap:2px}
   .admin-box{padding:12px}
+  .category-order-row{grid-template-columns:minmax(0,1fr) auto 30px 30px 30px;gap:4px}
 }
-
 
 /* NUEVO EDITOR FORMATO (estilo app) */
 .formato-panel{
@@ -379,7 +370,6 @@ nav{gap:2px}
   .formato-biu button{height:44px;font-size:17px}
 }
 
-/* EDITOR WORD PARA 0-SITE (legacy, se mantiene por si acaso) */
 .editor-toolbar-word{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px;background:#202226;border:1px solid #393c40;border-radius:5px;margin:8px 0 14px}
 .editor-toolbar-word button{min-height:34px;padding:7px 10px;background:#111;border:1px solid #45484d;color:#ddd;border-radius:3px;font:10px monospace;cursor:pointer}
 .editor-toolbar-word button:hover{background:#303238;border-color:#777}
@@ -398,15 +388,12 @@ nav{gap:2px}
 .rich-editor img{display:block;max-width:100%;max-height:450px;height:auto;width:auto;margin:1em 0;border:1px solid #292929}
 .admin-box>label.admin-status{display:block;margin:13px 0 5px}
 .admin-box>.admin-input{margin-top:0}
-/* Espaciado: un Enter = párrafo normal; dos Enter = separación amplia.
-   La separación entre publicaciones se mantiene independiente. */
 .publication{max-width:560px;margin:0;padding:0;border:0}
 .publication + .publication{margin-top:2.2em !important}
 .publication h3{margin:0 0 0.8em !important}
 .publication-body{max-width:560px;line-height:1.6}
 .publication-body p,.publication-body>div{margin:0 0 0.6em !important;padding:0}
 .publication-body p:empty,.publication-body div:empty{display:none !important}
-/* Un Enter = espacio normal; dos Enter = espacio amplio dentro de la misma historia */
 .publication-body p:has(> br:only-child),
 .publication-body>div:has(> br:only-child){
   display:block !important;
@@ -430,37 +417,6 @@ nav{gap:2px}
 
 .rich-editor,.rich-editor.title-editor{color:#dedede !important;}
 .rich-editor *{color:inherit;}
-
-/* FIX ESPACIADO Y SUPERPOSICIÓN DE TEXTO */
-.publication-body,
-.publication-font-modern .publication-body {
-  font-size: 17px !important;
-  line-height: 1.65 !important;
-  color: #bdbdbd !important;
-  word-wrap: break-word;
-  overflow-wrap: anywhere;
-}
-.publication-body p,
-.publication-font-modern .publication-body p {
-  margin: 0 0 0.75em !important;
-  padding: 0 !important;
-  line-height: 1.65 !important;
-  display: block !important;
-}
-.publication-body p:empty,
-.publication-body div:empty {
-  display: none !important;
-  margin: 0 !important;
-  height: 0 !important;
-}
-.publication + .publication {
-  margin-top: 2em !important;
-}
-.publication h3 {
-  margin: 0 0 0.6em !important;
-  line-height: 1.3 !important;
-}
-
 
 /* FIX DEFINITIVO SUPERPOSICIÓN */
 .publication-body,
@@ -497,8 +453,6 @@ nav{gap:2px}
   line-height: 1.3 !important;
   clear: both;
 }
-/* end fix */
-
 </style>
 </head>
 
@@ -749,11 +703,11 @@ ARC:[
 ]
 };
 
-/* CONFIGURACIÓN DE CATEGORÍAS: orden y nombres compartidos mediante Firestore */
+/* CONFIGURACIÓN DE CATEGORÍAS: orden, nombres y estado oculto mediante Firestore */
 function cloneSectionSettings(){
     const copy={};
     Object.keys(sections).forEach(key=>{
-        copy[key]=sections[key].map(item=>({...item}));
+        copy[key]=sections[key].map(item=>({...item,hidden:Boolean(item.hidden)}));
     });
     return copy;
 }
@@ -765,6 +719,7 @@ function applySectionSettings(value){
             .map(item=>({
                 title:item.title.trim().slice(0,60),
                 description:typeof item.description==="string"?item.description.slice(0,240):"",
+                hidden:Boolean(item.hidden),
                 ...(typeof item.legacyTitle==="string"&&item.legacyTitle?{legacyTitle:item.legacyTitle.slice(0,60)}:{})
             }));
         if(clean.length)sections[key].splice(0,sections[key].length,...clean);
@@ -797,7 +752,9 @@ Ninguno encontró exactamente lo que esperaba.
 
 Si has llegado hasta aquí, continúa.`
 ];
-const signature="\n\nCon cariño: EL CREADOR";
+const signature="
+
+Con cariño: EL CREADOR";
 
 function getSaved(key){
     try{return localStorage.getItem(key)}catch(e){return null}
@@ -972,7 +929,7 @@ function startPresence(user){
 
 /* RUTAS COMPARTIBLES */
 function routeSlug(value){
-    return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+    return String(value||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
 }
 function sectionPath(section){return "/"+String(section).toLowerCase();}
 function categoryPath(section,title){return "/"+routeSlug(title);}
@@ -980,18 +937,20 @@ function changePublicUrl(path,replace=false){
     if(location.pathname!==path){history[replace?"replaceState":"pushState"]({},"",path);}
 }
 
-/* MENÚS */
+/* MENÚS PÚBLICOS (OCULTA LAS CATEGORÍAS MARCADAS COMO HIDDEN) */
 function buildPublicMenus(){
     Object.keys(sections).filter(section=>section!=="INICIO").forEach(section=>{
         const menu=document.getElementById("menu-"+section);
         if(!menu)return;
         menu.innerHTML="";
-        sections[section].forEach(item=>{
-            const button=document.createElement("button");
-            button.textContent=item.title;
-            button.addEventListener("click",()=>showCategory(section,item.title,item.description,true));
-            menu.appendChild(button);
-        });
+        sections[section]
+            .filter(item=>!item.hidden)
+            .forEach(item=>{
+                const button=document.createElement("button");
+                button.textContent=item.title;
+                button.addEventListener("click",()=>showCategory(section,item.title,item.description,true));
+                menu.appendChild(button);
+            });
     });
 }
 buildPublicMenus();
@@ -1033,6 +992,50 @@ function closeMenus(){
 
 document.addEventListener("click",event=>{
     if(!event.target.closest(".nav-item"))closeMenus();
+});
+
+/* INTERCEPTAR CLICS EN ENLACES INTERNOS DENTRO DEL CONTENIDO */
+document.getElementById("content-area").addEventListener("click",event=>{
+    const anchor=event.target.closest("a");
+    if(!anchor)return;
+
+    const rawHref=anchor.getAttribute("href")||"";
+    if(!rawHref)return;
+
+    let url;
+    try{
+        url=new URL(rawHref,location.origin);
+    }catch(e){
+        return;
+    }
+
+    if(url.origin===location.origin){
+        const parts=url.pathname.split("/").filter(Boolean).map(p=>{try{return decodeURIComponent(p)}catch(e){return p}});
+        if(parts.length===1){
+            const slug=routeSlug(parts[0]);
+            const allCategories=Object.entries(sections).flatMap(([section,items])=>items.map(item=>({section,item})));
+            const match=allCategories.find(({item})=>routeSlug(item.title)===slug || (item.legacyTitle && routeSlug(item.legacyTitle)===slug));
+            if(match){
+                event.preventDefault();
+                showCategory(match.section,match.item.title,match.item.description,true);
+                window.scrollTo({top:0,behavior:"smooth"});
+                return;
+            }
+        }
+        if(parts.length>=2){
+            const sec=parts[0].toUpperCase();
+            if(sections[sec]){
+                const wanted=routeSlug(parts.slice(1).join("/"));
+                const cat=sections[sec].find(item=>routeSlug(item.title)===wanted || (item.legacyTitle && routeSlug(item.legacyTitle)===wanted));
+                if(cat){
+                    event.preventDefault();
+                    showCategory(sec,cat.title,cat.description,true);
+                    window.scrollTo({top:0,behavior:"smooth"});
+                    return;
+                }
+            }
+        }
+    }
 });
 
 /* LIBRO DE VISITAS */
@@ -1111,12 +1114,6 @@ function showGuestbook(){
     attachGuestbookListener("guest-list",false);
 }
 
-/*
-Listener reutilizable:
-- Página pública: guest-list, false.
-- Panel administrativo: admin-guest-list, true.
-*/
-
 function attachGuestbookListener(targetId,allowDelete){
     if(guestbookListener){
         guestbookListener.off("value");
@@ -1173,12 +1170,6 @@ function renderGuestbook(snapshot,targetId="guest-list",allowDelete=false){
     });
 
     entries.sort((a,b)=>b.ts-a.ts);
-
-    /*
-    Condición estricta:
-    el botón solo se muestra en la lista administrativa,
-    con la cuenta correcta y el panel abierto.
-    */
 
     const adminScreen=document.getElementById("admin-screen");
     const dashboard=document.getElementById("admin-dashboard");
@@ -1395,7 +1386,8 @@ function safeHtml(html){
 
             if(node.tagName==="A"){
                 try{
-                    const url=new URL(node.getAttribute("href"),location.href);
+                    const rawHref=(node.getAttribute("href")||"").trim();
+                    const url=new URL(rawHref,location.origin);
 
                     if(!["http:","https:","mailto:"].includes(url.protocol)){
                         const children=[...node.childNodes];
@@ -1408,9 +1400,15 @@ function safeHtml(html){
                         return;
                     }
 
-                    node.setAttribute("href",url.href);
-                    node.setAttribute("target","_blank");
-                    node.setAttribute("rel","noopener noreferrer");
+                    if(url.origin===location.origin){
+                        node.setAttribute("href",url.pathname+url.search+url.hash);
+                        node.removeAttribute("target");
+                        node.removeAttribute("rel");
+                    }else{
+                        node.setAttribute("href",url.href);
+                        node.setAttribute("target","_blank");
+                        node.setAttribute("rel","noopener noreferrer");
+                    }
 
                 }catch(e){
                     const children=[...node.childNodes];
@@ -1442,7 +1440,6 @@ function isImageUrl(rawUrl){
         return false;
     }
 }
-
 
 function clearContentListeners(){
     activeContentListeners.forEach(unsub=>{
@@ -1478,7 +1475,6 @@ async function showCategory(section,title,description,updateUrl=false){
 
     content.innerHTML="";
 
-    // Solo mostrar título/descripción en casos especiales (INICIO, Reglas, Rastros, Rutas)
     const showHeader = (section==="INICIO") || 
                        (section==="HOME" && title==="Reglas") ||
                        (section==="ARC" && title==="Rutas caducadas");
@@ -1506,7 +1502,6 @@ async function showCategory(section,title,description,updateUrl=false){
         rules.style.border="1px solid #303030";
         rules.style.background="#090909";
         rules.innerHTML=`
-            
             <h3 style="font-size:15px;font-weight:normal;letter-spacing:1px;color:#d0d0d0;margin:0 0 10px">REGLAS DE PERMANENCIA</h3>
             <p style="font-size:12px;line-height:1.7;color:#999;margin:0 0 15px">Lee cada instrucción antes de continuar. No todas las reglas fueron escritas para protegerte.</p>
             <ol style="margin:0;padding-left:20px;color:#aaa;font-size:12px;line-height:1.8">
@@ -1520,7 +1515,6 @@ async function showCategory(section,title,description,updateUrl=false){
                 <li style="padding:0 0 12px 4px">Si encuentras una historia titulada «El espejo 4», no la leas. Nunca fue publicada.</li>
                 <li style="padding:0 0 0 4px">Si ninguna de las reglas anteriores parece tener sentido, no significa que estés a salvo.</li>
             </ol>
-            
         `;
         content.appendChild(rules);
         return;
@@ -1559,11 +1553,9 @@ async function showCategory(section,title,description,updateUrl=false){
 
     try{
         clearContentListeners();
-        const legacyTitle=(sections[section]||[]).find(item=>item.title===title)?.legacyTitle;
 
         function renderContent(pubDocs, fileDocs){
             if(token!==currentContentToken)return;
-            // Clear previous dynamic content but keep special headers if any
             const existingPubs = content.querySelectorAll(".publication:not([data-static])");
             existingPubs.forEach(el => el.remove());
             const existingLoading = content.querySelector(".admin-status");
@@ -1647,12 +1639,10 @@ async function showCategory(section,title,description,updateUrl=false){
             }
         }
 
-        // Real-time listeners
         const pubQuery = firestore.collection("publicaciones").where("menu","==",section).where("category","==",title);
         const unsubPub = pubQuery.onSnapshot(snapshot=>{
             const docs=[];
             snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-            // For simplicity re-fetch files or keep separate; here we call with current
             renderContent(docs, window._currentFiles||[]);
         }, err=>console.error(err));
         activeContentListeners.push(unsubPub);
@@ -1662,7 +1652,6 @@ async function showCategory(section,title,description,updateUrl=false){
             const files=[];
             snapshot.forEach(doc=>files.push({id:doc.id,...doc.data()}));
             window._currentFiles=files;
-            // Trigger re-render by getting pubs again if needed; simplified
             pubQuery.get().then(snap=>{
                 const docs=[];
                 snap.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
@@ -1671,7 +1660,6 @@ async function showCategory(section,title,description,updateUrl=false){
         }, err=>console.error(err));
         activeContentListeners.push(unsubFile);
 
-        // Initial load
         Promise.all([pubQuery.get(), fileQuery.get()]).then(([pSnap, fSnap])=>{
             const docs=[], files=[];
             pSnap.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
@@ -1680,7 +1668,7 @@ async function showCategory(section,title,description,updateUrl=false){
             renderContent(docs, files);
         });
 
-        return; // skip old code
+        return;
 
     }catch(error){
         console.error("Error cargando contenido:",error);
@@ -1706,18 +1694,20 @@ function showSectionLanding(section,updateUrl=false){
     description.className="content-description";
     description.textContent="Selecciona una categoría para abrir sus registros.";
     content.append(heading,description);
-    (sections[section]||[]).forEach(item=>{
-        const button=document.createElement("button");
-        button.type="button";
-        button.className="section-category";
-        const name=document.createElement("strong");
-        name.textContent=item.title;
-        const detail=document.createElement("span");
-        detail.textContent=item.description;
-        button.append(name,detail);
-        button.addEventListener("click",()=>showCategory(section,item.title,item.description,true));
-        content.appendChild(button);
-    });
+    (sections[section]||[])
+        .filter(item=>!item.hidden)
+        .forEach(item=>{
+            const button=document.createElement("button");
+            button.type="button";
+            button.className="section-category";
+            const name=document.createElement("strong");
+            name.textContent=item.title;
+            const detail=document.createElement("span");
+            detail.textContent=item.description;
+            button.append(name,detail);
+            button.addEventListener("click",()=>showCategory(section,item.title,item.description,true));
+            content.appendChild(button);
+        });
 }
 
 function renderRouteFromPath(){
@@ -1726,7 +1716,7 @@ function renderRouteFromPath(){
     const slug=routeSlug(parts.join("/"));
     const allCategories=Object.entries(sections).flatMap(([section,items])=>items.map(item=>({section,item})));
 
-    // URL pública corta: /rutas-caducadas
+    // URL pública corta (funciona tanto para categorías visibles como ocultas): /2nd-round, /los-red-room, etc.
     if(parts.length===1){
         const direct=allCategories.find(({item})=>routeSlug(item.title)===slug || (item.legacyTitle && routeSlug(item.legacyTitle)===slug));
         if(direct){
@@ -1782,7 +1772,6 @@ function restoreCategory(){
     try{
         const data=JSON.parse(saved);
 
-        // Si la última sección guardada es INICIO, mostrar siempre la portada.
         if(data.section==="INICIO"){
             showInicio();
             return;
@@ -1817,7 +1806,8 @@ function typeWriter(){
             textElement.textContent+=character;
             index++;
 
-            setTimeout(type,character==="\n"?350:32);
+            setTimeout(type,character==="
+"?350:32);
 
         }else{
             cursor.style.display="none";
@@ -1858,7 +1848,6 @@ function initializePage(){
     const letter=document.getElementById("letter-screen");
     const home=document.getElementById("home-screen");
 
-    // La carta aparece una sola vez en este navegador. Después, se entra directo a la portada.
     if(getSaved("gardenEntered")==="yes"){
         letter.style.display="none";
         letter.style.opacity="0";
@@ -1925,12 +1914,6 @@ function openAdmin(){
 document.getElementById("admin-close").addEventListener("click",()=>{
     sessionStorage.removeItem("0site_admin_panel_open");
     document.getElementById("admin-screen").style.display="none";
-
-    /*
-    Al cerrar el panel se apaga el listener administrativo.
-    Si debajo está abierta la página pública del libro,
-    se vuelve a conectar en modo público, sin botones.
-    */
 
     if(guestbookListener){
         guestbookListener.off("value");
@@ -2004,7 +1987,7 @@ document.querySelectorAll(".admin-tab").forEach(button=>{
     });
 });
 
-/* SELECTORES DE MENÚ Y CATEGORÍA */
+/* SELECTORES DE MENÚ Y CATEGORÍA (INCLUYE CATEGORÍAS OCULTAS PARA QUE EL ADMIN PUBLIQUE EN ELLAS) */
 
 function menuOptions(selected="INICIO"){
     return Object.keys(sections).map(key=>
@@ -2015,9 +1998,10 @@ function menuOptions(selected="INICIO"){
 function categoryOptions(menu,selected=""){
     return sections[menu]
         .filter(item=>!(menu==="HOME"&&item.title==="Rastros"))
-        .map(item=>
-            `<option value="${item.title}" ${item.title===selected?"selected":""}>${item.title}</option>`
-        ).join("");
+        .map(item=>{
+            const suffix=item.hidden?" [OCULTA]":"";
+            return `<option value="${item.title}" ${item.title===selected?"selected":""}>${item.title}${suffix}</option>`;
+        }).join("");
 }
 
 function fillCategorySelect(menuSelect,categorySelect,selected=""){
@@ -2082,7 +2066,7 @@ function editorToolbar(){
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
                 <input type="color" id="editor-text-color" value="#c5c5c5" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" aria-label="Color del texto">
             </button>
-            <button type="button" id="insert-link" title="Insertar enlace">
+            <button type="button" id="insert-link" title="Insertar enlace (interno /ruta o externo https://)">
                 <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
             </button>
             <button type="button" id="remove-link" title="Quitar enlace">
@@ -2104,13 +2088,11 @@ function editorToolbar(){
 
 function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
 
-    // Forzar color blanco al pegar
     function forceWhiteOnPaste(editor){
         editor.addEventListener("paste", e=>{
             e.preventDefault();
             const text = (e.clipboardData || window.clipboardData).getData("text/plain");
             document.execCommand("insertText", false, text);
-            // Asegurar color claro
             const sel = window.getSelection();
             if(sel && sel.rangeCount){
                 const range = sel.getRangeAt(0);
@@ -2119,7 +2101,6 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
                 try{
                     range.surroundContents(span);
                 }catch(err){
-                    // fallback
                     editor.style.color = "#dedede";
                 }
             }
@@ -2137,7 +2118,6 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
     const colorPicker=document.getElementById("editor-text-color");
     const imageSizePicker=document.getElementById("editor-image-size");
 
-    // Captura de selección más agresiva (mejor en móvil)
     function rememberSelection(editor=activeEditor){
         const selection=window.getSelection();
         if(!selection||!selection.rangeCount)return;
@@ -2158,7 +2138,6 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
         }catch(error){return false;}
     }
 
-    // Guardar selección en más eventos
     [titleEditor,bodyEditor].forEach(editor=>{
         editor.addEventListener("focus",()=>{activeEditor=editor;});
         editor.addEventListener("keyup",()=>rememberSelection(editor));
@@ -2196,8 +2175,6 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
                 savedRanges.set(editor,next.cloneRange());
             }catch(error){console.error("No se pudo aplicar el formato",error);}
         }else{
-            // Si no hay texto seleccionado, el formato queda como estilo predeterminado
-            // del campo activo y se guarda junto con la publicación.
             editor.style[property]=value;
             if(property==="color"&&editor===titleEditor){
                 const titleColor=document.getElementById("record-title-color");
@@ -2243,18 +2220,34 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
             alert("Selecciona primero una palabra o frase.");
             return;
         }
-        const raw=prompt("Introduce la dirección del enlace (https://...)");
+        const raw=prompt("Introduce la ruta interna (ej: /2nd-round) o URL (https://...)");
         if(!raw)return;
+        const trimmed=raw.trim();
         let url;
-        try{url=new URL(raw.trim());}catch(e){alert("La dirección no es válida.");return;}
-        if(!["http:","https:","mailto:"].includes(url.protocol)){
-            alert("Solo se permiten enlaces http, https o mailto.");
+        try{
+            url=new URL(trimmed,location.origin);
+        }catch(e){
+            alert("La dirección no es válida.");
             return;
         }
-        document.execCommand("createLink",false,url.href);
+        if(!["http:","https:","mailto:"].includes(url.protocol)){
+            alert("Solo se permiten enlaces http, https, mailto o rutas internas (/ruta).");
+            return;
+        }
+        const finalHref=url.origin===location.origin?(url.pathname+url.search+url.hash):url.href;
+        document.execCommand("createLink",false,finalHref);
         editor.querySelectorAll("a").forEach(a=>{
-            a.target="_blank";
-            a.rel="noopener noreferrer";
+            const aHref=a.getAttribute("href")||"";
+            try{
+                const parsed=new URL(aHref,location.origin);
+                if(parsed.origin===location.origin){
+                    a.removeAttribute("target");
+                    a.removeAttribute("rel");
+                }else{
+                    a.target="_blank";
+                    a.rel="noopener noreferrer";
+                }
+            }catch(e){}
         });
         rememberSelection(editor);
     }
@@ -2284,7 +2277,6 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
         selectedEditorImage=img;rememberSelection(editor);
     });
 
-    // Cargar los valores guardados de cada campo; no se pierden al volver a editar.
     const titleFont=safeInlineFontFamily(editData?.titleFontFamily||"");
     const titleSize=safeInlineFontSize(editData?.titleFontSize||"");
     const bodyFont=safeInlineFontFamily(editData?.bodyFontFamily||"");
@@ -2477,7 +2469,10 @@ async function loadPublicationList(keepOpenState=null){
                 const catKey=section+"::"+category;
                 categoryBox.dataset.key=catKey;
                 if(openCategories.has(catKey))categoryBox.open=true;
-                const categoryTitle=document.createElement("summary");categoryTitle.textContent=category;categoryBox.appendChild(categoryTitle);
+                const isHiddenCat=(sections[section]||[]).find(c=>c.title===category)?.hidden;
+                const categoryTitle=document.createElement("summary");
+                categoryTitle.textContent=category+(isHiddenCat?" [OCULTA]":"");
+                categoryBox.appendChild(categoryTitle);
                 sortRecords(categories[section][category]).forEach(item=>{
                     const row=document.createElement("div");row.className="admin-record";
                     const label=document.createElement("span");label.textContent=item.title||"Sin título";
@@ -2806,7 +2801,7 @@ async function loadFileList(){
     }
 }
 
-/* CONFIGURACIÓN */
+/* CONFIGURACIÓN (CON CATEGORÍAS OCULTAS Y RUTAS DIRECTAS) */
 
 function renderConfiguration(){
     const panel=document.getElementById("admin-panel-content");
@@ -2814,14 +2809,18 @@ function renderConfiguration(){
     panel.innerHTML=`
     <div class="admin-box">
         <p class="admin-subtitle">MENÚS Y CATEGORÍAS</p>
-        <p class="admin-hint">Cambia el nombre de las categorías, añade nuevas o modifica su posición. Los cambios se guardan para todos los visitantes.</p>
+        <p class="admin-hint">Cambia el nombre de las categorías, añade nuevas, modifica su posición o márcalas como <b>Oculta</b> para que no aparezcan en el menú superior y solo se abran mediante enlace (ej: <code>/2nd-round</code>).</p>
         <label class="admin-status">MENÚ</label>
         <select class="admin-select" id="category-menu-select">
             ${Object.keys(sections).filter(key=>key!=="INICIO").map(key=>`<option value="${key}">${key}</option>`).join("")}
         </select>
         <div id="category-order-list" class="category-order-list"></div>
         <label class="admin-status">NUEVA CATEGORÍA</label>
-        <input class="admin-input" id="new-category-name" maxlength="60" placeholder="Nombre de la categoría">
+        <input class="admin-input" id="new-category-name" maxlength="60" placeholder="Nombre de la categoría (ej: 2nd-round o los-red-room)">
+        <label class="category-hidden-toggle" style="display:inline-flex;margin-bottom:12px;">
+            <input type="checkbox" id="new-category-hidden"> Oculta (no visible en los menús públicos, solo accesible por enlace)
+        </label>
+        <div id="new-category-preview" class="admin-hint" style="margin-top:0;margin-bottom:12px;"></div>
         <button class="admin-button" id="add-category-button">AÑADIR CATEGORÍA</button>
         <div class="admin-actions">
             <button class="admin-button" id="save-category-settings">GUARDAR CAMBIOS</button>
@@ -2845,6 +2844,13 @@ function renderConfiguration(){
     const menuPicker=document.getElementById("category-menu-select");
     const categoryList=document.getElementById("category-order-list");
     const categoryStatus=document.getElementById("category-settings-status");
+    const newCatInput=document.getElementById("new-category-name");
+    const newCatPreview=document.getElementById("new-category-preview");
+
+    newCatInput.addEventListener("input",()=>{
+        const slug=routeSlug(newCatInput.value);
+        newCatPreview.textContent=slug?`Ruta del enlace: ${location.origin}/${slug}  (o ${slug} en el editor)`:"";
+    });
 
     function drawCategoryDraft(){
         const menu=menuPicker.value;
@@ -2852,12 +2858,30 @@ function renderConfiguration(){
         categoryDraft[menu].forEach((item,index)=>{
             const row=document.createElement("div");
             row.className="category-order-row";
+
             const name=document.createElement("input");
             name.className="admin-input";
             name.maxLength=60;
             name.value=item.title;
+            name.title="Ruta: /"+routeSlug(item.title);
             name.setAttribute("aria-label","Nombre de categoría");
-            name.addEventListener("input",()=>{item.title=name.value;});
+            name.addEventListener("input",()=>{
+                item.title=name.value;
+                name.title="Ruta: /"+routeSlug(item.title);
+            });
+
+            const hiddenLabel=document.createElement("label");
+            hiddenLabel.className="category-hidden-toggle"+(item.hidden?" is-hidden":"");
+            hiddenLabel.title="Si está marcada, no sale en los menús superiores y solo se abre por enlace /"+routeSlug(item.title);
+            const hiddenCheck=document.createElement("input");
+            hiddenCheck.type="checkbox";
+            hiddenCheck.checked=Boolean(item.hidden);
+            hiddenCheck.addEventListener("change",()=>{
+                item.hidden=hiddenCheck.checked;
+                hiddenLabel.classList.toggle("is-hidden",item.hidden);
+            });
+            hiddenLabel.append(hiddenCheck,document.createTextNode(" Oculta"));
+
             const up=document.createElement("button");
             up.type="button";up.textContent="↑";up.title="Subir";
             up.disabled=index===0;
@@ -2865,6 +2889,7 @@ function renderConfiguration(){
                 [categoryDraft[menu][index-1],categoryDraft[menu][index]]=[categoryDraft[menu][index],categoryDraft[menu][index-1]];
                 drawCategoryDraft();
             });
+
             const down=document.createElement("button");
             down.type="button";down.textContent="↓";down.title="Bajar";
             down.disabled=index===categoryDraft[menu].length-1;
@@ -2872,22 +2897,38 @@ function renderConfiguration(){
                 [categoryDraft[menu][index+1],categoryDraft[menu][index]]=[categoryDraft[menu][index],categoryDraft[menu][index+1]];
                 drawCategoryDraft();
             });
-            row.append(name,up,down);
+
+            const del=document.createElement("button");
+            del.type="button";del.textContent="✕";del.title="Eliminar categoría";
+            del.className="admin-danger";
+            del.disabled=categoryDraft[menu].length<=1;
+            del.addEventListener("click",()=>{
+                if(!confirm(`¿Quitar la categoría "${item.title}"? (Recuerda pulsar GUARDAR CAMBIOS para confirmar)`))return;
+                categoryDraft[menu].splice(index,1);
+                drawCategoryDraft();
+            });
+
+            row.append(name,hiddenLabel,up,down,del);
             categoryList.appendChild(row);
         });
     }
     menuPicker.addEventListener("change",drawCategoryDraft);
     document.getElementById("add-category-button").addEventListener("click",()=>{
         const input=document.getElementById("new-category-name");
+        const hiddenInput=document.getElementById("new-category-hidden");
         const title=input.value.trim();
+        const isHidden=hiddenInput.checked;
         const menu=menuPicker.value;
         if(!title){categoryStatus.textContent="Escribe un nombre para la categoría.";return;}
         if(categoryDraft[menu].some(item=>item.title.toLowerCase()===title.toLowerCase())){
             categoryStatus.textContent="Esa categoría ya existe en este menú.";return;
         }
-        categoryDraft[menu].push({title,description:""});
+        categoryDraft[menu].push({title,description:"",hidden:isHidden});
         input.value="";
-        categoryStatus.textContent="Categoría añadida. Guarda los cambios para publicarla.";
+        hiddenInput.checked=false;
+        newCatPreview.textContent="";
+        const slug=routeSlug(title);
+        categoryStatus.textContent=`Categoría añadida${isHidden?" (oculta)":""}. Ruta: /${slug} — Pulsa GUARDAR CAMBIOS para activarla.`;
         drawCategoryDraft();
     });
     document.getElementById("save-category-settings").addEventListener("click",async()=>{
@@ -2899,7 +2940,11 @@ function renderConfiguration(){
         try{
             const clean={};
             Object.keys(categoryDraft).forEach(key=>{
-                clean[key]=categoryDraft[key].map(item=>({...item,title:item.title.trim()}));
+                clean[key]=categoryDraft[key].map(item=>({
+                    ...item,
+                    title:item.title.trim(),
+                    hidden:Boolean(item.hidden)
+                }));
             });
             await firestore.collection("configuracion").doc("__categorias").set({
                 sections:clean,
@@ -2909,7 +2954,7 @@ function renderConfiguration(){
             buildPublicMenus();
             categoryDraft=cloneSectionSettings();
             drawCategoryDraft();
-            categoryStatus.textContent="Categorías y orden guardados correctamente.";
+            categoryStatus.textContent="Categorías, estados ocultos y orden guardados correctamente.";
         }catch(error){
             console.error(error);
             categoryStatus.textContent="No se pudo guardar. Comprueba los permisos de Firestore.";
@@ -2959,7 +3004,7 @@ async function loadConfig(){
         }
 
         snapshot.forEach(doc=>{
-            if(doc.id.startsWith("__colores"))return;
+            if(doc.id.startsWith("__"))return;
             const row=document.createElement("div");
             row.className="admin-record";
 
