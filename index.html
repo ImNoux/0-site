@@ -711,6 +711,7 @@ let logoTimer=null;
 let typingStarted=false;
 let transitionStarted=false;
 let editingId=null;
+let gestorTargetLocation=null;
 let currentContentToken=0;
 let savedEditorRange=null;
 let activeContentListeners=[];
@@ -2359,6 +2360,9 @@ function renderPublicationEditor(editData=null){
     setupPublicationEditor(titleEditor,bodyEditor,editData);
 
     document.getElementById("record-cancel").addEventListener("click",()=>{
+        if(editData){
+            gestorTargetLocation={section:editData.menu||"INICIO",category:editData.category||"Portada"};
+        }
         editingId=null;
         document.querySelectorAll(".admin-tab").forEach(button=>button.classList.toggle("active",button.dataset.adminTab==="gestor"));
         localStorage.setItem("0site_admin_tab","gestor");
@@ -2396,7 +2400,12 @@ function renderPublicationEditor(editData=null){
                 if(sameLocation&&hasCustomOrder(editData))data.order=editData.order;
                 else data.order=await prepareNextOrder("publicaciones",newMenu,newCategory,editingId);
                 await firestore.collection("publicaciones").doc(editingId).update(data);
-                status.textContent="Publicación actualizada correctamente.";
+                editingId=null;
+                gestorTargetLocation={section:newMenu,category:newCategory};
+                document.querySelectorAll(".admin-tab").forEach(button=>button.classList.toggle("active",button.dataset.adminTab==="gestor"));
+                localStorage.setItem("0site_admin_tab","gestor");
+                renderAdminTab("gestor");
+                return;
             }else{
                 data.order=await prepareNextOrder("publicaciones",newMenu,newCategory);
                 data.createdAt=firebase.firestore.FieldValue.serverTimestamp();
@@ -2424,9 +2433,27 @@ async function renderPublicationManager(){
     await loadPublicationList();
 }
 
-async function loadPublicationList(){
+async function loadPublicationList(keepOpenState=null){
     const list=document.getElementById("gestor-publication-list");
     if(!list)return;
+    const openSections=new Set();
+    const openCategories=new Set();
+    if(keepOpenState){
+        keepOpenState.sections.forEach(s=>openSections.add(s));
+        keepOpenState.categories.forEach(c=>openCategories.add(c));
+    }else{
+        list.querySelectorAll("details.publication-group[open]").forEach(el=>{
+            if(el.dataset.section)openSections.add(el.dataset.section);
+        });
+        list.querySelectorAll("details.publication-category[open]").forEach(el=>{
+            if(el.dataset.key)openCategories.add(el.dataset.key);
+        });
+    }
+    if(gestorTargetLocation){
+        openSections.add(gestorTargetLocation.section);
+        openCategories.add(gestorTargetLocation.section+"::"+gestorTargetLocation.category);
+        gestorTargetLocation=null;
+    }
     try{
         const snapshot=await firestore.collection("publicaciones").get();
         if(!document.getElementById("gestor-publication-list"))return;
@@ -2442,9 +2469,14 @@ async function loadPublicationList(){
         [...new Set([...sectionsOrder,...Object.keys(categories)])].forEach(section=>{
             if(!categories[section])return;
             const sectionBox=document.createElement("details");sectionBox.className="publication-group";
+            sectionBox.dataset.section=section;
+            if(openSections.has(section))sectionBox.open=true;
             const sectionTitle=document.createElement("summary");sectionTitle.textContent=section;sectionBox.appendChild(sectionTitle);
             Object.keys(categories[section]).sort((a,b)=>a.localeCompare(b)).forEach(category=>{
                 const categoryBox=document.createElement("details");categoryBox.className="publication-category";
+                const catKey=section+"::"+category;
+                categoryBox.dataset.key=catKey;
+                if(openCategories.has(catKey))categoryBox.open=true;
                 const categoryTitle=document.createElement("summary");categoryTitle.textContent=category;categoryBox.appendChild(categoryTitle);
                 sortRecords(categories[section][category]).forEach(item=>{
                     const row=document.createElement("div");row.className="admin-record";
