@@ -21,6 +21,16 @@ html,body{min-height:100vh;background:#0d0d0d;background:radial-gradient(ellipse
 #letter-text{font-size:15px;line-height:2;color:#c5c5c5;white-space:pre-wrap;overflow-wrap:anywhere;min-height:100px}
 .cursor{display:inline-block;width:7px;height:15px;background:#aaa;margin-left:3px;vertical-align:baseline;animation:blink .8s infinite}
 @keyframes blink{50%{opacity:0}}
+@keyframes signalFlicker{
+  0%,82%,100%{opacity:1;text-shadow:0 0 15px rgba(255,255,255,.12)}
+  84%{opacity:.15;text-shadow:-2px 0 rgba(255,255,255,.45),2px 0 rgba(180,180,180,.35)}
+  86%{opacity:.95}
+  88%{opacity:.05;text-shadow:3px 0 rgba(255,255,255,.5)}
+  90%{opacity:.85}
+  92%{opacity:.25;text-shadow:-2px 0 rgba(255,255,255,.4)}
+  94%{opacity:1}
+}
+.blink-title{animation:signalFlicker 2s infinite}
 #home-screen{display:none;opacity:0;min-height:100vh;padding:65px 20px 25px;transition:opacity 1.5s ease}
 .container{width:100%;max-width:930px;margin:auto}
 .main-title{text-align:center;font-size:clamp(30px,6vw,48px);font-weight:normal;letter-spacing:5px;color:#e5e5e5;margin-bottom:35px;text-shadow:0 0 15px rgba(255,255,255,.12)}
@@ -471,7 +481,7 @@ nav{gap:2px}
 
 <main id="home-screen">
 <div class="container">
-    <h1 class="main-title">𝕰𝖑 𝖀́𝖑𝖙𝖎𝖒𝖔 𝕵𝖆𝖗𝖉𝖎́𝖓</h1>
+    <h1 class="main-title blink-title">𝟎-𝖘𝖎𝖙𝖊</h1>
     <img id="home-logo" class="home-image"
     src="https://i.ibb.co/q378bvQT/6336211-E-7579-4-F92-9-E93-87-F54-B37-C0-C9.png"
     alt="El Último Jardín" title="Volver al inicio">
@@ -677,26 +687,26 @@ INICIO:[
 HOME:[
 {title:"Entrada",legacyTitle:"Manifestación",description:"Algo ha comenzado a tomar forma. No sabemos qué lo provocó."},
 {title:"Reglas",legacyTitle:"Protocolo",description:"Existen reglas que no fueron escritas para ser cuestionadas."},
-{title:"Nodo",legacyTitle:"Estado del servidor",description:"La conexión permanece activa. El origen sigue sin identificarse."},
+{title:"Logs",legacyTitle:"Nodo",description:"La conexión permanece activa. El origen sigue sin identificarse."},
 {title:"Rastros",legacyTitle:"Libro de visitas",description:"Algunos dejaron constancia de su llegada. Otros nunca debieron hacerlo."}
 ],
 SHA:[
-{title:"Desvíos",legacyTitle:"Caminos ocultos",description:"No todos los caminos aparecen cuando los buscas."},
-{title:"Frontera",legacyTitle:"El otro lado",description:"Hay algo al otro lado que parece estar esperando."},
+{title:"Anomalías",legacyTitle:"Desvíos",description:"No todos los caminos aparecen cuando los buscas."},
+{title:"Límites",legacyTitle:"Frontera",description:"Hay algo al otro lado que parece estar esperando."},
 {title:"Reflejos",description:"A veces, lo que te observa no es tu reflejo."}
 ],
 SEC:[
-{title:"Registros borrados",description:"Información eliminada que todavía deja rastros."},
+{title:"dump",legacyTitle:"Registros borrados",description:"Información eliminada que todavía deja rastros."},
 {title:"Señales",legacyTitle:"Conexiones fantasmas",description:"Señales que permanecen activas sin un origen conocido."}
 ],
 OBL:[
-{title:"Puerta negra",legacyTitle:"Foros muertos",description:"Conversaciones abandonadas que todavía reciben visitas."},
-{title:"Vacíos",legacyTitle:"Ubicaciones que no existen",description:"Lugares registrados en mapas que nunca fueron encontrados."},
-{title:"Voces Olvidadas",legacyTitle:"Registros que nadie borró",description:"Archivos que permanecieron intactos durante años."},
-{title:"Memorias muertas",legacyTitle:"Usuarios olvidados",description:"Cuentas sin actividad. Sus nombres siguen apareciendo."}
+{title:"Sector 0",legacyTitle:"Puerta negra",description:"Conversaciones abandonadas que todavía reciben visitas."},
+{title:"Punto ciego",legacyTitle:"Vacíos",description:"Lugares registrados en mapas que nunca fueron encontrados."},
+{title:"Frecuencias",legacyTitle:"Voces Olvidadas",description:"Archivos que permanecieron intactos durante años."},
+{title:"Buffer",legacyTitle:"Memorias muertas",description:"Cuentas sin actividad. Sus nombres siguen apareciendo."}
 ],
 ARC:[
-{title:"Restos",legacyTitle:"Restos de 0-Site",description:"Fragmentos de una estructura que dejó de existir."},
+{title:"Fragmentos",legacyTitle:"Restos",description:"Fragmentos de una estructura que dejó de existir."},
 {title:"Espejos",legacyTitle:"Conexiones antiguas",description:"Vínculos con redes que ya no deberían estar disponibles."},
 {title:"Rutas caducadas",legacyTitle:"Registros viejos",description:"Direcciones recuperadas de redes olvidadas. Algunas dejaron de responder; otras solo sobreviven en registros incompletos."},
 {title:"FAQ",legacyTitle:"Lo que sobrevivió",description:"No todo desapareció cuando el sistema cayó."}
