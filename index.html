@@ -685,31 +685,31 @@ INICIO:[
 {title:"Portada",description:"La desconfianza es tu única protección. No todo lo que encuentres aquí quiere ser encontrado."}
 ],
 HOME:[
-{title:"Entrada",legacyTitle:"Manifestación",description:"Algo ha comenzado a tomar forma. No sabemos qué lo provocó."},
-{title:"Reglas",legacyTitle:"Protocolo",description:"Existen reglas que no fueron escritas para ser cuestionadas."},
-{title:"Logs",legacyTitle:"Nodo",description:"La conexión permanece activa. El origen sigue sin identificarse."},
-{title:"Rastros",legacyTitle:"Libro de visitas",description:"Algunos dejaron constancia de su llegada. Otros nunca debieron hacerlo."}
+{title:"Entrada",description:"Algo ha comenzado a tomar forma. No sabemos qué lo provocó."},
+{title:"Reglas",description:"Existen reglas que no fueron escritas para ser cuestionadas."},
+{title:"Logs",description:"La conexión permanece activa. El origen sigue sin identificarse."},
+{title:"Rastros",description:"Algunos dejaron constancia de su llegada. Otros nunca debieron hacerlo."}
 ],
 SHA:[
-{title:"Anomalías",legacyTitle:"Desvíos",description:"No todos los caminos aparecen cuando los buscas."},
-{title:"Límites",legacyTitle:"Frontera",description:"Hay algo al otro lado que parece estar esperando."},
+{title:"Anomalías",description:"No todos los caminos aparecen cuando los buscas."},
+{title:"Límites",description:"Hay algo al otro lado que parece estar esperando."},
 {title:"Reflejos",description:"A veces, lo que te observa no es tu reflejo."}
 ],
 SEC:[
-{title:"dump",legacyTitle:"Registros borrados",description:"Información eliminada que todavía deja rastros."},
-{title:"Señales",legacyTitle:"Conexiones fantasmas",description:"Señales que permanecen activas sin un origen conocido."}
+{title:"dump",description:"Información eliminada que todavía deja rastros."},
+{title:"Señales",description:"Señales que permanecen activas sin un origen conocido."}
 ],
 OBL:[
-{title:"Sector 0",legacyTitle:"Puerta negra",description:"Conversaciones abandonadas que todavía reciben visitas."},
-{title:"Punto ciego",legacyTitle:"Vacíos",description:"Lugares registrados en mapas que nunca fueron encontrados."},
-{title:"Frecuencias",legacyTitle:"Voces Olvidadas",description:"Archivos que permanecieron intactos durante años."},
-{title:"Buffer",legacyTitle:"Memorias muertas",description:"Cuentas sin actividad. Sus nombres siguen apareciendo."}
+{title:"Sector 0",description:"Conversaciones abandonadas que todavía reciben visitas."},
+{title:"Punto ciego",description:"Lugares registrados en mapas que nunca fueron encontrados."},
+{title:"Frecuencias",description:"Archivos que permanecieron intactos durante años."},
+{title:"Buffer",description:"Cuentas sin actividad. Sus nombres siguen apareciendo."}
 ],
 ARC:[
-{title:"Fragmentos",legacyTitle:"Restos",description:"Fragmentos de una estructura que dejó de existir."},
-{title:"Espejos",legacyTitle:"Conexiones antiguas",description:"Vínculos con redes que ya no deberían estar disponibles."},
-{title:"Rutas caducadas",legacyTitle:"Registros viejos",description:"Direcciones recuperadas de redes olvidadas. Algunas dejaron de responder; otras solo sobreviven en registros incompletos."},
-{title:"FAQ",legacyTitle:"Lo que sobrevivió",description:"No todo desapareció cuando el sistema cayó."}
+{title:"Fragmentos",description:"Fragmentos de una estructura que dejó de existir."},
+{title:"Espejos",description:"Vínculos con redes que ya no deberían estar disponibles."},
+{title:"Rutas caducadas",description:"Direcciones recuperadas de redes olvidadas. Algunas dejaron de responder; otras solo sobreviven en registros incompletos."},
+{title:"FAQ",description:"No todo desapareció cuando el sistema cayó."}
 ]
 };
 
@@ -729,8 +729,7 @@ function applySectionSettings(value){
             .map(item=>({
                 title:item.title.trim().slice(0,60),
                 description:typeof item.description==="string"?item.description.slice(0,240):"",
-                hidden:Boolean(item.hidden),
-                ...(typeof item.legacyTitle==="string"&&item.legacyTitle?{legacyTitle:item.legacyTitle.slice(0,60)}:{})
+                hidden:Boolean(item.hidden)
             }));
         if(clean.length)sections[key].splice(0,sections[key].length,...clean);
     });
@@ -969,7 +968,11 @@ async function loadCategorySettings(){
         if(doc.exists&&doc.data()?.sections){
             applySectionSettings(doc.data().sections);
             buildPublicMenus();
-            if(location.pathname.split("/").filter(Boolean).length)renderRouteFromPath();
+            if(location.pathname.split("/").filter(Boolean).length){
+                renderRouteFromPath();
+            }else if(document.getElementById("home-screen")?.style.display==="block"){
+                restoreCategory();
+            }
         }
     }catch(error){
         console.warn("Se mantienen las categorías predeterminadas:",error);
@@ -1022,7 +1025,7 @@ document.getElementById("content-area").addEventListener("click",event=>{
         if(parts.length===1){
             const slug=routeSlug(parts[0]);
             const allCategories=Object.entries(sections).flatMap(([section,items])=>items.map(item=>({section,item})));
-            const match=allCategories.find(({item})=>routeSlug(item.title)===slug || (item.legacyTitle && routeSlug(item.legacyTitle)===slug));
+            const match=allCategories.find(({item})=>routeSlug(item.title)===slug);
             if(match){
                 event.preventDefault();
                 showCategory(match.section,match.item.title,match.item.description,true);
@@ -1034,7 +1037,7 @@ document.getElementById("content-area").addEventListener("click",event=>{
             const sec=parts[0].toUpperCase();
             if(sections[sec]){
                 const wanted=routeSlug(parts.slice(1).join("/"));
-                const cat=sections[sec].find(item=>routeSlug(item.title)===wanted || (item.legacyTitle && routeSlug(item.legacyTitle)===wanted));
+                const cat=sections[sec].find(item=>routeSlug(item.title)===wanted);
                 if(cat){
                     event.preventDefault();
                     showCategory(sec,cat.title,cat.description,true);
@@ -1726,7 +1729,7 @@ function renderRouteFromPath(){
 
     // URL pública corta (funciona tanto para categorías visibles como ocultas): /2nd-round, /los-red-room, etc.
     if(parts.length===1){
-        const direct=allCategories.find(({item})=>routeSlug(item.title)===slug || (item.legacyTitle && routeSlug(item.legacyTitle)===slug));
+        const direct=allCategories.find(({item})=>routeSlug(item.title)===slug);
         if(direct){
             const letter=document.getElementById("letter-screen");
             const home=document.getElementById("home-screen");
@@ -1748,7 +1751,7 @@ function renderRouteFromPath(){
     saveData("gardenEntered","yes");
     if(parts.length===1){showSectionLanding(section,false);return true;}
     const wanted=routeSlug(parts.slice(1).join("/"));
-    const category=(sections[section]||[]).find(item=>routeSlug(item.title)===wanted || (item.legacyTitle && routeSlug(item.legacyTitle)===wanted));
+    const category=(sections[section]||[]).find(item=>routeSlug(item.title)===wanted);
     if(category){showCategory(section,category.title,category.description,false);return true;}
     showSectionLanding(section,false);
     return true;
@@ -1785,10 +1788,10 @@ function restoreCategory(){
             return;
         }
 
-        const valid=sections[data.section]?.find(item=>item.title===data.title||item.legacyTitle===data.title);
+        const valid=sections[data.section]?.find(item=>item.title===data.title);
 
         if(valid)showCategory(data.section,valid.title,valid.description);
-        else content.innerHTML="";
+        else showInicio();
 
     }catch(e){
         content.innerHTML="";
