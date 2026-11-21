@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>0-site // el último jardín</title>
+<title>0-site - el último jardín</title>
 
 <meta name="description" content="Un lugar entre lo que recuerdas y lo que nunca ocurrió.">
 
@@ -512,7 +512,7 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
     <section class="content-area" id="content-area"></section>
 
     <footer>
-        2026 El último jardín | ¿Este es el último lugar? Intenta averiguarlo
+        <span id="current-year"></span> El último jardín | ¿Este es el último lugar? Intenta averiguarlo
     </footer>
 </div>
 </main>
@@ -2801,6 +2801,9 @@ async function loadConfig(){
 initializePage();
 
 }
+</script>
+<script>
+document.getElementById("current-year").textContent=new Date().getFullYear();
 </script>
 
 </body>
