@@ -4,23 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>0-site // el último jardín</title>
+<title>0-site | Nada desaparece del todo</title>
 
-<meta name="description" content="Un jardín para los perdidos. Donde descansan los restos de lo que no debía seguir existiendo.">
+<meta name="description" content="Nada desaparece del todo.">
 
 <link rel="icon" type="image/png" href="/favicon.PNG">
 <link rel="shortcut icon" type="image/png" href="/favicon.PNG">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{min-height:100vh;background:#0d0d0d;background:radial-gradient(ellipse at center,#303030 0%,#1c1c1c 25%,#0d0d0d 55%,#000000 100%);background-attachment:fixed;color:#dedede;font-family:Georgia,"Times New Roman",serif;overflow-x:hidden}
-#letter-screen{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:25px;transition:opacity 1.5s ease}
-.letter{width:100%;max-width:650px;padding:35px 30px;background:rgba(0,0,0,.78);border:1px solid #292929;box-shadow:0 0 40px rgba(0,0,0,.9)}
-.letter-header{display:flex;justify-content:space-between;gap:15px;color:#777;font-family:monospace;font-size:11px;margin-bottom:28px;letter-spacing:1px}
-.letter h2{font-size:20px;font-weight:normal;letter-spacing:4px;text-align:center;margin-bottom:30px;color:#eee}
-#letter-text{font-size:15px;line-height:2;color:#c5c5c5;white-space:pre-wrap;overflow-wrap:anywhere;min-height:100px}
-.cursor{display:inline-block;width:7px;height:15px;background:#aaa;margin-left:3px;vertical-align:baseline;animation:blink .8s infinite}
+html,body{min-height:100vh;background-color:#020303;background-image:linear-gradient(to bottom,rgba(12,0,2,.14),rgba(0,0,0,.22)),url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201440%201100%22%20preserveAspectRatio%3D%22xMidYMid%20slice%22%3E%0A%3Cdefs%3E%0A%20%3ClinearGradient%20id%3D%22sky%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23160609%22%2F%3E%3Cstop%20offset%3D%22.38%22%20stop-color%3D%22%23080708%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23020303%22%2F%3E%3C%2FlinearGradient%3E%0A%20%3CradialGradient%20id%3D%22red%22%3E%3Cstop%20stop-color%3D%22%2365121b%22%20stop-opacity%3D%22.7%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2321060a%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%0A%20%3CradialGradient%20id%3D%22mist%22%3E%3Cstop%20stop-color%3D%22%23b3a9a0%22%20stop-opacity%3D%22.48%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23777%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%0A%20%3ClinearGradient%20id%3D%22path%22%20x2%3D%220%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%23464039%22%20stop-opacity%3D%22.5%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23090a08%22%20stop-opacity%3D%22.1%22%2F%3E%3C%2FlinearGradient%3E%0A%20%3Cfilter%20id%3D%22blur%22%3E%3CfeGaussianBlur%20stdDeviation%3D%2218%22%2F%3E%3C%2Ffilter%3E%0A%20%3Cfilter%20id%3D%22soft%22%3E%3CfeGaussianBlur%20stdDeviation%3D%225%22%2F%3E%3C%2Ffilter%3E%0A%20%3Cfilter%20id%3D%22grain%22%3E%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%22.8%22%20numOctaves%3D%223%22%2F%3E%3CfeColorMatrix%20values%3D%22.4%200%200%200%200%20.4%200%200%200%200%200%20.4%200%200%200%200%200%200%20.18%200%22%2F%3E%3C%2Ffilter%3E%0A%3C%2Fdefs%3E%0A%3Crect%20width%3D%221440%22%20height%3D%221100%22%20fill%3D%22url%28%23sky%29%22%2F%3E%0A%3Cellipse%20cx%3D%22720%22%20cy%3D%22145%22%20rx%3D%22760%22%20ry%3D%22280%22%20fill%3D%22url%28%23red%29%22%2F%3E%0A%3Cellipse%20cx%3D%22720%22%20cy%3D%22520%22%20rx%3D%22600%22%20ry%3D%22210%22%20fill%3D%22url%28%23mist%29%22%20filter%3D%22url%28%23blur%29%22%2F%3E%0A%3C%21--%20distant%20tree%20line%20--%3E%0A%3Cg%20fill%3D%22%230d130d%22%20opacity%3D%22.95%22%3E%0A%20%3Cpath%20d%3D%22M0%20610%20Q35%20430%2085%20520%20Q125%20350%20180%20530%20Q230%20390%20275%20550%20Q320%20410%20370%20560%20Q430%20330%20490%20570%20Q540%20410%20600%20570%20Q650%20350%20710%20560%20Q780%20390%20830%20560%20Q900%20330%20960%20560%20Q1020%20390%201080%20570%20Q1150%20350%201210%20570%20Q1280%20400%201330%20560%20Q1390%20390%201440%20570%20L1440%20900%20L0%20900Z%22%2F%3E%0A%3C%2Fg%3E%0A%3C%21--%20cypress%20trees%20with%20irregular%20layered%20silhouettes%20--%3E%0A%3Cg%20fill%3D%22%2310180f%22%20stroke%3D%22%2326301c%22%20stroke-width%3D%228%22%20opacity%3D%22.98%22%3E%0A%20%3Cpath%20d%3D%22M40%201000%20Q52%20760%2085%20600%20Q60%20560%2094%20520%20Q70%20480%20110%20430%20Q95%20390%20132%20340%20Q120%20300%20151%20245%20Q170%20310%20163%20350%20Q197%20395%20175%20440%20Q208%20485%20184%20530%20Q215%20575%20187%20625%20Q222%20720%20210%201000Z%22%2F%3E%0A%20%3Cpath%20d%3D%22M245%201000%20Q260%20780%20288%20630%20Q260%20590%20295%20545%20Q275%20500%20315%20450%20Q300%20400%20337%20345%20Q352%20400%20345%20450%20Q380%20495%20360%20545%20Q390%20590%20365%20640%20Q395%20760%20405%201000Z%22%2F%3E%0A%20%3Cpath%20d%3D%22M1060%201000%20Q1080%20760%201115%20600%20Q1085%20560%201120%20515%20Q1095%20470%201140%20420%20Q1120%20365%201165%20300%20Q1180%20370%201170%20420%20Q1210%20470%201185%20520%20Q1225%20570%201195%20625%20Q1230%20760%201240%201000Z%22%2F%3E%0A%20%3Cpath%20d%3D%22M1280%201000%20Q1290%20790%201325%20650%20Q1300%20610%201335%20565%20Q1310%20520%201350%20470%20Q1335%20425%201370%20365%20Q1390%20430%201380%20475%20Q1415%20520%201395%20570%20Q1425%20615%201405%20660%20Q1435%20790%201440%201000Z%22%2F%3E%0A%3C%2Fg%3E%0A%3C%21--%20foliage%20texture%20--%3E%0A%3Cg%20fill%3D%22none%22%20stroke%3D%22%23465036%22%20stroke-width%3D%2217%22%20opacity%3D%22.48%22%20filter%3D%22url%28%23soft%29%22%3E%0A%20%3Cpath%20d%3D%22M95%20900%20Q120%20700%20145%20480%20M300%20920%20Q320%20710%20340%20490%20M1140%20930%20Q1160%20700%201170%20470%20M1350%20920%20Q1370%20710%201380%20520%22%2F%3E%0A%3C%2Fg%3E%0A%3C%21--%20central%20path%20--%3E%0A%3Cpath%20d%3D%22M550%201100%20Q620%20850%20650%20720%20Q685%20630%20720%20610%20Q760%20650%20795%20730%20Q840%20890%20920%201100Z%22%20fill%3D%22url%28%23path%29%22%20opacity%3D%22.85%22%2F%3E%0A%3Cpath%20d%3D%22M690%201100%20Q700%20850%20720%20680%20Q745%20850%20770%201100%22%20fill%3D%22none%22%20stroke%3D%22%237b7164%22%20stroke-opacity%3D%22.13%22%20stroke-width%3D%228%22%20filter%3D%22url%28%23soft%29%22%2F%3E%0A%3C%21--%20faint%20gate%20and%20old%20pavilion%20--%3E%0A%3Cg%20stroke%3D%22%230d110d%22%20stroke-width%3D%2215%22%20fill%3D%22none%22%20opacity%3D%22.8%22%3E%0A%20%3Cpath%20d%3D%22M515%20730%20V560%20Q610%20520%20680%20560%20V730%20M760%20730%20V560%20Q850%20520%20925%20560%20V730%22%2F%3E%0A%20%3Cpath%20d%3D%22M520%20580%20H675%20M765%20580%20H920%22%20stroke-width%3D%227%22%2F%3E%0A%20%3Cpath%20d%3D%22M540%20730%20V600%20M570%20730%20V590%20M600%20730%20V585%20M630%20730%20V590%20M660%20730%20V600%20M780%20730%20V600%20M810%20730%20V590%20M840%20730%20V585%20M870%20730%20V590%20M900%20730%20V600%22%20stroke-width%3D%225%22%2F%3E%0A%20%3Cpath%20d%3D%22M690%20555%20Q720%20490%20750%20555%20L750%20710%20L690%20710Z%22%20fill%3D%22%230d110d%22%20stroke%3D%22none%22%2F%3E%0A%3C%2Fg%3E%0A%3Cellipse%20cx%3D%22720%22%20cy%3D%22665%22%20rx%3D%22430%22%20ry%3D%22125%22%20fill%3D%22url%28%23mist%29%22%20filter%3D%22url%28%23blur%29%22%2F%3E%0A%3C%21--%20ground%20and%20shrubs%20--%3E%0A%3Cpath%20d%3D%22M0%20800%20Q220%20740%20420%20825%20Q600%20760%20790%20820%20Q1030%20740%201220%20825%20Q1340%20770%201440%20810%20V1100%20H0Z%22%20fill%3D%22%230a0e08%22%20opacity%3D%22.94%22%2F%3E%0A%3Cg%20fill%3D%22%23172013%22%20opacity%3D%22.9%22%3E%0A%20%3Cpath%20d%3D%22M0%20880%20Q120%20760%20250%20870%20Q360%20760%20470%20900%20Q600%20790%20700%20910%20L700%201100%20H0Z%22%2F%3E%0A%20%3Cpath%20d%3D%22M800%20900%20Q940%20770%201060%20890%20Q1180%20760%201300%20875%20Q1380%20820%201440%20900%20V1100%20H800Z%22%2F%3E%0A%3C%2Fg%3E%0A%3Crect%20width%3D%221440%22%20height%3D%221100%22%20filter%3D%22url%28%23grain%29%22%20opacity%3D%22.16%22%2F%3E%0A%3Crect%20width%3D%221440%22%20height%3D%221100%22%20fill%3D%22%23000%22%20opacity%3D%22.2%22%2F%3E%0A%3C%2Fsvg%3E");background-size:cover;background-position:center center;background-attachment:fixed;color:#dedede;font-family:Georgia,"Times New Roman",serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.20;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")}
+body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.23;background:repeating-linear-gradient(to bottom,rgba(190,25,35,.22) 0,rgba(190,25,35,.22) 1px,transparent 2px,transparent 4px);box-shadow:inset 0 0 190px #000}
+#letter-screen{position:relative;z-index:1;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:25px;transition:opacity 1.5s ease}
+.letter{width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65)}
+.letter-header{display:flex;justify-content:space-between;gap:15px;color:#746d62;font-family:monospace;font-size:11px;margin-bottom:28px;letter-spacing:1px;padding-bottom:15px;border-bottom:1px solid rgba(80,70,55,.2)}
+.letter h2{font-size:20px;font-weight:normal;letter-spacing:4px;text-align:left;margin:30px 0 22px;color:#29251f}
+#letter-text{font-size:14px;line-height:1.9;color:#49443b;white-space:normal;overflow-wrap:break-word;min-height:115px;text-align:left;word-spacing:normal;letter-spacing:normal}
+.cursor{display:inline-block;width:1px;height:15px;background:#766b5c;margin-left:2px;vertical-align:-2px;animation:blink .8s infinite}
 @keyframes blink{50%{opacity:0}}
+.signature{margin-top:25px;text-align:right;font-size:14px;font-style:italic;color:#82786a;opacity:0;transition:opacity 1s ease}.signature.show{opacity:1}
 @keyframes signalFlicker{
   0%,82%,100%{opacity:1;text-shadow:0 0 15px rgba(255,255,255,.12)}
   84%{opacity:.15;text-shadow:-2px 0 rgba(255,255,255,.45),2px 0 rgba(180,180,180,.35)}
@@ -31,12 +34,12 @@ html,body{min-height:100vh;background:#0d0d0d;background:radial-gradient(ellipse
   94%{opacity:1}
 }
 .blink-title{animation:signalFlicker 2s infinite}
-#home-screen{display:none;opacity:0;min-height:100vh;padding:65px 20px 25px;transition:opacity 1.5s ease}
+#home-screen{position:relative;z-index:1;display:none;opacity:0;min-height:100vh;padding:65px 20px 25px;transition:opacity 1.5s ease}
 .container{width:100%;max-width:930px;margin:auto}
 .main-title{text-align:center;font-size:clamp(30px,6vw,48px);font-weight:normal;letter-spacing:5px;color:#e5e5e5;margin-bottom:35px;text-shadow:0 0 15px rgba(255,255,255,.12)}
-.home-image{width:100%;aspect-ratio:930/340;display:block;object-fit:cover;filter:grayscale(100%) brightness(.78) contrast(1.1);border:1px solid #292929;box-shadow:0 0 30px rgba(0,0,0,.8);cursor:pointer;transition:.3s}
+.home-image{width:100%;max-width:760px;margin:0 auto;aspect-ratio:930/340;display:block;object-fit:cover;filter:grayscale(100%) brightness(.78) contrast(1.1);border:1px solid #292929;box-shadow:0 0 30px rgba(0,0,0,.8);cursor:pointer;transition:.3s}
 .home-image:hover{filter:grayscale(100%) brightness(.95) contrast(1.1)}
-.image-caption{text-align:center;color:#999;font-size:13px;letter-spacing:3px;margin-top:18px;margin-bottom:35px;font-style:italic}
+.image-caption{text-align:center;color:#aaa;font-size:13px;letter-spacing:2px;margin-top:18px;margin-bottom:35px;font-style:italic}
 nav{
     display:flex;
     justify-content:center;
@@ -49,52 +52,34 @@ nav{
     font-family:monospace;
 }
 .nav-item{position:relative}
-.nav-button{color:#aaa;border:1px solid #555;background:#292929;padding:10px 13px;font-family:monospace;font-size:11px;letter-spacing:2px;transition:.3s;cursor:pointer}
-.nav-button:hover,.nav-button.active{color:#fff;background:#414141;border-color:#777}
-.dropdown{display:none;position:absolute;top:calc(100% + 5px);left:0;width:205px;max-width:75vw;background:rgba(5,5,5,.98);border:1px solid #303030;box-shadow:0 12px 30px rgba(0,0,0,.9);z-index:50}
+.nav-button{color:#bbb;border:1px solid #713038;background:rgba(20,8,10,.82);padding:10px 13px;font-family:monospace;font-size:11px;letter-spacing:2px;transition:.3s;cursor:pointer}
+.nav-button:hover,.nav-button.active{color:#fff;background:rgba(91,19,27,.42);border-color:#b34b56;box-shadow:0 0 12px rgba(130,25,35,.18)}
+.dropdown{display:none;position:absolute;top:calc(100% + 5px);left:0;width:205px;max-width:75vw;background:rgba(5,5,5,.98);border:1px solid #713038;box-shadow:0 12px 30px rgba(0,0,0,.9);z-index:50}
 #menu-OBL,#menu-ARC{left:auto;right:0}
 .dropdown.open{display:block;animation:appear .2s ease}
 .dropdown button{display:block;width:100%;padding:11px 12px;text-align:left;background:transparent;border:0;color:#999;font-family:Georgia,serif;font-size:11px;cursor:pointer}
 .dropdown button:last-child{border-bottom:none}
-.dropdown button:hover{background:#151515;color:#eee}
+.dropdown button:hover{background:#211013;color:#fff}
 .content-area{min-height:180px;padding:5px 0 32px;text-align:left;animation:appear .5s ease}
 .section-category{display:block;width:100%;max-width:620px;margin-top:12px;padding:13px 14px;text-align:left;background:#101010;border:1px solid #303030;color:#c9c9c9;font-family:Georgia,"Times New Roman",serif;cursor:pointer}
 .section-category strong{display:block;font-size:13px;font-weight:normal;letter-spacing:.5px;margin-bottom:5px}
-.section-category span{display:block;color:#777;font-size:11px;line-height:1.6}
+.section-category span{display:none!important}
 .section-category:hover{background:#181818;border-color:#666;color:#fff}
 
 .content-title{color:#d5d5d5;font-size:15px;font-weight:normal;letter-spacing:1px;margin-bottom:12px}
-.content-description{color:#888;font-size:11px;line-height:1.9;max-width:600px}
+.content-description{display:none!important}
 .content-area a{color:#c5a4a4;text-decoration:underline;text-underline-offset:3px}
 .content-area a:hover{color:#fff}
 .publication{max-width:700px;margin-top:14px;padding:12px 0;border:0}
 .publication h3{font-size:14px;font-weight:normal;letter-spacing:1px;color:#ccc;margin-bottom:8px}
 .publication-body{font-size:12px;color:#999;line-height:1.65;white-space:normal;overflow-wrap:anywhere}
+.read-more-button{display:inline-block;margin-top:12px;padding:0;background:transparent;border:0;color:#e32636;font:inherit;font-size:1em;letter-spacing:0;text-decoration:none;cursor:pointer}.read-more-button:hover,.read-more-button:focus{color:#ff5965;text-decoration:underline}.read-more-button[hidden]{display:none}
+
 .publication-body p{margin:0 0 6px}
 .publication-body ul,.publication-body ol{padding-left:25px;margin:10px 0}
 .publication-body a{color:#c5a4a4;text-decoration:underline}
 .publication-body img{display:block;max-width:100%;width:auto;height:auto;max-height:650px;object-fit:contain;margin:4px 0;border:1px solid #292929}
 .file-image{display:block;width:auto;max-width:100%;max-height:650px;height:auto;object-fit:contain;margin:4px 0;border:1px solid #292929}
-.guest-entry{width:100%;max-width:540px;margin-top:25px;padding:19px;background:rgba(0,0,0,.55);border:1px solid #292929;animation:subtleBorder 3s infinite}
-@keyframes subtleBorder{0%,100%{border-color:#292929}50%{border-color:#666}}
-.guest-label{color:#777;font-family:monospace;font-size:9px;letter-spacing:1.5px;margin-bottom:20px}
-.guest-user{color:#aaa;font-family:monospace;font-size:11px;margin-bottom:6px}
-.guest-name{color:#ddd;font-size:14px;margin-bottom:15px}
-.guest-phrase{color:#aaa;font-size:12px;line-height:1.8;font-style:italic;margin-bottom:20px}
-.guest-number{color:#666;font-family:monospace;font-size:9px;letter-spacing:1px}
-.guest-form{max-width:540px;margin-top:25px;padding:20px;background:rgba(0,0,0,.55);border:1px solid #292929}
-.guest-input,.guest-textarea,.admin-input,.admin-textarea,.admin-select{width:100%;background:#080808;border:1px solid #333;color:#ddd;padding:12px;font-family:Georgia,serif;font-size:13px;outline:none;margin-bottom:12px}
-.guest-input:focus,.guest-textarea:focus,.admin-input:focus,.admin-textarea:focus,.admin-select:focus{border-color:#777}
-.guest-textarea,.admin-textarea{min-height:110px;resize:vertical;line-height:1.6}
-.guest-submit,.admin-button{background:#111;border:1px solid #444;color:#bbb;padding:12px 22px;font-family:monospace;font-size:10px;letter-spacing:2px;cursor:pointer;transition:.2s}
-.guest-submit:hover,.admin-button:hover{background:#222;color:#fff;border-color:#888}
-.guest-submit:disabled{opacity:.4;cursor:wait}
-.guest-warning{color:#777;font-size:10px;line-height:1.8;margin-top:15px;max-width:500px}
-.guest-list{max-width:540px;margin-top:25px}
-.guest-post{padding:17px 0;border-bottom:1px solid #292929}
-.guest-post-name{color:#ccc;font-size:13px;margin-bottom:7px}
-.guest-post-message{color:#999;font-size:12px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere}
-.guest-post-date{color:#555;font-family:monospace;font-size:9px;margin-top:10px}
 #admin-screen{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.97);overflow-y:auto;padding:25px 16px}
 .admin-wrap{max-width:850px;margin:35px auto}
 .admin-heading{font-size:19px;font-weight:normal;letter-spacing:4px;text-align:center;margin-bottom:30px;color:#ddd}
@@ -104,8 +89,8 @@ nav{
 .admin-select{appearance:auto;color:#aaa}
 .admin-select option{background:#080808}
 .admin-nav{display:flex;flex-wrap:wrap;gap:7px;margin:20px 0;border:0;padding-bottom:15px}
-.admin-tab{background:#292929;border:1px solid #555;color:#aaa;padding:10px 13px;font-family:monospace;font-size:10px;cursor:pointer}
-.admin-tab.active,.admin-tab:hover{color:#fff;border-color:#888;background:#414141}
+.admin-tab{background:#170d0f;border:1px solid #713038;color:#aaa;padding:10px 13px;font-family:monospace;font-size:10px;cursor:pointer}
+.admin-tab.active,.admin-tab:hover{color:#fff;border-color:#b34b56;background:#35151a}
 .admin-record{padding:14px 0;border:0;display:flex;justify-content:space-between;gap:12px;align-items:center}
 .publication-group,.publication-category{border:1px solid #333;margin:8px 0;padding:10px;background:#090909}
 .publication-group>summary,.publication-category>summary{cursor:pointer;color:#bbb;font:11px monospace;letter-spacing:1px;padding:5px}
@@ -135,14 +120,16 @@ nav{
 footer{border-top:1px solid #292929;padding:25px 10px;text-align:center;color:#666;font-family:monospace;font-size:11px;letter-spacing:1px;line-height:2}
 @keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:600px){
+html,body{background-attachment:scroll;background-position:center top;background-size:auto 100vh}
 #home-screen{padding:45px 17px 20px}
+.home-image{max-width:100%;}
 .main-title{margin-bottom:25px;letter-spacing:3px}
 nav{gap:2px}
 .nav-button{padding:10px 11px;font-size:10px;letter-spacing:1px}
 .dropdown{width:190px}
 .letter{padding:27px 20px}
 .letter-header{flex-wrap:wrap}
-#letter-text{font-size:13px}
+#letter-text{font-size:13px;color:#49443b}
 .admin-wrap{margin:15px auto}
 .admin-record{align-items:flex-start;flex-direction:column}
 .admin-record .admin-actions{width:100%}
@@ -474,8 +461,9 @@ nav{gap:2px}
         <span>De: zorg</span>
         <span id="local-time"></span>
     </div>
-    <h2>MENSAJE DE INGRESO</h2>
+    <h2>BIENVENIDO</h2>
     <div id="letter-text"><span id="typed-text"></span><span class="cursor" id="cursor"></span></div>
+    <div class="signature" id="signature">Con cariño: zorg.</div>
 </div>
 </section>
 
@@ -485,7 +473,7 @@ nav{gap:2px}
     <img id="home-logo" class="home-image"
     src="https://i.ibb.co/q378bvQT/6336211-E-7579-4-F92-9-E93-87-F54-B37-C0-C9.png"
     alt="El Último Jardín" title="Volver al inicio">
-    <p class="image-caption">Un jardín para los perdidos.</p>
+    <p class="image-caption">Nada desaparece del todo.</p>
 
     <nav id="navigation">
         <div class="nav-item">
@@ -513,7 +501,7 @@ nav{gap:2px}
     <section class="content-area" id="content-area"></section>
 
     <footer>
-        2026 El último jardín | ¿Este es el último lugar? Intenta averiguarlo
+        2026 0-site | ¿Este es el último lugar? Intenta averiguarlo
     </footer>
 </div>
 </main>
@@ -536,7 +524,6 @@ nav{gap:2px}
             <button class="admin-tab active" data-admin-tab="contenido">CONTENIDO</button>
             <button class="admin-tab" data-admin-tab="gestor">GESTOR</button>
             <button class="admin-tab" data-admin-tab="archivos">ARCHIVOS</button>
-            <button class="admin-tab" data-admin-tab="inicio">INICIO</button>
             <button class="admin-tab" data-admin-tab="configuracion">CONFIGURACIÓN</button>
         </div>
         <div id="admin-panel-content"></div>
@@ -557,11 +544,6 @@ nav{gap:2px}
             primary:"https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js",
             fallback:"https://cdn.jsdelivr.net/npm/firebase@10.14.1/compat/firebase-auth.js",
             check:()=>window.firebase&&typeof firebase.auth==="function"
-        },
-        {
-            primary:"https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js",
-            fallback:"https://cdn.jsdelivr.net/npm/firebase@10.14.1/compat/firebase-database.js",
-            check:()=>window.firebase&&typeof firebase.database==="function"
         },
         {
             primary:"https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js",
@@ -615,9 +597,9 @@ nav{gap:2px}
     }
 
     async function loadAll(){
-        for(const source of sources){
-            await loadLibrary(source);
-        }
+        // Primero se carga el núcleo; Auth y Firestore pueden descargarse en paralelo.
+        await loadLibrary(sources[0]);
+        await Promise.all(sources.slice(1).map(loadLibrary));
 
         if(!window.firebase)throw new Error("Firebase no está disponible.");
         startGarden();
@@ -648,7 +630,6 @@ const firebaseConfig={
 if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
 
 const auth=firebase.auth();
-const database=firebase.database();
 const firestore=firebase.firestore();
 const ADMIN_UID="CLFuoan5IpXSp2LRSMPlsIaYMbB3";
 const ADMIN_EMAIL_KEY="0site_admin_email";
@@ -664,12 +645,6 @@ function syncAdminEmailField(){
 }
 
 let currentUser=null;
-let gardenOnlineCount=0;
-let presenceStarted=false;
-
-let guestbookListener=null;
-let latestGuestbookSnapshot=null;
-
 let logoClicks=0;
 let logoTimer=null;
 let typingStarted=false;
@@ -679,37 +654,35 @@ let gestorTargetLocation=null;
 let currentContentToken=0;
 let savedEditorRange=null;
 let activeContentListeners=[];
+// Caché en memoria: permite volver a mostrar categorías visitadas sin esperar otra lectura.
+const categoryContentCache=new Map();
 
 const sections={
-INICIO:[
-{title:"Portada",description:"La desconfianza es tu única protección. No todo lo que encuentres aquí quiere ser encontrado."}
-],
 HOME:[
-{title:"Entrada",description:"Algo ha comenzado a tomar forma. No sabemos qué lo provocó."},
-{title:"Reglas",description:"Existen reglas que no fueron escritas para ser cuestionadas."},
-{title:"Logs",description:"La conexión permanece activa. El origen sigue sin identificarse."},
-{title:"Rastros",description:"Algunos dejaron constancia de su llegada. Otros nunca debieron hacerlo."}
+{title:"Entrada",description:""},
+{title:"Relatos",description:""},
+{title:"Logs",description:""}
 ],
 SHA:[
-{title:"Anomalías",description:"No todos los caminos aparecen cuando los buscas."},
-{title:"Límites",description:"Hay algo al otro lado que parece estar esperando."},
-{title:"Reflejos",description:"A veces, lo que te observa no es tu reflejo."}
+{title:"Anomalías",description:""},
+{title:"Límites",description:""},
+{title:"Reflejos",description:""}
 ],
 SEC:[
-{title:"dump",description:"Información eliminada que todavía deja rastros."},
-{title:"Señales",description:"Señales que permanecen activas sin un origen conocido."}
+{title:"dump",description:""},
+{title:"Señales",description:""}
 ],
 OBL:[
-{title:"Sector 0",description:"Conversaciones abandonadas que todavía reciben visitas."},
-{title:"Punto ciego",description:"Lugares registrados en mapas que nunca fueron encontrados."},
-{title:"Frecuencias",description:"Archivos que permanecieron intactos durante años."},
-{title:"Buffer",description:"Cuentas sin actividad. Sus nombres siguen apareciendo."}
+{title:"Sector 0",description:""},
+{title:"Punto ciego",description:""},
+{title:"Frecuencias",description:""},
+{title:"Buffer",description:""}
 ],
 ARC:[
-{title:"Fragmentos",description:"Fragmentos de una estructura que dejó de existir."},
-{title:"Espejos",description:"Vínculos con redes que ya no deberían estar disponibles."},
-{title:"Rutas caducadas",description:"Direcciones recuperadas de redes olvidadas. Algunas dejaron de responder; otras solo sobreviven en registros incompletos."},
-{title:"FAQ",description:"No todo desapareció cuando el sistema cayó."}
+{title:"Fragmentos",description:""},
+{title:"Espejos",description:""},
+{title:"Rutas caducadas",description:""},
+{title:"FAQ",description:""}
 ]
 };
 
@@ -725,43 +698,26 @@ function applySectionSettings(value){
     if(!value||typeof value!=="object")return;
     Object.keys(sections).forEach(key=>{
         if(!Array.isArray(value[key]))return;
-        const clean=value[key].filter(item=>item&&typeof item.title==="string"&&item.title.trim())
+        const removedLegacyCategories=new Set(["reglas","rastros","libro de visitas","libro-visitas"]);
+        const clean=value[key].filter(item=>{
+                if(!item||typeof item.title!=="string"||!item.title.trim())return false;
+                const normalized=item.title.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+                return !removedLegacyCategories.has(normalized);
+            })
             .map(item=>({
                 title:item.title.trim().slice(0,60),
-                description:typeof item.description==="string"?item.description.slice(0,240):"",
+                description:"",
                 hidden:Boolean(item.hidden)
             }));
         if(clean.length)sections[key].splice(0,sections[key].length,...clean);
+        // Mantener la categoría Relatos disponible dentro de HOME aunque exista
+        // una configuración antigua guardada en Firestore.
+        if(key==="HOME"&&!sections[key].some(item=>item.title.toLowerCase()==="relatos")){
+            sections[key].push({title:"Relatos",description:""});
+        }
     });
 }
-const messages=[
-`Nadie llega aquí por casualidad.
-
-No buscaste este enlace. Él te encontró a ti.
-
-Hay cinco puertas. No todas conducen al mismo sitio.
-
-El jardín recuerda.
-
-Ahora observa.`,
-`Has vuelto.
-
-Probablemente no lo recuerdes, pero el jardín nunca te olvidó.
-
-Lee despacio. Desconfía de lo que parece sencillo.
-
-Algunas respuestas están a plena vista.
-
-Comienza a caminar.`,
-`No todas las entradas tienen una salida.
-
-Algunos llegaron buscando historias. Otros buscaban respuestas.
-
-Ninguno encontró exactamente lo que esperaba.
-
-Si has llegado hasta aquí, continúa.`
-];
-const signature="\n\nCon cariño: EL CREADOR";
+const welcomeMessage="No todos los lugares están destinados a ser encontrados, algunos permanecen ocultos incluso cuando están frente a nosotros, quizá llegaste aquí por casualidad o quizá llevabas tiempo buscando algo que no sabías nombrar, no importa cuánto tiempo permanezcas, el jardín no tiene prisa, puedes continuar cuando quieras.";
 
 function getSaved(key){
     try{return localStorage.getItem(key)}catch(e){return null}
@@ -866,23 +822,6 @@ async function moveRecord(collectionName,records,index,direction,reloadFunction)
 auth.onAuthStateChanged(async user=>{
     currentUser=user;
 
-    if(latestGuestbookSnapshot){
-        const adminScreen=document.getElementById("admin-screen");
-        const adminList=document.getElementById("admin-guest-list");
-        const publicList=document.getElementById("guest-list");
-
-        if(
-            adminList &&
-            adminScreen &&
-            adminScreen.style.display==="block"
-        ){
-            renderGuestbook(latestGuestbookSnapshot,"admin-guest-list",true);
-
-        }else if(publicList){
-            renderGuestbook(latestGuestbookSnapshot,"guest-list",false);
-        }
-    }
-
     if(!user){
         try{await auth.signInAnonymously()}
         catch(error){console.error("Error de autenticación anónima:",error)}
@@ -896,7 +835,7 @@ auth.onAuthStateChanged(async user=>{
         adminScreen.style.display="block";
 
         const savedTab=localStorage.getItem("0site_admin_tab")||"contenido";
-        const allowedTabs=["contenido","gestor","archivos","inicio","configuracion"];
+        const allowedTabs=["contenido","gestor","archivos","configuracion"];
         const tab=allowedTabs.includes(savedTab)?savedTab:(savedTab==="publicaciones"?"contenido":"contenido");
 
         document.querySelectorAll(".admin-tab").forEach(button=>{
@@ -905,34 +844,9 @@ auth.onAuthStateChanged(async user=>{
         renderAdminTab(tab);
     }
 
-    startPresence(user);
+
 });
 
-function startPresence(user){
-    const connectedRef=database.ref(".info/connected");
-    const myPresence=database.ref("presence/"+user.uid);
-
-    connectedRef.on("value",snapshot=>{
-        if(snapshot.val()!==true)return;
-
-        myPresence.onDisconnect().remove()
-        .then(()=>myPresence.set(true))
-        .catch(error=>console.error("Error de presencia:",error));
-    });
-
-    if(!presenceStarted){
-        presenceStarted=true;
-
-        database.ref("presence").on("value",snapshot=>{
-            gardenOnlineCount=snapshot.numChildren();
-            window.gardenOnlineCount=gardenOnlineCount;
-
-            const counter=document.getElementById("admin-online-count");
-            if(counter)counter.textContent=gardenOnlineCount;
-
-        },error=>console.error("No se pudo leer presencia:",error));
-    }
-}
 
 /* RUTAS COMPARTIBLES */
 function routeSlug(value){
@@ -1048,246 +962,6 @@ document.getElementById("content-area").addEventListener("click",event=>{
         }
     }
 });
-
-/* LIBRO DE VISITAS */
-
-function showGuestbook(){
-    const content=document.getElementById("content-area");
-
-    if(guestbookListener){
-        guestbookListener.off("value");
-        guestbookListener=null;
-    }
-
-    latestGuestbookSnapshot=null;
-
-    content.innerHTML=`
-    <h2 class="content-title">Rastros</h2>
-    <p class="content-description">Algunos dejaron constancia de su llegada. Otros nunca debieron hacerlo.</p>
-
-    <div class="guest-entry">
-        <div class="guest-label">RASTROS · REGISTRO FIJADO</div>
-        <div class="guest-user">zurg</div>
-        <div class="guest-name">Amalia Montenegro</div>
-        <div class="guest-phrase">«Anoche soñé con este jardín. Hoy encontré esta página».</div>
-        <div class="guest-number">REGISTRO N.º 0001</div>
-    </div>
-
-    <form class="guest-form" id="guest-form">
-        <div class="guest-label">DEJA TU CONSTANCIA</div>
-        <input class="guest-input" id="guest-name-input" maxlength="24" minlength="2" placeholder="Alias" required>
-        <textarea class="guest-textarea" id="guest-message-input" maxlength="500" placeholder="Escribe tu mensaje..." required></textarea>
-        <button class="guest-submit" id="guest-submit" type="submit">FIRMAR</button>
-        <p class="guest-warning">Al firmar, aceptas que tu mensaje se quede aquí. incluso después de que te vayas. incluso después de que dejes de existir.</p>
-        <p class="admin-status" id="guest-status"></p>
-    </form>
-
-    <div class="guest-list" id="guest-list">
-        <div class="guest-label">REGISTROS DE VISITANTES</div>
-        <p class="admin-status">Consultando registros...</p>
-    </div>`;
-
-    document.getElementById("guest-form").addEventListener("submit",async event=>{
-        event.preventDefault();
-
-        const name=document.getElementById("guest-name-input").value.trim();
-        const msg=document.getElementById("guest-message-input").value.trim();
-        const submit=document.getElementById("guest-submit");
-        const status=document.getElementById("guest-status");
-
-        if(name.length<2||name.length>24||msg.length<1||msg.length>500){
-            status.textContent="Revisa el alias y el mensaje.";
-            return;
-        }
-
-        submit.disabled=true;
-        status.textContent="Registrando firma...";
-
-        try{
-            await database.ref("guestbook").push({
-                name:name,
-                msg:msg,
-                ts:firebase.database.ServerValue.TIMESTAMP
-            });
-
-            event.target.reset();
-            status.textContent="Tu firma ha quedado registrada.";
-
-        }catch(error){
-            console.error("Error al firmar:",error);
-            status.textContent="No se pudo registrar. "+(error.message||"Inténtalo de nuevo.");
-
-        }finally{
-            submit.disabled=false;
-        }
-    });
-
-    attachGuestbookListener("guest-list",false);
-}
-
-function attachGuestbookListener(targetId,allowDelete){
-    if(guestbookListener){
-        guestbookListener.off("value");
-        guestbookListener=null;
-    }
-
-    guestbookListener=database.ref("guestbook");
-
-    guestbookListener.on("value",snapshot=>{
-        latestGuestbookSnapshot=snapshot;
-        renderGuestbook(snapshot,targetId,allowDelete);
-
-    },error=>{
-        console.error("Error leyendo el libro de visitas:",error);
-
-        const list=document.getElementById(targetId);
-
-        if(list){
-            list.innerHTML="";
-            const errorMessage=document.createElement("p");
-            errorMessage.className="admin-status";
-            errorMessage.textContent="No se pudieron cargar las firmas: "+(error.message||"Error de conexión.");
-            list.appendChild(errorMessage);
-        }
-    });
-}
-
-function renderGuestbook(snapshot,targetId="guest-list",allowDelete=false){
-    const list=document.getElementById(targetId);
-
-    if(!list)return;
-
-    list.innerHTML="<div class='guest-label'>REGISTROS DE VISITANTES</div>";
-
-    if(!snapshot||!snapshot.exists()){
-        const empty=document.createElement("p");
-        empty.className="admin-status";
-        empty.textContent="Todavía no hay firmas.";
-        list.appendChild(empty);
-        return;
-    }
-
-    const entries=[];
-
-    snapshot.forEach(child=>{
-        const data=child.val()||{};
-
-        entries.push({
-            id:child.key,
-            name:data.name||"Visitante",
-            msg:data.msg||"",
-            ts:Number(data.ts)||0
-        });
-    });
-
-    entries.sort((a,b)=>b.ts-a.ts);
-
-    const adminScreen=document.getElementById("admin-screen");
-    const dashboard=document.getElementById("admin-dashboard");
-
-    const canDelete=
-        allowDelete===true &&
-        targetId==="admin-guest-list" &&
-        currentUser &&
-        currentUser.uid===ADMIN_UID &&
-        adminScreen &&
-        adminScreen.style.display==="block" &&
-        dashboard &&
-        dashboard.style.display!=="none";
-
-    entries.forEach(entry=>{
-        const article=document.createElement("article");
-        article.className="guest-post";
-
-        const name=document.createElement("div");
-        name.className="guest-post-name";
-        name.textContent=entry.name;
-
-        const message=document.createElement("div");
-        message.className="guest-post-message";
-        message.textContent=entry.msg;
-
-        const date=document.createElement("div");
-        date.className="guest-post-date";
-        date.textContent=entry.ts
-            ?new Date(entry.ts).toLocaleString("es-EC")
-            :"";
-
-        article.append(name,message,date);
-
-        if(canDelete){
-            const remove=document.createElement("button");
-
-            remove.className="admin-button admin-danger";
-            remove.textContent="ELIMINAR FIRMA";
-            remove.style.marginTop="12px";
-
-            remove.addEventListener("click",async()=>{
-                if(
-                    !currentUser ||
-                    currentUser.uid!==ADMIN_UID ||
-                    document.getElementById("admin-screen").style.display!=="block"
-                ){
-                    alert("No tienes permisos para eliminar firmas.");
-                    return;
-                }
-
-                if(!confirm("¿Eliminar esta firma?"))return;
-
-                remove.disabled=true;
-
-                try{
-                    await database.ref("guestbook/"+entry.id).remove();
-
-                }catch(error){
-                    console.error("Error eliminando firma:",error);
-                    alert("No se pudo eliminar: "+error.message);
-                    remove.disabled=false;
-                }
-            });
-
-            article.appendChild(remove);
-        }
-
-        list.appendChild(article);
-    });
-}
-
-/* MODERACIÓN ADMINISTRATIVA DEL LIBRO DE VISITAS */
-
-function renderAdminGuestbook(){
-    const panel=document.getElementById("admin-panel-content");
-
-    if(!currentUser||currentUser.uid!==ADMIN_UID){
-        panel.innerHTML=`
-        <div class="admin-box">
-            <p class="admin-status">Acceso denegado.</p>
-        </div>`;
-        return;
-    }
-
-    panel.innerHTML=`
-    <div class="admin-box">
-        <p class="admin-subtitle">MODERACIÓN DEL LIBRO DE VISITAS</p>
-        <p class="admin-hint">Esta sección solo está disponible dentro del panel administrativo. Las firmas eliminadas desaparecerán también para los visitantes.</p>
-        <div class="guest-list" id="admin-guest-list">
-            <p class="admin-status">Consultando registros...</p>
-        </div>
-        <div class="admin-actions">
-            <button class="admin-button" id="admin-guestbook-back">VOLVER AL INICIO</button>
-        </div>
-    </div>`;
-
-    document.getElementById("admin-guestbook-back").addEventListener("click",()=>{
-        document.querySelectorAll(".admin-tab").forEach(button=>{
-            button.classList.toggle("active",button.dataset.adminTab==="inicio");
-        });
-
-        renderAdminTab("inicio");
-    });
-
-    attachGuestbookListener("admin-guest-list",true);
-}
 
 /* CONTENIDO HTML SEGURO */
 
@@ -1469,67 +1143,20 @@ async function showCategory(section,title,description,updateUrl=false){
         section,title,description
     }));
 
-    if(section==="HOME"&&(title==="Rastros"||title==="Libro de visitas")){
-        showGuestbook();
-        return;
-    }
-
-    if(guestbookListener){
-        guestbookListener.off("value");
-        guestbookListener=null;
-        latestGuestbookSnapshot=null;
-    }
-
     clearContentListeners();
     const content=document.getElementById("content-area");
     const token=++currentContentToken;
 
     content.innerHTML="";
 
-    const showHeader = (section==="INICIO") || 
-                       (section==="HOME" && title==="Reglas") ||
-                       (section==="ARC" && title==="Rutas caducadas");
-
-    if(showHeader){
-        const desc=document.createElement("p");
-        desc.className="content-description";
-        desc.textContent=description;
-        if(section!=="INICIO"){
-            const heading=document.createElement("h2");
-            heading.className="content-title";
-            heading.textContent=title;
-            content.append(heading,desc);
-        }else{
-            content.appendChild(desc);
-        }
+    /* Las categorías ya no muestran descripciones en la vista pública. */
+    if(section==="ARC" && title==="Rutas caducadas"){
+        const heading=document.createElement("h2");
+        heading.className="content-title";
+        heading.textContent=title;
+        content.appendChild(heading);
     }
 
-    if(section==="HOME"&&title==="Reglas"){
-        const rules=document.createElement("div");
-        rules.className="publication";
-        rules.setAttribute("data-static","true");
-        rules.style.marginTop="18px";
-        rules.style.padding="15px";
-        rules.style.border="1px solid #303030";
-        rules.style.background="#090909";
-        rules.innerHTML=`
-            <h3 style="font-size:15px;font-weight:normal;letter-spacing:1px;color:#d0d0d0;margin:0 0 10px">REGLAS DE PERMANENCIA</h3>
-            <p style="font-size:12px;line-height:1.7;color:#999;margin:0 0 15px">Lee cada instrucción antes de continuar. No todas las reglas fueron escritas para protegerte.</p>
-            <ol style="margin:0;padding-left:20px;color:#aaa;font-size:12px;line-height:1.8">
-                <li style="padding:0 0 12px 4px">Si aparece un nuevo menú que no estaba allí antes, no lo abras. Cierra la página y espera unos minutos. Debería desaparecer.</li>
-                <li style="padding:0 0 12px 4px">Si escuchas un sonido mientras navegas por el archivo, no intentes localizar su origen.</li>
-                <li style="padding:0 0 12px 4px">Si una publicación aparece con fecha de mañana, no intentes actualizar la página.</li>
-                <li style="padding:0 0 12px 4px">Si encuentras tu propio nombre en la sección Rastros, abandona esa sección inmediatamente.</li>
-                <li style="padding:0 0 12px 4px">Si una puerta aparece dos veces en el mismo menú, no abras ninguna de las dos.</li>
-                <li style="padding:0 0 12px 4px">Si una publicación desaparece mientras la estás leyendo, no intentes buscarla nuevamente.</li>
-                <li style="padding:0 0 12px 4px">Si encuentras una sección llamada «El último jardín», recuerda que ya estás dentro.</li>
-                <li style="padding:0 0 12px 4px">Si encuentras una historia titulada «El espejo 4», no la leas. Nunca fue publicada.</li>
-                <li style="padding:0 0 0 4px">Si ninguna de las reglas anteriores parece tener sentido, no significa que estés a salvo.</li>
-            </ol>
-        `;
-        content.appendChild(rules);
-        return;
-    }
 
     if(section==="ARC"&&title==="Rutas caducadas"){
         const archive=document.createElement("div");
@@ -1600,7 +1227,53 @@ async function showCategory(section,title,description,updateUrl=false){
                     if(!node.textContent.trim()&&!hasContent)node.remove();
                 });
                 body.querySelectorAll("br + br").forEach(br=>br.remove());
+
+                // HOME > RELATOS: recorte visual adaptable de 6 a 15 líneas.
+                // No modifica ni reemplaza el texto original de la historia.
+                let readMoreButton=null;
+                if(section==="HOME" && String(title).toLowerCase()==="relatos"){
+                    const storyText=(body.innerText||body.textContent||"").trim();
+                    const lineLimit=storyText.length<500?6:
+                        storyText.length<900?8:
+                        storyText.length<1400?10:
+                        storyText.length<2100?12:15;
+
+                    body.style.display="-webkit-box";
+                    body.style.webkitBoxOrient="vertical";
+                    body.style.webkitLineClamp=String(lineLimit);
+                    body.style.overflow="hidden";
+
+                    readMoreButton=document.createElement("button");
+                    readMoreButton.type="button";
+                    readMoreButton.className="read-more-button";
+                    readMoreButton.textContent="Seguir leyendo";
+                    readMoreButton.setAttribute("aria-expanded","false");
+                    readMoreButton.hidden=true;
+                    requestAnimationFrame(()=>{
+                        if(!body.isConnected)return;
+                        const isOverflowing=body.scrollHeight>body.clientHeight+3;
+                        if(isOverflowing){
+                            readMoreButton.hidden=false;
+                        }else{
+                            body.style.display="";
+                            body.style.webkitBoxOrient="";
+                            body.style.webkitLineClamp="";
+                            body.style.overflow="";
+                        }
+                    });
+                    readMoreButton.addEventListener("click",()=>{
+                        const expanded=readMoreButton.getAttribute("aria-expanded")==="true";
+                        body.style.display=expanded?"-webkit-box":"block";
+                        body.style.webkitBoxOrient=expanded?"vertical":"";
+                        body.style.webkitLineClamp=expanded?String(lineLimit):"unset";
+                        body.style.overflow=expanded?"hidden":"visible";
+                        readMoreButton.textContent=expanded?"Seguir leyendo":"Mostrar menos";
+                        readMoreButton.setAttribute("aria-expanded",String(!expanded));
+                    });
+                }
+
                 article.appendChild(body);
+                if(readMoreButton)article.appendChild(readMoreButton);
                 content.appendChild(article);
             });
 
@@ -1650,34 +1323,79 @@ async function showCategory(section,title,description,updateUrl=false){
             }
         }
 
-        const pubQuery = firestore.collection("publicaciones").where("menu","==",section).where("category","==",title);
-        const unsubPub = pubQuery.onSnapshot(snapshot=>{
-            const docs=[];
-            snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-            renderContent(docs, window._currentFiles||[]);
-        }, err=>console.error(err));
+        const cacheKey=section+"::"+title;
+        const cached=categoryContentCache.get(cacheKey);
+        let latestPublications=cached?.publications||[];
+        let latestFiles=cached?.files||[];
+        let publicationsReady=Boolean(cached);
+        let filesReady=Boolean(cached);
+        let publicationsError=null;
+        let filesError=null;
+
+        // Si ya se visitó esta categoría, se pinta inmediatamente mientras Firestore sincroniza.
+        if(cached){
+            renderContent(latestPublications,latestFiles);
+        }
+
+        // Cada colección se muestra por separado: un error en archivos no bloquea las historias.
+        function renderAvailableContent(){
+            if(!publicationsReady&&!filesReady)return;
+            renderContent(latestPublications,latestFiles);
+            if(token!==currentContentToken)return;
+            const message=publicationsError||filesError;
+            if(message){
+                const warning=document.createElement("p");
+                warning.className="admin-status";
+                warning.textContent="Parte del contenido no pudo cargarse. Revisa la conexión o los permisos de Firestore.";
+                content.appendChild(warning);
+            }
+        }
+
+        const pubQuery=firestore.collection("publicaciones")
+            .where("menu","==",section)
+            .where("category","==",title);
+        const fileQuery=firestore.collection("archivos")
+            .where("menu","==",section)
+            .where("category","==",title);
+
+        function renderLatestIfReady(){
+            if(publicationsReady&&filesReady){
+                categoryContentCache.set(cacheKey,{
+                    publications:latestPublications,
+                    files:latestFiles
+                });
+            }
+            renderAvailableContent();
+        }
+
+        // Una única suscripción por colección. Las historias no esperan a que terminen los archivos.
+        const unsubPub=pubQuery.onSnapshot(snapshot=>{
+            latestPublications=[];
+            snapshot.forEach(doc=>latestPublications.push({id:doc.id,...doc.data()}));
+            publicationsReady=true;
+            publicationsError=null;
+            renderLatestIfReady();
+        },err=>{
+            console.error("Error cargando publicaciones:",err);
+            publicationsReady=true;
+            publicationsError=err;
+            renderLatestIfReady();
+        });
         activeContentListeners.push(unsubPub);
 
-        const fileQuery = firestore.collection("archivos").where("menu","==",section).where("category","==",title);
-        const unsubFile = fileQuery.onSnapshot(snapshot=>{
-            const files=[];
-            snapshot.forEach(doc=>files.push({id:doc.id,...doc.data()}));
-            window._currentFiles=files;
-            pubQuery.get().then(snap=>{
-                const docs=[];
-                snap.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-                renderContent(docs, files);
-            });
-        }, err=>console.error(err));
-        activeContentListeners.push(unsubFile);
-
-        Promise.all([pubQuery.get(), fileQuery.get()]).then(([pSnap, fSnap])=>{
-            const docs=[], files=[];
-            pSnap.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-            fSnap.forEach(doc=>files.push({id:doc.id,...doc.data()}));
-            window._currentFiles=files;
-            renderContent(docs, files);
+        const unsubFile=fileQuery.onSnapshot(snapshot=>{
+            latestFiles=[];
+            snapshot.forEach(doc=>latestFiles.push({id:doc.id,...doc.data()}));
+            filesReady=true;
+            filesError=null;
+            renderLatestIfReady();
+        },err=>{
+            console.error("Error cargando archivos:",err);
+            filesReady=true;
+            filesError=err;
+            renderLatestIfReady();
         });
+        activeContentListeners.push(unsubFile);
 
         return;
 
@@ -1685,7 +1403,7 @@ async function showCategory(section,title,description,updateUrl=false){
         console.error("Error cargando contenido:",error);
 
         if(token===currentContentToken){
-            loading.textContent="No se pudo cargar el contenido. Comprueba las reglas de Firestore.";
+            loading.textContent="No se pudo cargar el contenido. Comprueba los permisos de Firestore.";
         }
     }
 }
@@ -1695,16 +1413,12 @@ function showSectionLanding(section,updateUrl=false){
     if(updateUrl)changePublicUrl(sectionPath(section));
     saveData("gardenSection",section);
     const content=document.getElementById("content-area");
-    if(guestbookListener){guestbookListener.off("value");guestbookListener=null;latestGuestbookSnapshot=null;}
     ++currentContentToken;
     content.innerHTML="";
     const heading=document.createElement("h2");
     heading.className="content-title";
     heading.textContent=section+" // DIRECTORIO";
-    const description=document.createElement("p");
-    description.className="content-description";
-    description.textContent="Selecciona una categoría para abrir sus registros.";
-    content.append(heading,description);
+    content.appendChild(heading);
     (sections[section]||[])
         .filter(item=>!item.hidden)
         .forEach(item=>{
@@ -1713,9 +1427,7 @@ function showSectionLanding(section,updateUrl=false){
             button.className="section-category";
             const name=document.createElement("strong");
             name.textContent=item.title;
-            const detail=document.createElement("span");
-            detail.textContent=item.description;
-            button.append(name,detail);
+            button.appendChild(name);
             button.addEventListener("click",()=>showCategory(section,item.title,item.description,true));
             content.appendChild(button);
         });
@@ -1757,74 +1469,50 @@ function renderRouteFromPath(){
     return true;
 }
 window.addEventListener("popstate",()=>{
-    if(!renderRouteFromPath()&&(location.pathname==="/"||location.pathname==="/index.html"))restoreCategory();
+    if(!renderRouteFromPath()&&(location.pathname==="/"||location.pathname==="/index.html"))showInicio();
 });
 
+// Portada pública: vista inicial independiente de HOME > Entrada.
+// No se registra como sección ni aparece como opción administrativa.
 function showInicio(){
     closeMenus();
-    showCategory("INICIO","Portada",sections.INICIO[0].description);
+    ++currentContentToken;
+    const content=document.getElementById("content-area");
+    if(content)content.innerHTML="";
+    try{localStorage.removeItem("gardenCategory");}catch(e){}
 }
 
 function showHome(){
-    showCategory("HOME","Entrada",sections.HOME[0].description);
+    showSectionLanding("HOME",true);
 }
 
 document.getElementById("home-logo").addEventListener("click",showInicio);
 
 function restoreCategory(){
-    const content=document.getElementById("content-area");
-    const saved=getSaved("gardenCategory");
-
-    if(!saved){
-        showInicio();
-        return;
-    }
-
-    try{
-        const data=JSON.parse(saved);
-
-        if(data.section==="INICIO"){
-            showInicio();
-            return;
-        }
-
-        const valid=sections[data.section]?.find(item=>item.title===data.title);
-
-        if(valid)showCategory(data.section,valid.title,valid.description);
-        else showInicio();
-
-    }catch(e){
-        content.innerHTML="";
-    }
+    // Al entrar al sitio se muestra siempre la portada, no la última categoría visitada.
+    showInicio();
 }
 
 /* CARTA DE ENTRADA */
 
 function typeWriter(){
     if(typingStarted)return;
-
     typingStarted=true;
-
-    const message=messages[Math.floor(Math.random()*messages.length)]+signature;
     const textElement=document.getElementById("typed-text");
     const cursor=document.getElementById("cursor");
+    const signatureElement=document.getElementById("signature");
     let index=0;
-
     function type(){
-        if(index<message.length){
-            const character=message.charAt(index);
-
-            textElement.textContent+=character;
+        if(index<welcomeMessage.length){
+            textElement.textContent+=welcomeMessage.charAt(index);
             index++;
-
-            setTimeout(type,character==="\n"?350:32);
-
+            setTimeout(type,35);
         }else{
             cursor.style.display="none";
-            setTimeout(showHomeScreen,2500);
+            setTimeout(()=>signatureElement.classList.add("show"),600);
+            setTimeout(showHomeScreen,2600);
         }
     }
-
     type();
 }
 
@@ -1845,7 +1533,7 @@ function showHomeScreen(){
         setTimeout(()=>home.style.opacity="1",100);
 
         saveData("gardenEntered","yes");
-        restoreCategory();
+        showInicio();
 
     },1500);
 }
@@ -1902,7 +1590,7 @@ function openAdmin(){
         document.getElementById("admin-login").style.display="none";
         document.getElementById("admin-dashboard").style.display="block";
         const savedTab=localStorage.getItem("0site_admin_tab")||"contenido";
-        const allowedTabs=["contenido","gestor","archivos","inicio","configuracion"];
+        const allowedTabs=["contenido","gestor","archivos","configuracion"];
         const tab=allowedTabs.includes(savedTab)?savedTab:(savedTab==="publicaciones"?"contenido":"contenido");
         document.querySelectorAll(".admin-tab").forEach(button=>{
             button.classList.toggle("active",button.dataset.adminTab===tab);
@@ -1913,10 +1601,6 @@ function openAdmin(){
         document.getElementById("admin-dashboard").style.display="none";
     }
 
-    if(guestbookListener){
-        guestbookListener.off("value");
-        guestbookListener=null;
-    }
 }
 
 /* CERRAR PANEL ADMINISTRATIVO */
@@ -1925,18 +1609,6 @@ document.getElementById("admin-close").addEventListener("click",()=>{
     sessionStorage.removeItem("0site_admin_panel_open");
     document.getElementById("admin-screen").style.display="none";
 
-    if(guestbookListener){
-        guestbookListener.off("value");
-        guestbookListener=null;
-    }
-
-    latestGuestbookSnapshot=null;
-
-    const publicList=document.getElementById("guest-list");
-
-    if(publicList){
-        attachGuestbookListener("guest-list",false);
-    }
 });
 
 /* LOGIN ADMINISTRADOR */
@@ -1999,7 +1671,7 @@ document.querySelectorAll(".admin-tab").forEach(button=>{
 
 /* SELECTORES DE MENÚ Y CATEGORÍA (INCLUYE CATEGORÍAS OCULTAS PARA QUE EL ADMIN PUBLIQUE EN ELLAS) */
 
-function menuOptions(selected="INICIO"){
+function menuOptions(selected="HOME"){
     return Object.keys(sections).map(key=>
         `<option value="${key}" ${key===selected?"selected":""}>${key}</option>`
     ).join("");
@@ -2007,7 +1679,6 @@ function menuOptions(selected="INICIO"){
 
 function categoryOptions(menu,selected=""){
     return sections[menu]
-        .filter(item=>!(menu==="HOME"&&item.title==="Rastros"))
         .map(item=>{
             const suffix=item.hidden?" [OCULTA]":"";
             return `<option value="${item.title}" ${item.title===selected?"selected":""}>${item.title}${suffix}</option>`;
@@ -2018,7 +1689,7 @@ function fillCategorySelect(menuSelect,categorySelect,selected=""){
     categorySelect.innerHTML=categoryOptions(menuSelect.value,selected);
 }
 
-function addLocationSelectors(menuValue="INICIO",categoryValue="Portada"){
+function addLocationSelectors(menuValue="HOME",categoryValue="Entrada"){
     return `
     <label class="admin-status">MENÚ DONDE SE PUBLICARÁ</label>
     <select class="admin-select" id="record-menu">${menuOptions(menuValue)}</select>
@@ -2306,24 +1977,6 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
 
 function renderAdminTab(tab){
     const panel=document.getElementById("admin-panel-content");
-    if(tab==="guestbook"){renderAdminGuestbook();return;}
-    if(tab==="inicio"){
-        panel.innerHTML=`
-        <div class="admin-box">
-            <p class="admin-subtitle">ESTADO DEL SISTEMA</p>
-            <p class="admin-status">Firebase conectado.</p>
-            <p class="admin-subtitle">VISITANTES EN LÍNEA</p>
-            <div class="admin-count" id="admin-online-count">${gardenOnlineCount}</div>
-            <p class="admin-hint">El conteo representa conexiones anónimas activas, no personas únicas.</p>
-            <p class="admin-subtitle">LIBRO DE VISITAS</p>
-            <button class="admin-button" id="admin-guestbook-button">MODERAR FIRMAS</button>
-        </div>`;
-        document.getElementById("admin-guestbook-button").addEventListener("click",()=>{
-            renderAdminTab("guestbook");
-            document.querySelectorAll(".admin-tab").forEach(button=>button.classList.remove("active"));
-        });
-        return;
-    }
     if(tab==="contenido"){renderPublicationEditor();return;}
     if(tab==="gestor"){renderPublicationManager();return;}
     if(tab==="archivos"){renderFileEditor();return;}
@@ -2334,8 +1987,8 @@ function renderAdminTab(tab){
 
 function renderPublicationEditor(editData=null){
     const panel=document.getElementById("admin-panel-content");
-    const menu=editData?.menu||"INICIO";
-    const category=editData?.category||(menu==="INICIO"?"Portada":"Entrada");
+    const menu=sections[editData?.menu]?editData.menu:"HOME";
+    const category=sections[menu]?.some(item=>item.title===editData?.category)?editData.category:"Entrada";
     panel.innerHTML=`
     <div class="admin-box">
         <p class="admin-subtitle">${editData?"EDITAR PUBLICACIÓN":"NUEVA PUBLICACIÓN"}</p>
@@ -2363,7 +2016,7 @@ function renderPublicationEditor(editData=null){
 
     document.getElementById("record-cancel").addEventListener("click",()=>{
         if(editData){
-            gestorTargetLocation={section:editData.menu||"INICIO",category:editData.category||"Portada"};
+            gestorTargetLocation={section:sections[editData.menu]?editData.menu:"HOME",category:sections[editData.menu]?.some(item=>item.title===editData.category)?editData.category:"Entrada"};
         }
         editingId=null;
         document.querySelectorAll(".admin-tab").forEach(button=>button.classList.toggle("active",button.dataset.adminTab==="gestor"));
@@ -2424,7 +2077,7 @@ function renderPublicationEditor(editData=null){
             saveButton.textContent="PUBLICAR";
             setTimeout(()=>{if(document.getElementById("record-status"))document.getElementById("record-status").textContent="";},3500);
         }catch(error){
-            console.error(error);status.textContent="No se pudo guardar. Comprueba las reglas de Firestore.";
+            console.error(error);status.textContent="No se pudo guardar. Comprueba los permisos de Firestore.";
         }finally{saveButton.disabled=false;}
     });
 }
@@ -2462,7 +2115,7 @@ async function loadPublicationList(keepOpenState=null){
         list.innerHTML="";
         if(snapshot.empty){list.textContent="No hay publicaciones todavía.";return;}
         const docs=[];snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-        const sectionsOrder=["INICIO","HOME","SHA","SEC","OBL","ARC"];
+        const sectionsOrder=["HOME","SHA","SEC","OBL","ARC"];
         const categories={};
         docs.forEach(item=>{
             const section=item.menu||"SIN SECCIÓN";const category=item.category||"Sin categoría";
@@ -2519,7 +2172,7 @@ async function loadPublicationList(keepOpenState=null){
                     remove.addEventListener("click",async()=>{
                         if(!confirm("¿Eliminar esta publicación definitivamente?"))return;
                         try{await firestore.collection("publicaciones").doc(item.id).delete();await loadPublicationList();}
-                        catch(error){console.error(error);alert("No se pudo eliminar. Comprueba las reglas de Firestore.");}
+                        catch(error){console.error(error);alert("No se pudo eliminar. Comprueba los permisos de Firestore.");}
                     });
                     actions.append(up, down, edit, remove);row.append(label,actions);categoryBox.appendChild(row);
                 });
@@ -2527,7 +2180,7 @@ async function loadPublicationList(keepOpenState=null){
             });
             list.appendChild(sectionBox);
         });
-    }catch(error){console.error(error);list.textContent="No se pudieron cargar las publicaciones. Revisa las reglas de Firestore.";}
+    }catch(error){console.error(error);list.textContent="No se pudieron cargar las publicaciones. Revisa los permisos de Firestore.";}
 }
 
 function refreshPublicationManagement(){if(document.getElementById("gestor-publication-list"))loadPublicationList();}
@@ -2537,8 +2190,8 @@ function refreshPublicationManagement(){if(document.getElementById("gestor-publi
 function renderFileEditor(editData=null){
     const panel=document.getElementById("admin-panel-content");
 
-    const menu=editData?.menu||"INICIO";
-    const category=editData?.category||(menu==="INICIO"?"Portada":"Entrada");
+    const menu=sections[editData?.menu]?editData.menu:"HOME";
+    const category=sections[menu]?.some(item=>item.title===editData?.category)?editData.category:"Entrada";
 
     panel.innerHTML=`
     <div class="admin-box">
@@ -2687,7 +2340,7 @@ function renderFileEditor(editData=null){
 
         }catch(error){
             console.error(error);
-            status.textContent="No se pudo guardar. Comprueba las reglas de Firestore.";
+            status.textContent="No se pudo guardar. Comprueba los permisos de Firestore.";
 
         }finally{
             saveButton.disabled=false;
@@ -2807,7 +2460,7 @@ async function loadFileList(){
 
     }catch(error){
         console.error(error);
-        list.textContent="No se pudieron cargar los archivos. Revisa las reglas de Firestore.";
+        list.textContent="No se pudieron cargar los archivos. Revisa los permisos de Firestore.";
     }
 }
 
@@ -2991,7 +2644,7 @@ function renderConfiguration(){
             loadConfig();
         }catch(error){
             console.error(error);
-            status.textContent="No se pudo guardar. Revisa las reglas de Firestore.";
+            status.textContent="No se pudo guardar. Revisa los permisos de Firestore.";
         }
     });
 }
@@ -3043,7 +2696,7 @@ async function loadConfig(){
 
     }catch(error){
         console.error(error);
-        list.textContent="No se pudo cargar la configuración. Revisa las reglas de Firestore.";
+        list.textContent="No se pudo cargar la configuración. Revisa los permisos de Firestore.";
     }
 }
 
