@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>0-site - el último jardín</title>
+<title>0-site // el último jardín</title>
 
 <meta name="description" content="Un lugar entre lo que recuerdas y lo que nunca ocurrió.">
 
@@ -557,11 +557,6 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
             check:()=>window.firebase&&typeof firebase.auth==="function"
         },
         {
-            primary:"https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js",
-            fallback:"https://cdn.jsdelivr.net/npm/firebase@10.14.1/compat/firebase-database.js",
-            check:()=>window.firebase&&typeof firebase.database==="function"
-        },
-        {
             primary:"https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js",
             fallback:"https://cdn.jsdelivr.net/npm/firebase@10.14.1/compat/firebase-firestore.js",
             check:()=>window.firebase&&typeof firebase.firestore==="function"
@@ -635,18 +630,15 @@ function startGarden(){
 const firebaseConfig={
     apiKey:"AIzaSyBBBIjiRltl6_-D6FGUUml72Pq9Gb-JiEI",
     authDomain:"site-98c0d.firebaseapp.com",
-    databaseURL:"https://site-98c0d-default-rtdb.firebaseio.com",
     projectId:"site-98c0d",
     storageBucket:"site-98c0d.firebasestorage.app",
     messagingSenderId:"1091529579406",
-    appId:"1:1091529579406:web:718ee797d447947d6e62df",
-    measurementId:"G-C85KS5G5SW"
+    appId:"1:1091529579406:web:718ee797d447947d6e62df"
 };
 
 if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
 
 const auth=firebase.auth();
-const database=firebase.database();
 const firestore=firebase.firestore();
 const ADMIN_UID="CLFuoan5IpXSp2LRSMPlsIaYMbB3";
 const ADMIN_EMAIL_KEY="0site_admin_email";
@@ -662,8 +654,6 @@ function syncAdminEmailField(){
 }
 
 let currentUser=null;
-let gardenOnlineCount=0;
-let presenceStarted=false;
 
 let logoClicks=0;
 let logoTimer=null;
@@ -888,34 +878,8 @@ auth.onAuthStateChanged(async user=>{
         renderAdminTab(tab);
     }
 
-    startPresence(user);
+    
 });
-
-function startPresence(user){
-    const connectedRef=database.ref(".info/connected");
-    const myPresence=database.ref("presence/"+user.uid);
-
-    connectedRef.on("value",snapshot=>{
-        if(snapshot.val()!==true)return;
-
-        myPresence.onDisconnect().remove()
-        .then(()=>myPresence.set(true))
-        .catch(error=>console.error("Error de presencia:",error));
-    });
-
-    if(!presenceStarted){
-        presenceStarted=true;
-
-        database.ref("presence").on("value",snapshot=>{
-            gardenOnlineCount=snapshot.numChildren();
-            window.gardenOnlineCount=gardenOnlineCount;
-
-            const counter=document.getElementById("admin-online-count");
-            if(counter)counter.textContent=gardenOnlineCount;
-
-        },error=>console.error("No se pudo leer presencia:",error));
-    }
-}
 
 /* RUTAS COMPARTIBLES */
 function routeSlug(value){
