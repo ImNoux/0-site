@@ -60,7 +60,7 @@ nav{
 .dropdown button{display:block;width:100%;padding:11px 12px;text-align:left;background:transparent;border:0;color:#999;font-family:Georgia,serif;font-size:11px;cursor:pointer}
 .dropdown button:last-child{border-bottom:none}
 .dropdown button:hover{background:#211013;color:#fff}
-.content-area{min-height:180px;padding:5px 0 32px;text-align:left;animation:appear .5s ease}
+.content-area{min-height:180px;padding:18px 16px 32px;text-align:left;animation:appear .5s ease;background:rgba(45,45,45,.58)}
 .section-category{display:block;width:100%;max-width:620px;margin-top:12px;padding:13px 14px;text-align:left;background:#101010;border:1px solid #303030;color:#c9c9c9;font-family:Georgia,"Times New Roman",serif;cursor:pointer}
 .section-category strong{display:block;font-size:13px;font-weight:normal;letter-spacing:.5px;margin-bottom:5px}
 .section-category span{display:none!important}
@@ -512,7 +512,7 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
     <section class="content-area" id="content-area"></section>
 
     <footer>
-        <span id="current-year"></span> El último jardín | ¿Este es el último lugar? Intenta averiguarlo
+        2026 El último jardín | ¿Este es el último lugar? Intenta averiguarlo
     </footer>
 </div>
 </main>
@@ -633,7 +633,8 @@ const firebaseConfig={
     projectId:"site-98c0d",
     storageBucket:"site-98c0d.firebasestorage.app",
     messagingSenderId:"1091529579406",
-    appId:"1:1091529579406:web:718ee797d447947d6e62df"
+    appId:"1:1091529579406:web:718ee797d447947d6e62df",
+    measurementId:"G-C85KS5G5SW"
 };
 
 if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
@@ -2801,9 +2802,6 @@ async function loadConfig(){
 initializePage();
 
 }
-</script>
-<script>
-document.getElementById("current-year").textContent=new Date().getFullYear();
 </script>
 
 </body>
