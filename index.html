@@ -16,14 +16,14 @@
 html{min-height:100%;background:#020303}
 body{min-height:100vh;position:relative;background:transparent}
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png");background-position:center center;background-repeat:no-repeat;background-size:contain}
-#letter-screen{position:relative;z-index:1;min-height:100vh;display:flex;justify-content:center;align-items:center;padding:25px;transition:opacity 1.5s ease}
+#letter-screen{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:flex;justify-content:center;align-items:stretch;padding:42px 7vw;background:#000;transition:opacity 1.5s ease}
 .letter{width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65)}
 .letter-header{display:flex;justify-content:space-between;gap:15px;color:#746d62;font-family:monospace;font-size:11px;margin-bottom:28px;letter-spacing:1px;padding-bottom:15px;border-bottom:1px solid rgba(80,70,55,.2)}
 .letter h2{font-size:20px;font-weight:normal;letter-spacing:4px;text-align:left;margin:30px 0 22px;color:#29251f}
 #letter-text{font-size:14px;line-height:1.9;color:#49443b;white-space:normal;overflow-wrap:break-word;min-height:115px;text-align:left;word-spacing:normal;letter-spacing:normal}
 .cursor{display:inline-block;width:1px;height:15px;background:#766b5c;margin-left:2px;vertical-align:-2px;animation:blink .8s infinite}
 @keyframes blink{50%{opacity:0}}
-.signature{margin-top:25px;text-align:right;font-size:14px;font-style:italic;color:#82786a;opacity:0;transition:opacity 1s ease}.signature.show{opacity:1}
+.signature{display:block;width:100%;margin-top:28px;padding-top:0;text-align:right;font-size:14px;font-style:italic;color:#82786a;opacity:0;transition:opacity 1s ease}.signature.show{opacity:1}.signature.show{opacity:1}
 @keyframes signalFlicker{
   0%,82%,100%{opacity:1;text-shadow:0 0 15px rgba(255,255,255,.12)}
   84%{opacity:.15;text-shadow:-2px 0 rgba(255,255,255,.45),2px 0 rgba(180,180,180,.35)}
@@ -126,6 +126,7 @@ nav{
 footer{border-top:1px solid #292929;padding:25px 10px;text-align:center;color:#666;font-family:monospace;font-size:11px;letter-spacing:1px;line-height:2}
 @keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:600px){
+ .letter{padding:27px 20px}
 
 #home-screen{padding:45px 17px 20px}
 .home-image{max-width:100%;}
@@ -475,6 +476,7 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
     </div>
     <h2>Bienvenido</h2>
     <div id="letter-text"><span id="typed-text"></span><span class="cursor" id="cursor"></span></div>
+    <div class="signature" id="letter-signature">Con cariño: zorg.</div>
 </div>
 </section>
 
@@ -919,7 +921,7 @@ async function loadCategorySettings(){
             if(location.pathname.split("/").filter(Boolean).length){
                 renderRouteFromPath();
             }else if(document.getElementById("home-screen")?.style.display==="block"){
-                restoreCategory();
+                showInicio();
             }
         }
     }catch(error){
@@ -965,6 +967,14 @@ document.getElementById("content-area").addEventListener("click",event=>{
     try{
         url=new URL(rawHref,location.origin);
     }catch(e){
+        return;
+    }
+
+    const sameSiteHost=url.hostname.replace(/^www\./i,"")===location.hostname.replace(/^www\./i,"");
+    if(sameSiteHost&&(url.pathname==="/"||url.pathname==="/index.html")){
+        event.preventDefault();
+        showInicio();
+        window.scrollTo({top:0,behavior:"smooth"});
         return;
     }
 
@@ -1544,12 +1554,18 @@ function renderRouteFromPath(){
     return true;
 }
 window.addEventListener("popstate",()=>{
-    if(!renderRouteFromPath()&&(location.pathname==="/"||location.pathname==="/index.html"))restoreCategory();
+    if(!renderRouteFromPath()&&(location.pathname==="/"||location.pathname==="/index.html"))showInicio();
 });
 
 function showInicio(){
     closeMenus();
-    showCategory("INICIO","Portada",sections.INICIO[0].description);
+    if(location.pathname!=="/")changePublicUrl("/");
+    const letter=document.getElementById("letter-screen");
+    const home=document.getElementById("home-screen");
+    if(letter){letter.style.display="none";letter.style.opacity="0";}
+    if(home){home.style.display="block";home.style.opacity="1";}
+    saveData("gardenEntered","yes");
+    showCategory("INICIO","Portada",sections.INICIO[0].description,false);
 }
 
 function showHome(){
@@ -1592,9 +1608,10 @@ function typeWriter(){
 
     typingStarted=true;
 
-    const message=messages[Math.floor(Math.random()*messages.length)]+signature;
+    const message=messages[Math.floor(Math.random()*messages.length)];
     const textElement=document.getElementById("typed-text");
     const cursor=document.getElementById("cursor");
+    const signatureElement=document.getElementById("letter-signature");
     let index=0;
 
     function type(){
@@ -1608,6 +1625,7 @@ function typeWriter(){
 
         }else{
             cursor.style.display="none";
+            if(signatureElement)signatureElement.classList.add("show");
             setTimeout(showHomeScreen,2500);
         }
     }
@@ -1632,7 +1650,7 @@ function showHomeScreen(){
         setTimeout(()=>home.style.opacity="1",100);
 
         saveData("gardenEntered","yes");
-        restoreCategory();
+        showInicio();
 
     },1500);
 }
@@ -1650,7 +1668,7 @@ function initializePage(){
         letter.style.opacity="0";
         home.style.display="block";
         home.style.opacity="1";
-        restoreCategory();
+        showInicio();
         return;
     }
 
