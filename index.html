@@ -923,8 +923,6 @@ async function loadCategorySettings(){
         console.warn("Se mantienen las categorías predeterminadas:",error);
     }
 }
-// Las rutas se resuelven después de recuperar la configuración remota.
-// Así Safari/Chrome no confunden una categoría oculta con un relato mientras Firebase responde.
 const categorySettingsPromise=loadCategorySettings();
 
 document.querySelectorAll(".nav-button").forEach(button=>{
@@ -1181,6 +1179,8 @@ async function showCategory(section,title,description,updateUrl=false){
     closeMenus();
     if(updateUrl)changePublicUrl(categoryPath(section,title));
 
+    // Cualquier categoría abierta confirma que la carta inicial ya fue superada.
+    saveData("gardenEntered","yes");
     saveData("gardenCategory",JSON.stringify({
         section,title,description
     }));
@@ -1506,7 +1506,7 @@ function showSectionLanding(section,updateUrl=false){
 
 function renderRouteFromPath(){
     const parts=location.pathname.split("/").filter(Boolean).map(part=>{try{return decodeURIComponent(part)}catch(e){return part}});
-    if(!parts.length|| (parts.length===1&&["index.html","index.htm"].includes(parts[0].toLowerCase())))return false;
+    if(!parts.length)return false;
     const slug=routeSlug(parts.join("/"));
     const allCategories=Object.entries(sections).flatMap(([section,items])=>items.map(item=>({section,item})));
 
@@ -1654,7 +1654,7 @@ function showHomeScreen(){
 
 async function initializePage(){
     typingStarted=false;
-    // Espera a Firebase para conocer también las categorías ocultas y personalizadas.
+    // Espera la configuración remota antes de interpretar rutas de categorías nuevas.
     await categorySettingsPromise;
     if(renderRouteFromPath())return;
     transitionStarted=false;
@@ -1662,7 +1662,9 @@ async function initializePage(){
     const letter=document.getElementById("letter-screen");
     const home=document.getElementById("home-screen");
 
-    if(getSaved("gardenEntered")==="yes"){
+    // gardenCategory también sirve como prueba de que el visitante ya entró.
+    if(getSaved("gardenEntered")==="yes"||Boolean(getSaved("gardenCategory"))){
+        saveData("gardenEntered","yes");
         letter.style.display="none";
         letter.style.opacity="0";
         home.style.display="block";
