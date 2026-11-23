@@ -473,7 +473,7 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
         <span>De: zorg</span>
         <span id="local-time"></span>
     </div>
-    <h2>MENSAJE DE INGRESO</h2>
+    <h2>Bienvenido</h2>
     <div id="letter-text"><span id="typed-text"></span><span class="cursor" id="cursor"></span></div>
 </div>
 </section>
@@ -752,7 +752,7 @@ Ninguno encontró exactamente lo que esperaba.
 
 Si has llegado hasta aquí, continúa.`
 ];
-const signature="\n\nCon cariño: EL CREADOR";
+const signature="\n\nCon cariño: zorg.";
 
 function getSaved(key){
     try{return localStorage.getItem(key)}catch(e){return null}
@@ -1769,7 +1769,7 @@ document.querySelectorAll(".admin-tab").forEach(button=>{
 /* SELECTORES DE MENÚ Y CATEGORÍA (INCLUYE CATEGORÍAS OCULTAS PARA QUE EL ADMIN PUBLIQUE EN ELLAS) */
 
 function menuOptions(selected="HOME"){
-    return Object.keys(sections).filter(key=>key!=="INICIO").map(key=>
+    return Object.keys(sections).map(key=>
         `<option value="${key}" ${key===selected?"selected":""}>${key}</option>`
     ).join("");
 }
@@ -2212,9 +2212,9 @@ async function loadPublicationList(keepOpenState=null){
         list.innerHTML="";
         if(snapshot.empty){list.textContent="No hay publicaciones todavía.";return;}
         const docs=[];snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-        const sectionsOrder=["HOME","SHA","SEC","OBL","ARC"];
+        const sectionsOrder=["INICIO","HOME","SHA","SEC","OBL","ARC"];
         const categories={};
-        docs.filter(item=>item.menu!=="INICIO").forEach(item=>{
+        docs.forEach(item=>{
             const section=item.menu||"SIN SECCIÓN";const category=item.category||"Sin categoría";
             categories[section]??={};categories[section][category]??=[];categories[section][category].push(item);
         });
@@ -2572,7 +2572,7 @@ function renderConfiguration(){
         <p class="admin-hint">Cambia el nombre de las categorías, añade nuevas, modifica su posición o márcalas como <b>Oculta</b> para que no aparezcan en el menú superior y solo se abran mediante enlace (ej: <code>/2nd-round</code>).</p>
         <label class="admin-status">MENÚ</label>
         <select class="admin-select" id="category-menu-select">
-            ${Object.keys(sections).filter(key=>key!=="INICIO").map(key=>`<option value="${key}">${key}</option>`).join("")}
+            ${Object.keys(sections).map(key=>`<option value="${key}">${key}</option>`).join("")}
         </select>
         <div id="category-order-list" class="category-order-list"></div>
         <label class="admin-status">NUEVA CATEGORÍA</label>
