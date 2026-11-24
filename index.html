@@ -851,10 +851,28 @@ function legacyCollection(name){
             _ref:ref
         };
     };
+    function buildFirestoreQuery(){
+        let firestoreQuery=firestore.collection(target);
+
+        /* Firestore Rules no filtra documentos: la consulta pública debe
+           limitarse en el servidor a publicaciones publicadas del tipo correcto. */
+        if(kind==="publicaciones"||kind==="archivos"){
+            firestoreQuery=firestoreQuery.where(
+                "kind","==",kind==="publicaciones"?"publication":"file"
+            );
+
+            const isAdmin=currentUser&&currentUser.uid===ADMIN_UID;
+            if(!isAdmin){
+                firestoreQuery=firestoreQuery.where("published","==",true);
+            }
+        }
+
+        return firestoreQuery;
+    }
     const query={
         where(field,op,value){if(op!=="==")throw new Error("Solo se admite igualdad en este adaptador.");filters.push([field,value]);return query;},
-        get:async()=>makeSnapshot(await firestore.collection(target).get()),
-        onSnapshot:(next,error)=>firestore.collection(target).onSnapshot(snap=>next(makeSnapshot(snap)),error)
+        get:async()=>makeSnapshot(await buildFirestoreQuery().get()),
+        onSnapshot:(next,error)=>buildFirestoreQuery().onSnapshot(snap=>next(makeSnapshot(snap)),error)
     };
     return {
         where:query.where,get:query.get,onSnapshot:query.onSnapshot,
