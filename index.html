@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>
+// Decide antes de pintar el body si la carta ya fue vista.
+try { if (localStorage.getItem('0site-welcome-seen') === '1') document.documentElement.classList.add('welcome-seen'); else document.documentElement.classList.add('welcome-first'); }
+catch (e) { document.documentElement.classList.add('welcome-first'); }
+</script>
 <meta name="description" content="Hay lugares que encuentras por casualidad y otros que terminan haciéndote pensar. Este es uno de ellos.">
 <meta name="robots" content="index,follow">
 <link rel="icon" type="image/png" href="/favicon.PNG">
@@ -122,6 +127,36 @@ h1{font-size:20px;font-weight:normal;letter-spacing:4px;text-align:left;margin:3
 .connection-message{background:transparent!important;border:0!important;box-shadow:none!important;padding:12px 8px!important;text-align:center;font:18px/1.8 monospace!important;letter-spacing:1px;color:rgba(245,245,245,.88)!important;text-shadow:0 2px 8px rgba(0,0,0,.9)}
 @media(max-width:600px){.story-card{padding:15px 13px 17px}.connection-message{font-size:17px!important}}
 </style>
+
+<style id="0site-legacy-admin-and-welcome-fix">
+/* La carta queda oculta por defecto; solo se pinta en la primera visita. */
+.letter{display:none!important}
+html.welcome-first .letter{display:block!important}
+html.welcome-seen .letter{display:none!important}
+/* Recupera el aspecto del panel anterior: negro, bordes vino y tipografía monoespaciada. */
+.admin-overlay{background:rgba(0,0,0,.97)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;padding:25px 16px!important}
+.admin-shell{width:min(100%,850px)!important;margin:35px auto!important;padding:22px!important;background:#080808!important;border:1px solid #292929!important;box-shadow:none!important}
+.admin-top{display:block!important;text-align:center!important;border-bottom:0!important;padding-bottom:0!important;margin-bottom:18px!important}
+.admin-top h2{font-size:19px!important;font-weight:normal!important;letter-spacing:4px!important;text-align:center!important;color:#ddd!important;margin:0 0 18px!important}
+.admin-top .admin-actions{justify-content:center!important}
+.admin-tabs{display:flex!important;flex-wrap:wrap!important;gap:7px!important;margin:20px 0!important;border:0!important;border-bottom:1px solid #292929!important;padding-bottom:15px!important}
+.admin-tab{background:#170d0f!important;border:1px solid #713038!important;color:#aaa!important;padding:10px 13px!important;font:10px monospace!important;letter-spacing:1px!important}
+.admin-tab[aria-selected="true"],.admin-tab:hover{color:#fff!important;border-color:#b34b56!important;background:#35151a!important}
+.admin-section{background:#080808!important;border:1px solid #292929!important;padding:22px!important;margin:14px 0!important}
+.admin-section h3{color:#bbb!important;font-size:11px!important;letter-spacing:2px!important;font-weight:normal!important}
+.admin-btn{background:#111!important;border:1px solid #444!important;color:#bbb!important;padding:10px 14px!important;font:10px monospace!important;letter-spacing:1px!important}
+.admin-btn:hover{background:#222!important;color:#fff!important;border-color:#888!important}
+.admin-btn.danger{color:#e88!important}
+.admin-input,.admin-select,.admin-textarea{background:#080808!important;border:1px solid #333!important;color:#bbb!important;font:12px monospace!important}
+.admin-label,.admin-muted{color:#888!important}
+.admin-status{color:#888!important}
+.admin-status.error{color:#e88!important}.admin-status.ok{color:#9c9!important}
+.admin-item{border-bottom:1px solid #292929!important;background:transparent!important}
+.word-toolbar{background:#170d0f!important;border-color:#713038!important}
+.word-toolbar button,.word-toolbar select,.word-toolbar input{background:#111!important;border-color:#713038!important;color:#ddd!important}
+.word-editor{background:#080808!important;border-color:#333!important;color:#ddd!important}
+@media(max-width:650px){.admin-shell{padding:16px!important}.admin-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important}.admin-tab{padding:10px 4px!important;font-size:9px!important}.admin-item{align-items:flex-start!important}}
+</style>
 </head>
 <body>
 <main class="letter" aria-label="Carta de bienvenida">
@@ -184,8 +219,7 @@ const firebaseConfig = {
 const ADMIN_UID = 'bMbb9efM9jaqf7vi1EOywWmMWBI2';
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-// Mantiene la sesión administrativa incluso al cerrar y volver a abrir el navegador.
-// Solo se elimina al pulsar 'Cerrar sesión' o al borrar los datos del sitio.
+// Mantiene la sesión iniciada aunque se cierre y vuelva a abrir el navegador.
 await setPersistence(auth, browserLocalPersistence);
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -220,7 +254,9 @@ const dashboard=document.getElementById('admin-dashboard');
 const loginStatus=document.getElementById('admin-login-status');
 const adminStatus=document.getElementById('admin-status');
 let isAdmin=false, categories=[], posts=[];
-async function openLogin(){overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');if(auth.currentUser&&auth.currentUser.uid===ADMIN_UID){try{await showDashboard();}catch(err){loginStatus.textContent=err.message||'No se pudo abrir el panel.';}}else{loginBox.hidden=false;dashboard.hidden=true;}}
+let resolveAuthReady;
+const authReadyPromise=new Promise(resolve=>{resolveAuthReady=resolve;});
+async function openLogin(){await authReadyPromise;overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');if(isAdmin){await showDashboard();}else{loginBox.hidden=false;dashboard.hidden=true;}}
 function closePanel(){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
 document.getElementById('admin-close-login').addEventListener('click',closePanel);
 document.getElementById('admin-close').addEventListener('click',closePanel);
@@ -245,7 +281,7 @@ document.getElementById('admin-login-form').addEventListener('submit',async e=>{
  catch(err){loginStatus.textContent=err.message||'No se pudo iniciar sesión.';loginStatus.className='admin-status error';}
 });
 document.getElementById('admin-logout').addEventListener('click',async()=>{await signOut(auth);isAdmin=false;closePanel();});
-onAuthStateChanged(auth,async user=>{isAdmin=!!(user&&user.uid===ADMIN_UID);if(isAdmin&&overlay.classList.contains('open')&&dashboard.hidden){try{await showDashboard();}catch(err){adminStatus.textContent=err.message||'No se pudo restaurar la sesión.';adminStatus.className='admin-status error';}}else if(!isAdmin&&overlay.classList.contains('open')){loginBox.hidden=false;dashboard.hidden=true;}});
+onAuthStateChanged(auth,user=>{isAdmin=!!(user&&user.uid===ADMIN_UID);resolveAuthReady(user);});
 
 function slugify(value){return value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
 document.getElementById('category-name').addEventListener('input',e=>{if(!document.getElementById('category-id').value)document.getElementById('category-slug').value=slugify(e.target.value);});
