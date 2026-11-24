@@ -1869,15 +1869,18 @@ async function initializePage(){
         return;
     }
 
-    // Guardar la primera visita antes de cualquier espera o animación.
+    // Guardar la primera visita y resolver rutas directas antes de mostrar la carta.
     saveData("siteEntered","yes");
-    await categorySettingsPromise;
     if(renderRouteFromPath())return;
 
+    // Mostrar la carta inmediatamente: no esperar a que Firebase termine de cargar.
     transitionStarted=false;
     if(letter){letter.style.display="flex";letter.style.opacity="1";}
     if(home){home.style.display="none";home.style.opacity="0";}
     typeWriter();
+
+    // La configuración puede terminar de cargar mientras se escribe la carta.
+    await categorySettingsPromise;
 }
 
 /* ACCESO OCULTO */
