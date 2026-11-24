@@ -121,6 +121,34 @@ h1{font-size:20px;font-weight:normal;letter-spacing:4px;text-align:left;margin:3
 .story-card:last-child{margin-bottom:0;padding-bottom:20px}
 .connection-message{background:transparent!important;border:0!important;box-shadow:none!important;padding:12px 8px!important;text-align:center;font:18px/1.8 monospace!important;letter-spacing:1px;color:rgba(245,245,245,.88)!important;text-shadow:0 2px 8px rgba(0,0,0,.9)}
 @media(max-width:600px){.story-card{padding:15px 13px 17px}.connection-message{font-size:17px!important}}
+
+/* Recuperación del diseño visual del panel administrativo clásico de 0-SITE */
+.admin-overlay{background:rgba(0,0,0,.97);backdrop-filter:none;-webkit-backdrop-filter:none;padding:25px 16px;color:#ddd}
+.admin-shell{width:min(100%,850px);margin:35px auto;padding:22px;background:#050505;border:1px solid #292929;box-shadow:none}
+.admin-shell.admin-login{max-width:520px;margin:12vh auto}
+.admin-top{display:block;text-align:center;border:0;border-bottom:1px solid #292929;padding:0 0 20px;margin-bottom:22px}
+.admin-top h2{font-family:Georgia,serif;font-size:19px;font-weight:normal;letter-spacing:4px;color:#ddd;margin-bottom:14px}
+.admin-top .admin-actions{justify-content:center}
+.admin-btn,.admin-input,.admin-select,.admin-textarea{font-family:Georgia,serif;font-size:13px;color:#ddd;background:#080808;border:1px solid #333;border-radius:0;padding:12px}
+.admin-btn{font-family:monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.admin-btn:hover{background:#35151a;border-color:#b34b56;color:#fff}
+.admin-btn.danger{color:#d98a8a;border-color:#713038}
+.admin-input,.admin-select,.admin-textarea{margin-top:12px}
+.admin-label{font-family:monospace;color:#777;font-size:10px;letter-spacing:2px;margin-top:12px}
+.admin-status{font-family:monospace;font-size:11px;color:#888;line-height:1.8}
+.admin-tabs{display:flex;flex-wrap:wrap;gap:7px;margin:20px 0;border:0;border-bottom:1px solid #292929;padding:0 0 15px}
+.admin-tab{background:#170d0f;border:1px solid #713038;color:#aaa;padding:10px 13px;font-family:monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.admin-tab[aria-selected="true"],.admin-tab:hover{color:#fff;border-color:#b34b56;background:#35151a}
+.admin-section{background:#080808;border:1px solid #292929;padding:22px;margin:14px 0}
+.admin-section h3{font-family:monospace;font-size:10px;font-weight:normal;letter-spacing:2px;color:#777;margin-bottom:18px}
+.admin-item{border-bottom:1px solid #292929;padding:14px 0;background:transparent}
+.admin-item-actions .admin-btn{padding:7px 10px}
+.word-toolbar{background:#100b0c;border-color:#713038}
+.word-toolbar button,.word-toolbar select,.word-toolbar input{background:#211416;border-color:#713038;color:#ddd}
+.word-toolbar button:hover{background:#35151a;border-color:#b34b56}
+.word-editor{border-color:#777}
+@media(max-width:650px){.admin-shell{padding:17px}.admin-top h2{font-size:16px;letter-spacing:2px}.admin-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.admin-tab{padding:10px 4px;font-size:9px}.admin-section{padding:15px}.admin-item{align-items:flex-start}}
+
 </style>
 </head>
 <body>
@@ -444,7 +472,7 @@ loadData().catch(err=>{console.error(err);storiesView.classList.add('visible');s
 
 <div class="admin-overlay" id="admin-overlay" aria-hidden="true">
   <div class="admin-shell admin-login" id="admin-login">
-    <div class="admin-top"><h2>0-SITE / ACCESO PRIVADO</h2><button class="admin-btn" id="admin-close-login" type="button">Cerrar</button></div>
+    <div class="admin-top"><h2>𝕰𝖑 𝖀́𝖑𝖙𝖎𝖒𝖔 𝕵𝖆𝖗𝖉𝖎́𝖓</h2><button class="admin-btn" id="admin-close-login" type="button">Cerrar</button></div>
     <form id="admin-login-form">
       <label class="admin-label" for="admin-email">CORREO</label><input class="admin-input" id="admin-email" type="email" autocomplete="username" required>
       <label class="admin-label" for="admin-password">CONTRASEÑA</label><input class="admin-input" id="admin-password" type="password" autocomplete="current-password" required>
@@ -453,7 +481,7 @@ loadData().catch(err=>{console.error(err);storiesView.classList.add('visible');s
     </form>
   </div>
   <div class="admin-shell" id="admin-dashboard" hidden>
-    <div class="admin-top"><h2>0-SITE / ADMINISTRACIÓN</h2><div class="admin-actions"><button class="admin-btn" id="admin-logout" type="button">Cerrar sesión</button><button class="admin-btn" id="admin-close" type="button">Cerrar panel</button></div></div>
+    <div class="admin-top"><h2>𝕰𝖑 𝖀́𝖑𝖙𝖎𝖒𝖔 𝕵𝖆𝖗𝖉𝖎́𝖓</h2><div class="admin-actions"><button class="admin-btn" id="admin-logout" type="button">Cerrar sesión</button><button class="admin-btn" id="admin-close" type="button">Cerrar panel</button></div></div>
     <p class="admin-status" id="admin-status">Conectando con Firestore…</p>
     <div class="admin-tabs" role="tablist" aria-label="Secciones de administración">
       <button class="admin-tab" type="button" role="tab" aria-selected="true" data-pane="content">Contenido</button>
