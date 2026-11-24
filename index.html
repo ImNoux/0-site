@@ -39,6 +39,13 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 .main-title{text-align:center;font-size:clamp(30px,6vw,48px);font-weight:normal;letter-spacing:5px;color:#e5e5e5;margin-bottom:35px;text-shadow:0 0 15px rgba(255,255,255,.12)}
 .home-image{width:auto;max-width:min(76vw,280px);height:auto;max-height:190px;aspect-ratio:auto;margin:0 auto;display:block;object-fit:contain;filter:none;border:0;box-shadow:none;cursor:pointer;transition:opacity .3s}
 .home-image:hover{opacity:.86}
+@keyframes logoFlicker{
+    0%,91%,94%,100%{opacity:1;filter:brightness(1)}
+    92%{opacity:.28;filter:brightness(1.8)}
+    93%{opacity:.72;filter:brightness(1.25)}
+}
+.home-image{animation:logoFlicker 3s infinite ease-in-out}
+@media(prefers-reduced-motion:reduce){.home-image{animation:none}}
 .image-caption{text-align:center;color:#aaa;font-size:13px;letter-spacing:2px;margin-top:18px;margin-bottom:35px;font-style:italic}
 nav{
     display:flex;
@@ -923,10 +930,21 @@ No sé si volverás después de hoy, pero mientras estés aquí, siéntete libre
 const signature="\n\nCon cariño: zorg.";
 
 function getSaved(key){
-    try{return localStorage.getItem(key)}catch(e){return null}
+    try{
+        const value=localStorage.getItem(key);
+        if(value!==null)return value;
+    }catch(e){}
+    try{
+        const safeKey=key.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+        const match=document.cookie.match(new RegExp("(?:^|; )"+safeKey+"=([^;]*)"));
+        return match?decodeURIComponent(match[1]):null;
+    }catch(e){return null}
 }
 function saveData(key,value){
     try{localStorage.setItem(key,value)}catch(e){}
+    try{
+        document.cookie=key+"="+encodeURIComponent(value)+"; Max-Age=31536000; Path=/; SameSite=Lax; Secure";
+    }catch(e){}
 }
 function updateTime(){
     const el=document.getElementById("local-time");
@@ -1828,29 +1846,28 @@ function showHomeScreen(){
 
 async function initializePage(){
     typingStarted=false;
-    // Espera a Firebase para conocer también las categorías ocultas y personalizadas.
-    await categorySettingsPromise;
-    if(renderRouteFromPath())return;
-    transitionStarted=false;
-
     const letter=document.getElementById("letter-screen");
     const home=document.getElementById("home-screen");
 
+    // Si ya entró antes, ocultar la carta inmediatamente, sin esperar a Firebase.
     if(getSaved("gardenEntered")==="yes"){
-        letter.style.display="none";
-        letter.style.opacity="0";
-        home.style.display="block";
-        home.style.opacity="1";
+        if(letter){letter.style.display="none";letter.style.opacity="0";}
+        if(home){home.style.display="block";home.style.opacity="1";}
+        transitionStarted=true;
+        await categorySettingsPromise;
+        if(renderRouteFromPath())return;
         showInicio();
         return;
     }
 
-    letter.style.display="flex";
-    home.style.display="none";
-    home.style.opacity="0";
-    // Registrar la primera entrada antes de iniciar la animación:
-    // si el visitante actualiza durante la carta, no volverá a aparecer.
+    // Guardar la primera visita antes de cualquier espera o animación.
     saveData("gardenEntered","yes");
+    await categorySettingsPromise;
+    if(renderRouteFromPath())return;
+
+    transitionStarted=false;
+    if(letter)letter.style.display="flex";
+    if(home){home.style.display="none";home.style.opacity="0";}
     typeWriter();
 }
 
