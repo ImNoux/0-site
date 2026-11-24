@@ -3,2825 +3,400 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>0-site - el último jardín</title>
-
-<meta name="description" content="Un lugar entre lo que recuerdas y lo que nunca ocurrió.">
-
+<meta name="description" content="Hay lugares que encuentras por casualidad y otros que terminan haciéndote pensar. Este es uno de ellos.">
+<meta name="robots" content="index,follow">
 <link rel="icon" type="image/png" href="/favicon.PNG">
-<link rel="shortcut icon" type="image/png" href="/favicon.PNG">
-
+<link rel="apple-touch-icon" href="/favicon.PNG">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="0-SITE">
+<meta property="og:title" content="0-SITE - Stories and more">
+<meta property="og:description" content="Hay lugares que encuentras por casualidad y otros que terminan haciéndote pensar. Este es uno de ellos.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="0-SITE - Stories and more">
+<meta name="twitter:description" content="Hay lugares que encuentras por casualidad y otros que terminan haciéndote pensar. Este es uno de ellos.">
+<title>0-SITE - Stories and more</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html{min-height:100%;background:#020303}
-body{min-height:100vh;position:relative;background:transparent}
-body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png");background-position:center center;background-repeat:no-repeat;background-size:contain}
-#letter-screen{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:flex;justify-content:center;align-items:stretch;padding:42px 7vw;background:#000;transition:opacity 1.5s ease}
-.letter{width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65)}
+html,body{min-height:100%;background:#020303}
+body{min-height:100vh;min-height:100svh;position:relative;display:flex;justify-content:center;align-items:center;padding:42px 7vw;overflow-x:hidden;overflow-y:auto}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png");background-position:center center;background-repeat:no-repeat;background-size:cover}
+.letter{position:relative;z-index:1;width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65);transition:opacity 1.1s ease,transform 1.1s ease}
+.letter.leave{opacity:0;transform:translateY(-8px);pointer-events:none}
+#home-screen{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity 1.2s ease;pointer-events:none}
+#home-screen.show{opacity:1;visibility:visible;pointer-events:auto}
+.brand-row{position:relative;width:min(100%,520px);display:flex;justify-content:center;align-items:center;margin:2.5vh auto 0;padding:0 62px}
+#site-logo{display:block;width:clamp(230px,42vw,360px);height:auto;max-height:42vh;object-fit:contain;margin:0;animation:logo-flicker 3s infinite;filter:drop-shadow(0 0 14px rgba(255,255,255,.12))}
+.search-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.14);border-radius:5px;background:rgba(0,0,0,.52);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:rgba(245,245,245,.88);cursor:pointer;box-shadow:0 5px 18px rgba(0,0,0,.28);transition:background .2s,border-color .2s}
+.search-toggle:hover,.search-toggle:focus-visible{background:rgba(0,0,0,.72);border-color:rgba(255,255,255,.35);outline:none;color:#fff}
+.search-toggle svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.search-panel{display:none;width:min(86vw,360px);margin:12px auto 0;padding:10px;background:rgba(0,0,0,.58);border:1px solid rgba(255,255,255,.13);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.search-panel.open{display:block}
+.search-panel input{width:100%;padding:11px 12px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#eee;font:12px monospace;letter-spacing:.8px;outline:none}
+.search-panel input::placeholder{color:rgba(230,230,230,.48)}
+.search-note{margin-top:7px;color:rgba(220,220,220,.45);font:9px monospace;letter-spacing:.5px;text-align:center}
+@media(max-width:420px){.brand-row{padding:0 53px 0 38px}.search-toggle{right:2px;width:38px;height:38px}}
+.site-nav{display:flex;justify-content:center;align-items:center;gap:clamp(15px,3.5vw,32px);margin:25px 18px 0;padding:13px 22px;background:rgba(0,0,0,.48);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);font-family:monospace;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(235,235,235,.88);box-shadow:0 8px 28px rgba(0,0,0,.2)}
+.stories-view{display:none;width:min(90vw,720px);margin:38px auto 20px;padding:26px 28px;background:rgba(0,0,0,.58);border:1px solid rgba(255,255,255,.13);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:rgba(235,235,235,.88);font-family:monospace;line-height:1.8;box-shadow:0 12px 35px rgba(0,0,0,.28)}
+.stories-view.visible{display:block}
+.stories-heading{font-size:15px;font-weight:normal;letter-spacing:3px;text-transform:uppercase;margin-bottom:24px;color:#eee}
+.story-card{padding:0 0 24px;margin:0 0 24px;border-bottom:1px solid rgba(255,255,255,.13)}
+.story-card:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.story-title{font-size:14px;font-weight:normal;letter-spacing:1.4px;margin-bottom:10px;color:#f0f0f0}
+.story-preview,.story-full{font:12px/1.9 monospace;color:rgba(225,225,225,.72);white-space:pre-line;overflow-wrap:anywhere}
+.read-more{display:inline-block;margin-top:12px;color:#c94b4b;font:11px monospace;text-decoration:none;letter-spacing:.5px}
+.read-more:hover{color:#f06b6b;text-decoration:underline}
+.story-meta{font:9px monospace;color:rgba(220,220,220,.38);margin-bottom:12px;letter-spacing:1px}
+.story-navigation{display:flex;justify-content:space-between;gap:20px;margin-top:32px;padding-top:16px;border-top:1px solid rgba(255,255,255,.13)}
+.story-navigation a{font:11px monospace;color:rgba(220,220,220,.55);text-decoration:none}
+.story-navigation a:hover{color:#fff}
+.stories-empty{font:12px/1.9 monospace;color:rgba(225,225,225,.55)}
+@media(max-width:600px){.stories-view{width:calc(100% - 34px);padding:22px 18px;margin-top:28px}.story-preview,.story-full{font-size:11px}}
+.site-footer{margin-top:auto;padding:18px 12px 20px;text-align:center;color:rgba(220,220,220,.48);font:10px/1.8 monospace;letter-spacing:1.2px;text-shadow:0 1px 5px rgba(0,0,0,.7)}
+.site-footer .copyright{display:block;letter-spacing:1.5px}
+.site-footer .tagline{display:block;font-size:9px;letter-spacing:.7px;color:rgba(220,220,220,.38)}
+.nav-group{position:relative;white-space:nowrap}
+.nav-trigger{border:0;background:transparent;color:inherit;font:inherit;letter-spacing:inherit;text-transform:inherit;cursor:pointer;text-shadow:0 0 9px rgba(255,255,255,.16);padding:3px 0}
+.nav-trigger:hover,.nav-trigger:focus-visible{color:#fff;text-shadow:0 0 12px rgba(255,255,255,.55);outline:none}
+.submenu{display:none;position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%);min-width:155px;padding:8px 0;background:rgba(0,0,0,.78);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);box-shadow:0 10px 28px rgba(0,0,0,.35);text-align:center;z-index:5}
+.nav-group.open .submenu{display:block}
+.submenu a{display:block;padding:10px 14px;color:rgba(235,235,235,.82);font:11px monospace;letter-spacing:1.5px;text-decoration:none;text-transform:uppercase}
+.submenu a:hover,.submenu a:focus-visible{background:rgba(255,255,255,.09);color:#fff;outline:none}
+.nav-trigger:focus-visible{outline:1px solid rgba(255,255,255,.5);outline-offset:5px}
+@media(max-width:420px){.site-nav{gap:clamp(9px,3vw,15px);font-size:10px;letter-spacing:1px;margin-top:22px;padding:12px 13px}}
+@keyframes logo-flicker{0%,87%,90%,93%,100%{opacity:1;filter:brightness(1) drop-shadow(0 0 14px rgba(255,255,255,.12));transform:translateX(0)}88%{opacity:.45;filter:brightness(1.8);transform:translateX(-2px)}89%{opacity:.9;transform:translateX(2px)}91%{opacity:.25;filter:blur(1px);transform:translateX(-1px)}92%{opacity:1;transform:translateX(1px)}}
+@keyframes signal-flicker{0%,87%,90%,93%,100%{opacity:1;filter:none;transform:translateX(0)}88%{opacity:.35;filter:brightness(2);transform:translateX(-2px)}89%{opacity:.85;transform:translateX(2px)}91%{opacity:.2;filter:blur(1px);transform:translateX(-1px)}92%{opacity:1;transform:translateX(1px)}}
+@keyframes signal-top{0%,87%,93%,100%{opacity:0;transform:translateX(0)}88%,90%{opacity:.65;transform:translateX(5px)}91%{opacity:0}}
+@keyframes signal-bottom{0%,88%,92%,100%{opacity:0;transform:translateX(0)}89%,91%{opacity:.5;transform:translateX(-5px)}92%{opacity:0}}
 .letter-header{display:flex;justify-content:space-between;gap:15px;color:#746d62;font-family:monospace;font-size:11px;margin-bottom:28px;letter-spacing:1px;padding-bottom:15px;border-bottom:1px solid rgba(80,70,55,.2)}
-.letter h2{font-size:20px;font-weight:normal;letter-spacing:4px;text-align:left;margin:30px 0 22px;color:#29251f}
-#letter-text{font-size:14px;line-height:1.9;color:#49443b;white-space:normal;overflow-wrap:break-word;min-height:115px;text-align:left;word-spacing:normal;letter-spacing:normal}
+h1{font-size:20px;font-weight:normal;letter-spacing:4px;text-align:left;margin:30px 0 22px;color:#29251f}
+#letter-text{font-size:14px;line-height:1.9;color:#49443b;white-space:pre-line;overflow-wrap:break-word;min-height:115px;text-align:left;word-spacing:normal;letter-spacing:normal}
 .cursor{display:inline-block;width:1px;height:15px;background:#766b5c;margin-left:2px;vertical-align:-2px;animation:blink .8s infinite}
 @keyframes blink{50%{opacity:0}}
-.signature{display:block;width:100%;margin-top:28px;padding-top:0;text-align:right;font-size:14px;font-style:italic;color:#82786a;opacity:0;transition:opacity 1s ease}.signature.show{opacity:1}.signature.show{opacity:1}
-@keyframes signalFlicker{
-  0%,82%,100%{opacity:1;text-shadow:0 0 15px rgba(255,255,255,.12)}
-  84%{opacity:.15;text-shadow:-2px 0 rgba(255,255,255,.45),2px 0 rgba(180,180,180,.35)}
-  86%{opacity:.95}
-  88%{opacity:.05;text-shadow:3px 0 rgba(255,255,255,.5)}
-  90%{opacity:.85}
-  92%{opacity:.25;text-shadow:-2px 0 rgba(255,255,255,.4)}
-  94%{opacity:1}
-}
-.blink-title{animation:signalFlicker 2s infinite}
-#home-screen{position:relative;z-index:1;display:none;opacity:0;min-height:100vh;padding:65px 20px 25px;transition:opacity 1.5s ease}
-.container{width:100%;max-width:930px;margin:auto}
-.main-title{text-align:center;font-size:clamp(30px,6vw,48px);font-weight:normal;letter-spacing:5px;color:#e5e5e5;margin-bottom:35px;text-shadow:0 0 15px rgba(255,255,255,.12)}
-.home-image{width:100%;max-width:760px;margin:0 auto;aspect-ratio:930/340;display:block;object-fit:cover;filter:grayscale(100%) brightness(.78) contrast(1.1);border:1px solid #292929;box-shadow:0 0 30px rgba(0,0,0,.8);cursor:pointer;transition:.3s}
-.home-image:hover{filter:grayscale(100%) brightness(.95) contrast(1.1)}
-.image-caption{text-align:center;color:#aaa;font-size:13px;letter-spacing:2px;margin-top:18px;margin-bottom:35px;font-style:italic}
-nav{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:5px;
-    border:0;
-    padding:15px 0;
-    margin-bottom:35px;
-    font-family:monospace;
-}
-.nav-item{position:relative}
-.nav-button{color:#bbb;border:1px solid #713038;background:rgba(20,8,10,.82);padding:10px 13px;font-family:monospace;font-size:11px;letter-spacing:2px;transition:.3s;cursor:pointer}
-.nav-button:hover,.nav-button.active{color:#fff;background:rgba(91,19,27,.42);border-color:#b34b56;box-shadow:0 0 12px rgba(130,25,35,.18)}
-.dropdown{display:none;position:absolute;top:calc(100% + 5px);left:0;width:205px;max-width:75vw;background:rgba(5,5,5,.98);border:1px solid #713038;box-shadow:0 12px 30px rgba(0,0,0,.9);z-index:50}
-#menu-OBL,#menu-ARC{left:auto;right:0}
-.dropdown.open{display:block;animation:appear .2s ease}
-.dropdown button{display:block;width:100%;padding:11px 12px;text-align:left;background:transparent;border:0;color:#999;font-family:Georgia,serif;font-size:11px;cursor:pointer}
-.dropdown button:last-child{border-bottom:none}
-.dropdown button:hover{background:#211013;color:#fff}
-.content-area{min-height:180px;padding:18px 16px 32px;text-align:left;animation:appear .5s ease;background:rgba(45,45,45,.58)}
-.section-category{display:block;width:100%;max-width:620px;margin-top:12px;padding:13px 14px;text-align:left;background:#101010;border:1px solid #303030;color:#c9c9c9;font-family:Georgia,"Times New Roman",serif;cursor:pointer}
-.section-category strong{display:block;font-size:13px;font-weight:normal;letter-spacing:.5px;margin-bottom:5px}
-.section-category span{display:none!important}
-.section-category:hover{background:#181818;border-color:#666;color:#fff}
+.signature{display:block;width:100%;margin-top:28px;padding-top:0;text-align:right;font-size:14px;font-style:italic;color:#82786a;opacity:0;transition:opacity 1s ease}
+.signature.show{opacity:1}
+@media(max-width:600px){body{padding:27px 20px}.letter{padding:27px 20px}.letter-header{flex-wrap:wrap}#letter-text{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.cursor,#site-logo{animation:none}}
 
-.content-title{color:#d5d5d5;font-size:15px;font-weight:normal;letter-spacing:1px;margin-bottom:12px}
-.content-description{display:none!important}
-.content-area a{color:#c5a4a4;text-decoration:underline;text-underline-offset:3px}
-.content-area a:hover{color:#fff}
-.publication{max-width:700px;margin-top:14px;padding:12px 0;border:0}
-.publication h3{font-size:14px;font-weight:normal;letter-spacing:1px;color:#ccc;margin-bottom:8px}
-.publication-body{font-size:12px;color:#999;line-height:1.65;white-space:normal;overflow-wrap:anywhere}
-.relato-preview-body{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:15;line-clamp:15;overflow:hidden}
-.relato-detail-body{display:block;overflow:visible}
-.read-more-button{display:inline-block;margin-top:12px;padding:0;background:transparent;border:0;color:#e32636;font:inherit;font-size:1em;letter-spacing:0;text-decoration:none;cursor:pointer}.read-more-button:hover,.read-more-button:focus{color:#ff5965;text-decoration:underline}.read-more-button[hidden]{display:none}
-.relato-navigation{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin:28px 0 12px;padding-top:18px;border-top:1px solid rgba(255,255,255,.14)}
-.relato-nav-button{display:block;background:transparent;border:0;color:#626262;font:inherit;font-size:1em;text-align:left;padding:0;cursor:pointer}
-.relato-nav-button:hover,.relato-nav-button:focus{color:#929292;text-decoration:none}
+/* Panel privado de administración */
+.admin-overlay{display:none;position:fixed;inset:0;z-index:30;overflow:auto;background:rgba(0,0,0,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:24px 14px;color:#eee;font-family:monospace}
+.admin-overlay.open{display:block}
+.admin-shell{width:min(100%,900px);margin:5vh auto;padding:22px;background:rgba(8,9,9,.96);border:1px solid rgba(255,255,255,.16);box-shadow:0 20px 70px #000}
+.admin-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px;border-bottom:1px solid #333;padding-bottom:14px}
+.admin-top h2{font-size:14px;font-weight:normal;letter-spacing:2px}
+.admin-actions{display:flex;gap:8px;flex-wrap:wrap}
+.admin-btn,.admin-input,.admin-select,.admin-textarea{font:12px monospace;color:#eee;background:#111;border:1px solid #444;border-radius:0;padding:10px}
+.admin-btn{cursor:pointer}.admin-btn:hover{background:#222;border-color:#777}.admin-btn.danger{color:#e88}
+.admin-input,.admin-select,.admin-textarea{width:100%;margin:5px 0 12px}.admin-textarea{min-height:180px;resize:vertical;line-height:1.7}
+.admin-label{display:block;color:#aaa;font-size:10px;letter-spacing:1px;margin-top:8px}
+.editor-tools{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin:-4px 0 12px}.editor-tools .admin-select{margin:0}.editor-tools .admin-actions{gap:6px}.editor-help{font-size:10px;color:#888;line-height:1.6;margin:-5px 0 12px}.story-full a,.story-preview a{color:#d36b6b;text-decoration:underline;text-underline-offset:3px}.story-full a:hover,.story-preview a:hover{color:#ff9999}.unavailable{width:min(90vw,620px);margin:38px auto;padding:42px 25px;text-align:center;background:rgba(0,0,0,.62);border:1px solid rgba(255,255,255,.15);color:#eee;font-family:monospace;letter-spacing:1px}.unavailable h2{font-size:22px;font-weight:normal;letter-spacing:4px;margin-bottom:16px}.unavailable p{font-size:12px;color:rgba(235,235,235,.72);line-height:1.8}
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.admin-section{border:1px solid #333;padding:15px;margin:14px 0}.admin-section h3{font-size:12px;font-weight:normal;letter-spacing:1.5px;margin-bottom:12px;color:#ddd}
+.admin-list{display:grid;gap:8px}.admin-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #292929;font-size:11px}.admin-item small{color:#888}.admin-item-actions{display:flex;gap:6px;flex-shrink:0}
+.admin-status{font-size:11px;color:#aaa;line-height:1.6;margin:8px 0}.admin-status.error{color:#e88}.admin-status.ok{color:#9c9}
+.admin-media-preview{max-width:100%;max-height:220px;margin:8px 0;display:block}.admin-login{max-width:420px;margin:12vh auto}
+.media-block{margin:22px 0}.media-block img,.media-block video{max-width:100%;height:auto;display:block}.media-block audio{width:100%}.youtube-frame{width:100%;aspect-ratio:16/9;border:0}
+@media(max-width:650px){.admin-grid{grid-template-columns:1fr}.admin-shell{padding:16px}.admin-item{align-items:flex-start}.admin-item-actions{flex-direction:column}}
 
-
-.publication-body p{margin:0 0 6px}
-.publication-body ul,.publication-body ol{padding-left:25px;margin:10px 0}
-.publication-body a{color:#c5a4a4;text-decoration:underline}
-.publication-body img{display:block;max-width:100%;width:auto;height:auto;max-height:650px;object-fit:contain;margin:4px 0;border:1px solid #292929}
-.file-image{display:block;width:auto;max-width:100%;max-height:650px;height:auto;object-fit:contain;margin:4px 0;border:1px solid #292929}
-#admin-screen{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.97);overflow-y:auto;padding:25px 16px}
-.admin-wrap{max-width:850px;margin:35px auto}
-.admin-heading{font-size:19px;font-weight:normal;letter-spacing:4px;text-align:center;margin-bottom:30px;color:#ddd}
-.admin-subtitle{color:#777;font-family:monospace;font-size:10px;letter-spacing:2px;margin:20px 0}
-.admin-box{background:#080808;border:1px solid #292929;padding:22px;margin-bottom:20px}
-.admin-input,.admin-textarea,.admin-select{margin-top:12px}
-.admin-select{appearance:auto;color:#aaa}
-.admin-select option{background:#080808}
-.admin-nav{display:flex;flex-wrap:wrap;gap:7px;margin:20px 0;border:0;padding-bottom:15px}
-.admin-tab{background:#170d0f;border:1px solid #713038;color:#aaa;padding:10px 13px;font-family:monospace;font-size:10px;cursor:pointer}
-.admin-tab.active,.admin-tab:hover{color:#fff;border-color:#b34b56;background:#35151a}
-.admin-record{padding:14px 0;border:0;display:flex;justify-content:space-between;gap:12px;align-items:center}
-.publication-group,.publication-category{border:1px solid #333;margin:8px 0;padding:10px;background:#090909}
-.publication-group>summary,.publication-category>summary{cursor:pointer;color:#bbb;font:11px monospace;letter-spacing:1px;padding:5px}
-.publication-category{margin-left:12px;background:#0d0d0d}
-.admin-record span{font-size:12px;color:#bbb;overflow-wrap:anywhere;min-width:0}
-.admin-record .admin-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:0;flex-shrink:0}
-.admin-record button{background:transparent;border:1px solid #444;color:#999;padding:7px 10px;font-size:10px;cursor:pointer}
-.admin-record button:hover{color:#fff;border-color:#888}
-.admin-record button:disabled{opacity:.25;cursor:not-allowed}
-.admin-record .move-button{min-width:30px;padding:7px 9px;font-size:13px}
-.admin-status{font-family:monospace;font-size:11px;color:#888;line-height:1.8;margin-top:12px}
-.admin-close{display:block;margin:25px auto 0;background:transparent;border:1px solid #444;color:#888;padding:10px 20px;font-family:monospace;cursor:pointer}
-.admin-count{color:#ddd;font-family:monospace;font-size:22px;margin:10px 0}
-.admin-hint{font-size:10px;color:#666;line-height:1.8;margin-top:12px}
-.editor-toolbar{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
-.editor-toolbar button{background:#111;border:1px solid #444;color:#aaa;padding:9px 12px;font-family:monospace;font-size:10px;cursor:pointer}
-.editor-toolbar button:hover{border-color:#888;color:#fff}
-.editor-size-control{display:flex;align-items:center;gap:5px;color:#888;font:9px monospace}
-.editor-size-control select{background:#080808;border:1px solid #444;color:#bbb;padding:7px;font:10px monospace}
-.rich-editor{min-height:180px;padding:14px;background:#080808;border:1px solid #333;color:#bbb;font-size:13px;line-height:1.8;outline:none;overflow-wrap:anywhere}
-.rich-editor:focus{border-color:#777}
-.rich-editor a{color:#c5a4a4;text-decoration:underline}
-.rich-editor img{display:block;max-width:100%;max-height:450px;height:auto;width:auto;margin:4px 0;border:1px solid #292929}
-.editor-help{font-size:10px;color:#666;line-height:1.8;margin:10px 0}
-.admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
-.admin-danger{border-color:#633!important;color:#c99!important}
-footer{border-top:1px solid #292929;padding:25px 10px;text-align:center;color:#666;font-family:monospace;font-size:11px;letter-spacing:1px;line-height:2}
-@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@media(max-width:600px){
- .letter{padding:27px 20px}
-
-#home-screen{padding:45px 17px 20px}
-.home-image{max-width:100%;}
-.main-title{margin-bottom:25px;letter-spacing:3px}
-nav{gap:2px}
-.nav-button{padding:10px 11px;font-size:10px;letter-spacing:1px}
-.dropdown{width:190px}
-.letter{padding:27px 20px}
-.letter-header{flex-wrap:wrap}
-#letter-text{font-size:13px;color:#49443b}
-.admin-wrap{margin:15px auto}
-.admin-record{align-items:flex-start;flex-direction:column}
-.admin-record .admin-actions{width:100%}
-}
-
-/* FORMATO DE COLOR INDIVIDUAL */
-.editor-color-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:10px 0 14px}
-.editor-color-tools label{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #333;background:#0b0b0b;color:#aaa;font:10px monospace;letter-spacing:1px}
-
-.editor-color-tools input[type="color"],
-.title-color-input{
-    -webkit-appearance:none;
-    appearance:none;
-    box-sizing:border-box;
-    width:24px;
-    min-width:24px;
-    height:24px;
-    padding:0;
-    border:1px solid #555;
-    border-radius:50%;
-    background:transparent;
-    overflow:hidden;
-    cursor:pointer;
-}
-.editor-color-tools input[type="color"]::-webkit-color-swatch-wrapper,
-.title-color-input::-webkit-color-swatch-wrapper{
-    padding:0;
-}
-.editor-color-tools input[type="color"]::-webkit-color-swatch,
-.title-color-input::-webkit-color-swatch{
-    border:0;
-    border-radius:50%;
-}
-.title-format-toolbar{display:flex;gap:10px;margin:-4px 0 12px}
-.title-format-toolbar button{width:54px;height:48px;background:#101010;border:1px solid #444;color:#bbb;font-size:20px;cursor:pointer}
-.title-format-toolbar button:active{background:#242424;border-color:#888}
-.title-format-toolbar select{height:48px;background:#101010;border:1px solid #444;color:#bbb;padding:0 10px;font:10px monospace;letter-spacing:.5px}
-#record-title:empty:before{content:attr(data-placeholder);color:#666}
-#record-title{font-family:Arial,Helvetica,sans-serif;font-size:17px;line-height:1.5}
-.title-color-row{display:flex;align-items:center;gap:12px;margin:12px 0}
-.title-color-row label{font:10px monospace;color:#888;letter-spacing:1px}
-.title-color-input{flex-shrink:0}
-
-/* DISEÑO DE LECTURA: COLUMNA ESTRECHA Y ESPACIADO COMPACTO */
-.content-area{max-width:560px;margin-left:auto;margin-right:auto}
-.publication{max-width:560px;margin-top:6px;padding:6px 0}
-.publication h3{margin-bottom:5px}
-.publication-body{max-width:560px}
-.publication-body p{margin:0 0 3px}
-.publication-body img,.file-image{margin:2px 0}
-.publication-body ul,.publication-body ol{margin:5px 0}
-.publication-font-modern .publication-body,
-.publication-font-modern .publication-body p,
-.publication-font-modern .publication-body li{font-family:Arial,Helvetica,sans-serif}
-.publication-font-modern .publication-body{font-size:17px;line-height:1.62;color:#bdbdbd}
-.publication-font-modern h3{font-family:Arial,Helvetica,sans-serif;font-size:21px;line-height:1.35;letter-spacing:.2px;margin-bottom:4px;color:#d0d0d0}
-@media(max-width:600px){.content-area{max-width:560px;width:100%}}
-
-/* AJUSTES DE EDITOR Y ESPACIADO ENTRE HISTORIAS */
-.title-format-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin:8px 0}
-.title-format-toolbar button{width:46px;height:46px;padding:0;font-size:19px}
-.editor-toolbar{gap:5px;margin:8px 0}
-.editor-toolbar button{padding:7px 9px;font-size:10px}
-.editor-size-control select{padding:6px;font-size:10px}
-.admin-input,.admin-select,.admin-textarea{padding:10px 12px}
-.publication{margin-top:15px;margin-bottom:0;padding:0}
-.publication h3{margin-bottom:6px}
-.publication-body p{margin:0 0 6px}
-.publication-body img,.file-image{margin:6px 0}
-.publication-body ul,.publication-body ol{margin:6px 0}
-
-/* GESTIÓN DE CATEGORÍAS CON CHECKBOX DE OCULTAR Y ELIMINAR */
-.category-order-list{display:flex;flex-direction:column;gap:8px;margin:12px 0}
-.category-order-row{display:grid;grid-template-columns:minmax(0,1fr) auto 34px 34px 34px;gap:6px;align-items:center}
-.category-order-row .admin-input{margin:0;min-width:0;padding:8px 10px}
-.category-order-row button{height:36px;border:1px solid #444;background:#111;color:#bbb;font-size:15px;cursor:pointer}
-.category-order-row button:hover{border-color:#888;color:#fff}
-.category-order-row button:disabled{opacity:.25;cursor:not-allowed}
-.category-hidden-toggle{display:flex;align-items:center;gap:5px;padding:0 8px;height:36px;border:1px solid #383838;background:#101010;color:#999;font:9px monospace;letter-spacing:.5px;cursor:pointer;user-select:none;white-space:nowrap}
-.category-hidden-toggle input{accent-color:#888;cursor:pointer}
-.category-hidden-toggle.is-hidden{border-color:#633;color:#d8a4a4;background:#170c0c}
-
-.title-format-toolbar button{min-width:42px;width:42px;height:42px}
-.editor-toolbar button{min-height:34px}
-
-.admin-box{padding:14px;margin-bottom:14px}
-.title-format-toolbar{
-  display:flex;align-items:center;flex-wrap:nowrap;gap:4px;margin:6px 0 9px;
-  width:100%;min-width:0;
-}
-.title-format-toolbar button{
-  flex:0 0 30px;min-width:30px;width:30px;height:30px;padding:0;
-  font-size:15px;line-height:1;background:#101010;border:1px solid #444;
-}
-.title-format-toolbar .editor-size-control{
-  display:flex;align-items:center;gap:3px;min-width:0;white-space:nowrap;
-  font:8px monospace;letter-spacing:0;color:#888;
-}
-.title-format-toolbar select{
-  width:68px;min-width:0;height:30px;padding:0 4px;font:9px monospace;
-  background:#101010;border:1px solid #444;color:#bbb;
-}
-.editor-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:6px 0}
-.editor-toolbar button{
-  min-height:27px;height:27px;padding:4px 7px;font:9px monospace;
-  background:#111;border:1px solid #444;color:#aaa;
-}
-.editor-toolbar .editor-size-control{display:flex;align-items:center;gap:3px;white-space:nowrap;font:8px monospace;color:#888}
-.editor-toolbar .editor-size-control select{height:27px;max-width:94px;padding:3px 5px;font:9px monospace}
-.admin-input,.admin-select,.admin-textarea{padding:8px 10px;font-size:12px}
-.rich-editor{min-height:150px;padding:10px;font-size:13px;line-height:1.55}
-
-.publication{max-width:560px;margin:0;padding:0;border:0}
-.publication + .publication{margin-top:1.5em !important}
-.publication h3{margin:0 0 .45em !important}
-.publication-body{max-width:560px;line-height:1.55}
-.publication-body p{margin:0 0 .45em !important;padding:0}
-.publication-body p:empty,.publication-body div:empty{display:none !important}
-.publication-body img,.publication-body .file-image,.file-image{margin:.45em 0 !important}
-.publication-body ul,.publication-body ol{margin:.45em 0 !important;padding-left:1.4em}
-.editor-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0}
-.editor-toolbar button{
-  min-height:0;height:auto;padding:9px 12px;font-family:monospace;
-  font-size:10px;line-height:normal;background:#111;border:1px solid #444;color:#aaa;
-}
-.editor-toolbar .editor-size-control{display:flex;align-items:center;gap:5px;white-space:nowrap;color:#888;font:9px monospace}
-.editor-toolbar .editor-size-control select{height:auto;max-width:none;padding:7px;font:10px monospace;background:#080808;border:1px solid #444;color:#bbb}
-@media(max-width:600px){
-  .title-format-toolbar{gap:3px}
-  .title-format-toolbar button{flex-basis:29px;width:29px;min-width:29px;height:29px}
-  .title-format-toolbar select{width:64px;height:29px;font-size:8px}
-  .title-format-toolbar .editor-size-control{font-size:7px;gap:2px}
-  .admin-box{padding:12px}
-  .category-order-row{grid-template-columns:minmax(0,1fr) auto 30px 30px 30px;gap:4px}
-}
-
-/* NUEVO EDITOR FORMATO (estilo app) */
-.formato-panel{
-  background:#1c1c1e;
-  border-radius:14px;
-  padding:14px 12px 16px;
-  margin:8px 0 14px;
-}
-.formato-panel h4{
-  font-size:16px;
-  font-weight:600;
-  color:#fff;
-  margin:0 0 12px;
-  font-family:system-ui,sans-serif;
-}
-.formato-select-row{
-  display:flex;
-  gap:8px;
-  margin-bottom:10px;
-}
-.formato-select-row select{
-  flex:1;
-  background:#2c2c2e;
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  padding:11px 12px;
-  font-size:15px;
-  appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23aaa' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 10px center;
-  cursor:pointer;
-}
-.formato-biu{
-  display:flex;
-  gap:8px;
-  margin-bottom:12px;
-}
-.formato-biu button{
-  flex:1;
-  background:#2c2c2e;
-  border:none;
-  border-radius:10px;
-  height:46px;
-  font-size:18px;
-  color:#fff;
-  cursor:pointer;
-}
-.formato-biu button:hover{background:#3a3a3c}
-.formato-divider{
-  height:1px;
-  background:#3a3a3c;
-  margin:10px 0 14px;
-}
-.formato-icons{
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  margin-bottom:12px;
-}
-.formato-icons button{
-  background:none;
-  border:none;
-  width:46px;
-  height:46px;
-  border-radius:10px;
-  cursor:pointer;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  color:#ddd;
-}
-.formato-icons button:hover{background:#2c2c2e}
-.formato-icons svg{
-  width:22px;
-  height:22px;
-  stroke:#ddd;
-  fill:none;
-  stroke-width:1.8;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-}
-.formato-image-size{
-  width:100%;
-  background:#2c2c2e;
-  color:#fff;
-  border:none;
-  border-radius:12px;
-  padding:13px 14px;
-  font-size:15px;
-  appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23aaa' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
-  background-repeat:no-repeat;
-  background-position:right 14px center;
-  cursor:pointer;
-}
-@media(max-width:600px){
-  .formato-panel{padding:12px 10px}
-  .formato-biu button{height:44px;font-size:17px}
-}
-
-.editor-toolbar-word{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px;background:#202226;border:1px solid #393c40;border-radius:5px;margin:8px 0 14px}
-.editor-toolbar-word button{min-height:34px;padding:7px 10px;background:#111;border:1px solid #45484d;color:#ddd;border-radius:3px;font:10px monospace;cursor:pointer}
-.editor-toolbar-word button:hover{background:#303238;border-color:#777}
-.editor-dropdown{display:flex;flex-direction:column;align-items:flex-start;gap:4px;color:#999;font:8px monospace;letter-spacing:.5px}
-.editor-dropdown select{height:34px;min-width:90px;max-width:145px;padding:5px 20px 5px 7px;background:#111;border:1px solid #45484d;color:#ddd;font:11px Arial,sans-serif;border-radius:3px}
-.editor-color-picker{display:flex;align-items:center;justify-content:center;gap:5px;height:34px;padding:4px 8px;background:#111;border:1px solid #45484d;border-radius:3px;color:#eee;font:bold 15px Arial;cursor:pointer}
-.editor-color-picker input{width:23px;height:23px;padding:0;border:0;background:transparent}
-.editor-color-picker input::-webkit-color-swatch-wrapper{padding:0}
-.editor-color-picker input::-webkit-color-swatch{border:1px solid #777;border-radius:2px}
-.editor-size-control select{background:#080808;color:#ddd}
-.rich-editor{min-height:155px;padding:12px;background:#080808;border:1px solid #393c40;color:#c5c5c5;font-size:16px;line-height:1.55;outline:none;overflow-wrap:anywhere;border-radius:3px}
-.rich-editor:focus{border-color:#777}
-.rich-editor.title-editor{min-height:48px;margin-bottom:16px}
-.rich-editor:empty:before{content:attr(data-placeholder);color:#666}
-.rich-editor a{color:#c5a4a4;text-decoration:underline;cursor:pointer}
-.rich-editor img{display:block;max-width:100%;max-height:450px;height:auto;width:auto;margin:1em 0;border:1px solid #292929}
-.admin-box>label.admin-status{display:block;margin:13px 0 5px}
-.admin-box>.admin-input{margin-top:0}
-.publication{max-width:560px;margin:0;padding:0;border:0}
-.publication + .publication{margin-top:2.2em !important}
-.publication h3{margin:0 0 0.8em !important}
-.publication-body{max-width:560px;line-height:1.6}
-.publication-body p,.publication-body>div{margin:0 0 0.6em !important;padding:0}
-.publication-body p:empty,.publication-body div:empty{display:none !important}
-.publication-body p:has(> br:only-child),
-.publication-body>div:has(> br:only-child){
-  display:block !important;
-  min-height:1.6em;
-  height:1.6em;
-  margin:0 !important;
-  padding:0;
-}
-.publication-body p + p{margin-top:0.4em !important}
-.publication-body img,.publication-body .file-image,.file-image{margin:1em 0 !important}
-.publication-body ul,.publication-body ol{margin:1em 0 !important;padding-left:1.4em}
-.publication-body a{cursor:pointer;text-decoration:underline}
-@media(max-width:600px){
- .editor-toolbar-word{gap:5px;padding:8px}
- .editor-dropdown select{min-width:76px;max-width:118px;font-size:10px}
- .editor-toolbar-word button{padding:7px 8px;font-size:9px}
- .editor-color-picker{height:33px;padding:4px 6px}
- .editor-color-picker input{width:21px;height:21px}
- .admin-box{padding:12px}
-}
-
-.rich-editor,.rich-editor.title-editor{color:#dedede !important;}
-.rich-editor *{color:inherit;}
-
-/* FIX DEFINITIVO SUPERPOSICIÓN */
-.publication-body,
-.publication-font-modern .publication-body {
-  font-size: 17px !important;
-  line-height: 1.7 !important;
-  color: #c8c8c8 !important;
-  white-space: normal !important;
-  word-break: break-word !important;
-}
-.publication-body p,
-.publication-body div,
-.publication-font-modern .publication-body p {
-  margin: 0 0 1em !important;
-  padding: 0 !important;
-  line-height: 1.7 !important;
-  display: block !important;
-  min-height: 0 !important;
-  height: auto !important;
-}
-.publication-body p:empty,
-.publication-body div:empty {
-  display: none !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  height: 0 !important;
-  min-height: 0 !important;
-}
-.publication + .publication {
-  margin-top: 2.5em !important;
-}
-.publication h3 {
-  margin: 0 0 0.8em !important;
-  line-height: 1.3 !important;
-  clear: both;
-}
-
-/* Fondo VHS: conserva la ilustración original y añade interferencia sutil */
-html{background:#020303}
-html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.20) 0px,rgba(0,0,0,.20) 1px,rgba(25,35,20,.07) 2px,transparent 3px),linear-gradient(90deg,rgba(30,70,30,.08),transparent 48%,rgba(90,0,0,.07));opacity:.55;mix-blend-mode:screen}
-
-
+/* Ajustes visuales: aviso sin panel y menú siempre por delante */
+.stories-view{background:transparent;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;position:relative;z-index:1}
+.site-nav{position:relative;z-index:10020}
+.nav-group{z-index:10021}
+.submenu{z-index:10022}
+/* Las publicaciones dentro de cada categoría conservan solo un velo oscuro muy sutil */
+.story-card{background:rgba(0,0,0,.20);border:1px solid rgba(255,255,255,.08);padding:18px 18px 20px;margin:0 0 18px;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+.story-card:last-child{margin-bottom:0;padding-bottom:20px}
+.connection-message{background:transparent!important;border:0!important;box-shadow:none!important;padding:12px 8px!important;text-align:center;font:18px/1.8 monospace!important;letter-spacing:1px;color:rgba(245,245,245,.88)!important;text-shadow:0 2px 8px rgba(0,0,0,.9)}
+@media(max-width:600px){.story-card{padding:15px 13px 17px}.connection-message{font-size:17px!important}}
 </style>
 </head>
-
 <body>
-
-<section id="letter-screen">
-<div class="letter">
-    <div class="letter-header">
-        <span>De: zorg</span>
-        <span id="local-time"></span>
-    </div>
-    <h2>Bienvenido</h2>
-    <div id="letter-text"><span id="typed-text"></span><span class="cursor" id="cursor"></span></div>
-    <div class="signature" id="letter-signature">Con cariño: zorg.</div>
-</div>
-</section>
-
-<main id="home-screen">
-<div class="container">
-    <h1 class="main-title blink-title">𝟎-𝖘𝖎𝖙𝖊</h1>
-    <img id="home-logo" class="home-image"
-    src="https://i.ibb.co/q378bvQT/6336211-E-7579-4-F92-9-E93-87-F54-B37-C0-C9.png"
-    alt="El Último Jardín" title="Volver al inicio">
-    <p class="image-caption">Un jardín para los perdidos.</p>
-
-    <nav id="navigation">
-        <div class="nav-item">
-            <button class="nav-button" data-menu="HOME">HOME</button>
-            <div class="dropdown" id="menu-HOME"></div>
-        </div>
-        <div class="nav-item">
-            <button class="nav-button" data-menu="SHA">SHA</button>
-            <div class="dropdown" id="menu-SHA"></div>
-        </div>
-        <div class="nav-item">
-            <button class="nav-button" data-menu="SEC">SEC</button>
-            <div class="dropdown" id="menu-SEC"></div>
-        </div>
-        <div class="nav-item">
-            <button class="nav-button" data-menu="OBL">OBL</button>
-            <div class="dropdown" id="menu-OBL"></div>
-        </div>
-        <div class="nav-item">
-            <button class="nav-button" data-menu="ARC">ARC</button>
-            <div class="dropdown" id="menu-ARC"></div>
-        </div>
-    </nav>
-
-    <section class="content-area" id="content-area"></section>
-
-    <footer>
-        2026 El último jardín | ¿Este es el último lugar? Intenta averiguarlo
-    </footer>
-</div>
+<main class="letter" aria-label="Carta de bienvenida">
+  <div class="letter-header">
+    <span>De: zorg</span>
+    <span id="local-time"></span>
+  </div>
+  <h1>Bienvenido</h1>
+  <div id="letter-text"><span id="typed-text"></span><span class="cursor" id="cursor" aria-hidden="true"></span></div>
+  <div class="signature" id="letter-signature">Con cariño: zorg.</div>
 </main>
-
-<section id="admin-screen">
-<div class="admin-wrap">
-    <h2 class="admin-heading">𝕰𝖑 𝖀́𝖑𝖙𝖎𝖒𝖔 𝕵𝖆𝖗𝖉𝖎́𝖓</h2>
-
-    <div id="admin-login" class="admin-box">
-        <p class="admin-subtitle">ACCESO RESTRINGIDO · ADMINISTRACIÓN</p>
-        <input class="admin-input" id="admin-email" type="email" placeholder="Correo del administrador" autocomplete="username">
-        <input class="admin-input" id="admin-password" type="password" placeholder="Contraseña" autocomplete="current-password">
-        <button class="admin-button" id="admin-login-button">ENTRAR</button>
-        <p class="admin-status" id="admin-login-status"></p>
+<section id="home-screen" aria-label="Pantalla de inicio">
+  <div class="brand-row">
+    <img id="site-logo" src="https://i.ibb.co/1tch1QYB/A5-F21995-9-A54-476-F-80-E9-D3-A54-EDCF9-A0.png" alt="Logo 0-SITE: televisión antigua con señal analógica">
+    <button class="search-toggle" id="search-toggle" type="button" aria-label="Abrir buscador" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6"></circle><path d="m16 16 4.2 4.2"></path></svg>
+    </button>
+  </div>
+  <div class="search-panel" id="search-panel" aria-hidden="true">
+    <input id="site-search" type="search" placeholder="Buscar por título o palabras..." autocomplete="off" aria-label="Buscar en 0-SITE">
+    <div class="search-note">Busca en las publicaciones de 0-SITE</div>
+  </div>
+  <nav class="site-nav" aria-label="Menú principal">
+    <div class="nav-group">
+      <button class="nav-trigger" type="button" aria-expanded="false">&lt; Home &gt;</button>
+      <div class="submenu"><a href="#the-room">The Room</a><a href="#open-space">Open Space</a></div>
     </div>
-
-    <div id="admin-dashboard" style="display:none">
-        <p class="admin-subtitle">DIRECTORIO DE ADMINISTRACIÓN</p>
-        <div class="admin-nav">
-            <button class="admin-tab active" data-admin-tab="contenido">CONTENIDO</button>
-            <button class="admin-tab" data-admin-tab="gestor">GESTOR</button>
-            <button class="admin-tab" data-admin-tab="archivos">ARCHIVOS</button>
-            <button class="admin-tab" data-admin-tab="configuracion">CONFIGURACIÓN</button>
-        </div>
-        <div id="admin-panel-content"></div>
+    <div class="nav-group">
+      <button class="nav-trigger" type="button" aria-expanded="false">&lt; Blog &gt;</button>
+      <div class="submenu"><a href="#stories">Stories</a><a href="#art">Art</a><a href="#experiments">Experiments</a></div>
     </div>
-    <button class="admin-close" id="admin-close">CERRAR</button>
-</div>
+    <div class="nav-group">
+      <button class="nav-trigger" type="button" aria-expanded="false">&lt; Status &gt;</button>
+    </div>
+    <div class="nav-group">
+      <button class="nav-trigger" type="button" aria-expanded="false">&lt; About &gt;</button>
+      <div class="submenu"><a href="#faq">FAQ</a><a href="#contact">Contact</a><a href="#the-project">The Project</a><a href="#guidelines">Guidelines</a></div>
+    </div>
+  </nav>
+  <main class="stories-view" id="stories-view" aria-live="polite"></main>
+  <footer class="site-footer">
+    <span class="copyright">zorg © <span id="current-year"></span> · 0-SITE</span>
+    <span class="tagline">Somewhere between reality and fiction.</span>
+  </footer>
 </section>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import { getFirestore, collection, doc, getDocs, getDoc, setDoc, deleteDoc, query, where, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js';
 
-<script>
-(function(){
-    const sources=[
-        {
-            primary:"https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js",
-            fallback:"https://cdn.jsdelivr.net/npm/firebase@10.14.1/compat/firebase-app.js",
-            check:()=>window.firebase&&typeof firebase.initializeApp==="function"
-        },
-        {
-            primary:"https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js",
-            fallback:"https://cdn.jsdelivr.net/npm/firebase@10.14.1/compat/firebase-auth.js",
-            check:()=>window.firebase&&typeof firebase.auth==="function"
-        },
-        {
-            primary:"https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js",
-            fallback:"https://cdn.jsdelivr.net/npm/firebase@10.14.1/compat/firebase-firestore.js",
-            check:()=>window.firebase&&typeof firebase.firestore==="function"
-        }
-    ];
-
-    function loadScript(url){
-        return new Promise((resolve,reject)=>{
-            const script=document.createElement("script");
-            let finished=false;
-
-            const timeout=setTimeout(()=>{
-                if(finished)return;
-                finished=true;
-                script.remove();
-                reject(new Error("Tiempo de espera agotado: "+url));
-            },15000);
-
-            script.src=url;
-            script.onload=()=>{
-                if(finished)return;
-                finished=true;
-                clearTimeout(timeout);
-                resolve();
-            };
-            script.onerror=()=>{
-                if(finished)return;
-                finished=true;
-                clearTimeout(timeout);
-                script.remove();
-                reject(new Error("No se pudo cargar: "+url));
-            };
-
-            document.head.appendChild(script);
-        });
-    }
-
-    async function loadLibrary(source){
-        try{
-            await loadScript(source.primary);
-            if(source.check())return;
-            throw new Error("La librería principal no quedó disponible.");
-        }catch(primaryError){
-            await loadScript(source.fallback);
-            if(!source.check()){
-                throw new Error("La librería alternativa tampoco quedó disponible.");
-            }
-        }
-    }
-
-    async function loadAll(){
-        for(const source of sources){
-            await loadLibrary(source);
-        }
-
-        if(!window.firebase)throw new Error("Firebase no está disponible.");
-        startGarden();
-    }
-
-    loadAll().catch(error=>{
-        console.error("Error cargando Firebase:",error);
-        const message=document.createElement("div");
-        message.style.cssText="position:fixed;z-index:9999;bottom:12px;left:12px;right:12px;padding:15px;background:#180909;border:1px solid #633;color:#ddd;font:12px monospace;line-height:1.7";
-        message.textContent="No se pudieron cargar las librerías de Firebase. Comprueba tu conexión o si el navegador bloquea los servidores de Firebase.";
-        document.body.appendChild(message);
-    });
-})();
-
-function startGarden(){
-
-const firebaseConfig={
-    apiKey:"AIzaSyBBBIjiRltl6_-D6FGUUml72Pq9Gb-JiEI",
-    authDomain:"site-98c0d.firebaseapp.com",
-    projectId:"site-98c0d",
-    storageBucket:"site-98c0d.firebasestorage.app",
-    messagingSenderId:"1091529579406",
-    appId:"1:1091529579406:web:718ee797d447947d6e62df",
-    measurementId:"G-C85KS5G5SW"
+const firebaseConfig = {
+  apiKey: "AIzaSyCy9q0OAdTcvLiR4ycWP5Nnk9VoW17jbL4",
+  authDomain: "sitezorgx.firebaseapp.com",
+  projectId: "sitezorgx",
+  storageBucket: "sitezorgx.firebasestorage.app",
+  messagingSenderId: "1028623467902",
+  appId: "1:1028623467902:web:e6f910b6b0b11580629f2f"
 };
+const ADMIN_UID = 'bMbb9efM9jaqf7vi1EOywWmMWBI2';
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+// La sesión administrativa se conserva solo durante la sesión del navegador.
+await setPersistence(auth, browserSessionPersistence);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
-
-const auth=firebase.auth();
-const firestore=firebase.firestore();
-const ADMIN_UID="CLFuoan5IpXSp2LRSMPlsIaYMbB3";
-const ADMIN_EMAIL_KEY="0site_admin_email";
-
-function syncAdminEmailField(){
-    const emailInput=document.getElementById("admin-email");
-    const rememberedEmail=localStorage.getItem(ADMIN_EMAIL_KEY)||"";
-    emailInput.value=rememberedEmail;
-    emailInput.style.display=rememberedEmail?"none":"block";
-    emailInput.required=!rememberedEmail;
-    document.getElementById("admin-password").placeholder=
-        rememberedEmail?"Contraseña":"Contraseña del administrador";
-}
-
-let currentUser=null;
-
-let logoClicks=0;
-let logoTimer=null;
-let typingStarted=false;
-let transitionStarted=false;
-let editingId=null;
-let gestorTargetLocation=null;
-let currentContentToken=0;
-let savedEditorRange=null;
-let activeContentListeners=[];
-
-const sections={
-INICIO:[
-{title:"Portada",description:"La desconfianza es tu única protección. No todo lo que encuentres aquí quiere ser encontrado."}
-],
-HOME:[
-{title:"Entrada",description:"Algo ha comenzado a tomar forma. No sabemos qué lo provocó."},
-{title:"Logs",description:"La conexión permanece activa. El origen sigue sin identificarse."},
-{title:"Relatos",description:"Historias y relatos recuperados de los rincones del jardín."}
-],
-SHA:[
-{title:"Anomalías",description:"No todos los caminos aparecen cuando los buscas."},
-{title:"Límites",description:"Hay algo al otro lado que parece estar esperando."},
-{title:"Reflejos",description:"A veces, lo que te observa no es tu reflejo."}
-],
-SEC:[
-{title:"dump",description:"Información eliminada que todavía deja rastros."},
-{title:"Señales",description:"Señales que permanecen activas sin un origen conocido."}
-],
-OBL:[
-{title:"Sector 0",description:"Conversaciones abandonadas que todavía reciben visitas."},
-{title:"Punto ciego",description:"Lugares registrados en mapas que nunca fueron encontrados."},
-{title:"Frecuencias",description:"Archivos que permanecieron intactos durante años."},
-{title:"Buffer",description:"Cuentas sin actividad. Sus nombres siguen apareciendo."}
-],
-ARC:[
-{title:"Fragmentos",description:"Fragmentos de una estructura que dejó de existir."},
-{title:"Espejos",description:"Vínculos con redes que ya no deberían estar disponibles."},
-{title:"Rutas caducadas",description:"Direcciones recuperadas de redes olvidadas. Algunas dejaron de responder; otras solo sobreviven en registros incompletos."},
-{title:"FAQ",description:"No todo desapareció cuando el sistema cayó."}
-]
-};
-
-/* CONFIGURACIÓN DE CATEGORÍAS: orden, nombres y estado oculto mediante Firestore */
-function cloneSectionSettings(){
-    const copy={};
-    Object.keys(sections).forEach(key=>{
-        copy[key]=sections[key].map(item=>({...item,hidden:Boolean(item.hidden)}));
-    });
-    return copy;
-}
-function applySectionSettings(value){
-    if(!value||typeof value!=="object")return;
-    Object.keys(sections).forEach(key=>{
-        if(!Array.isArray(value[key]))return;
-        const clean=value[key].filter(item=>
-            item&&typeof item.title==="string"&&item.title.trim()&&
-            !(key==="HOME"&&["Reglas","Rastros","Libro de visitas"].includes(item.title.trim()))
-        ).map(item=>({
-                title:item.title.trim().slice(0,60),
-                description:typeof item.description==="string"?item.description.slice(0,240):"",
-                hidden:Boolean(item.hidden)
-            }));
-        // Relatos forma parte de HOME incluso si la configuración remota es anterior.
-        if(key==="HOME"&&!clean.some(item=>item.title.toLowerCase()==="relatos")){
-            clean.push({title:"Relatos",description:"Historias y relatos recuperados de los rincones del jardín.",hidden:false});
-        }
-        if(clean.length)sections[key].splice(0,sections[key].length,...clean);
-    });
-}
-const messages=[
-`Nadie llega aquí por casualidad.
-
-No buscaste este enlace. Él te encontró a ti.
-
-Hay cinco puertas. No todas conducen al mismo sitio.
-
-El jardín recuerda.
-
-Ahora observa.`,
-`Has vuelto.
-
-Probablemente no lo recuerdes, pero el jardín nunca te olvidó.
-
-Lee despacio. Desconfía de lo que parece sencillo.
-
-Algunas respuestas están a plena vista.
-
-Comienza a caminar.`,
-`No todas las entradas tienen una salida.
-
-Algunos llegaron buscando historias. Otros buscaban respuestas.
-
-Ninguno encontró exactamente lo que esperaba.
-
-Si has llegado hasta aquí, continúa.`
+const welcomeCards = [
+  ["No hay un mapa que pueda mostrarte exactamente dónde estás.","Puedes mirar, leer, perderte un poco o simplemente permanecer aquí."],
+  ["Quizá llegaste por casualidad, siguiendo un enlace o buscando algo que ni siquiera sabías cómo nombrar.","Sea cual sea el motivo, ahora estás aquí."],
+  ["Antes de continuar, puedes tomarte un momento.","No hay nada urgente que descubrir ni nada que debas comprender de inmediato."],
+  ["Tal vez viniste buscando una respuesta, una pregunta o simplemente algo diferente.","No puedo prometerte que encontrarás lo que buscas, pero quizá encuentres algo que no sabías que necesitabas."],
+  ["Hay lugares que no aparecen en los mapas y conversaciones que nunca sucedieron.","No necesitas entender por qué existe este sitio, solo recordar que por alguna razón terminaste aquí."],
+  ["Qué curioso que hayas llegado hasta aquí, entre tantas páginas, nombres y direcciones, esta fue la que apareció frente a ti.","No sé si volverás después de hoy, pero mientras estés aquí, siéntete libre de explorar."]
 ];
-const signature="\n\nCon cariño: zorg.";
+const selectedCard = welcomeCards[Math.floor(Math.random()*welcomeCards.length)];
+const message = selectedCard.join('\n');
+const textElement = document.getElementById('typed-text');
+const cursor = document.getElementById('cursor');
+const signature = document.getElementById('letter-signature');
+let typeIndex = 0;
+function typeNext(){if(typeIndex<message.length){const ch=message.charAt(typeIndex++);textElement.textContent+=ch;setTimeout(typeNext,ch==='\n'?350:32);}else{cursor.style.display='none';signature.classList.add('show');setTimeout(showHomeScreen,2800);}}
+function showHomeScreen(){const letter=document.querySelector('.letter');const home=document.getElementById('home-screen');letter.classList.add('leave');setTimeout(()=>{letter.style.display='none';home.classList.add('show');},1100);}
+function updateTime(){document.getElementById('local-time').textContent=new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit',hour12:false});}
+updateTime();setInterval(updateTime,60000);document.getElementById('current-year').textContent=new Date().getFullYear();typeNext();
 
-function getSaved(key){
-    try{return localStorage.getItem(key)}catch(e){return null}
+const overlay=document.getElementById('admin-overlay');
+const loginBox=document.getElementById('admin-login');
+const dashboard=document.getElementById('admin-dashboard');
+const loginStatus=document.getElementById('admin-login-status');
+const adminStatus=document.getElementById('admin-status');
+let isAdmin=false, categories=[], posts=[];
+function openLogin(){overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');loginBox.hidden=false;dashboard.hidden=true;}
+function closePanel(){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
+document.getElementById('admin-close-login').addEventListener('click',closePanel);
+document.getElementById('admin-close').addEventListener('click',closePanel);
+const logo=document.getElementById('site-logo');
+// Dos toques rápidos en el logo abren el buscador.
+let lastLogoTap=0;
+function openSearch(){searchPanel.classList.add('open');searchToggle.setAttribute('aria-expanded','true');searchPanel.setAttribute('aria-hidden','false');searchInput.focus();}
+logo.addEventListener('pointerup',()=>{const now=Date.now();if(now-lastLogoTap<450){openSearch();lastLogoTap=0;}else{lastLogoTap=now;}});
+logo.addEventListener('contextmenu',e=>e.preventDefault());
+
+document.getElementById('admin-login-form').addEventListener('submit',async e=>{
+ e.preventDefault();loginStatus.textContent='Verificando acceso…';loginStatus.className='admin-status';
+ try{const cred=await signInWithEmailAndPassword(auth,document.getElementById('admin-email').value.trim(),document.getElementById('admin-password').value);if(cred.user.uid!==ADMIN_UID){await signOut(auth);throw new Error('Esta cuenta no tiene permiso de administración.');}await showDashboard();}
+ catch(err){loginStatus.textContent=err.message||'No se pudo iniciar sesión.';loginStatus.className='admin-status error';}
+});
+document.getElementById('admin-logout').addEventListener('click',async()=>{await signOut(auth);isAdmin=false;closePanel();});
+onAuthStateChanged(auth,async user=>{if(user&&user.uid===ADMIN_UID){isAdmin=true;}else{isAdmin=false;}});
+
+function slugify(value){return value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
+document.getElementById('category-name').addEventListener('input',e=>{if(!document.getElementById('category-id').value)document.getElementById('category-slug').value=slugify(e.target.value);});
+document.getElementById('post-title').addEventListener('input',e=>{if(!document.getElementById('post-id').value)document.getElementById('post-slug').value=slugify(e.target.value);});
+const defaultCategories=[
+ {name:'The Room',slug:'the-room',section:'Home'}, {name:'Open Space',slug:'open-space',section:'Home'},
+ {name:'Stories',slug:'stories',section:'Blog'}, {name:'Art',slug:'art',section:'Blog'}, {name:'Experiments',slug:'experiments',section:'Blog'},
+ {name:'FAQ',slug:'faq',section:'About'}, {name:'Contact',slug:'contact',section:'About'}, {name:'The Project',slug:'the-project',section:'About'}, {name:'Guidelines',slug:'guidelines',section:'About'}
+];
+async function seedDefaultCategories(){const snap=await getDocs(collection(db,'categories'));if(snap.empty){for(const c of defaultCategories)await setDoc(doc(db,'categories',c.slug),{...c,published:true,createdAt:serverTimestamp()});}}
+async function loadData(){const cSnap=isAdmin?await getDocs(collection(db,'categories')):await getDocs(query(collection(db,'categories'),where('published','==',true)));categories=cSnap.docs.map(d=>({id:d.id,...d.data()}));const pSnap=isAdmin?await getDocs(collection(db,'posts')):await getDocs(query(collection(db,'posts'),where('published','==',true)));posts=pSnap.docs.map(d=>({id:d.id,...d.data()}));renderNavigation();renderAdminLists();renderCurrentRoute();}
+async function showDashboard(){loginBox.hidden=true;dashboard.hidden=false;overlay.classList.add('open');adminStatus.textContent='Cargando contenido…';try{await seedDefaultCategories();await loadData();adminStatus.textContent='Conectado. Solo tu cuenta puede modificar el contenido.';adminStatus.className='admin-status ok';}catch(err){adminStatus.textContent='Error al cargar Firestore: '+err.message;adminStatus.className='admin-status error';}}
+
+function renderNavigation(){const groups=[...document.querySelectorAll('.site-nav .nav-group')];const sectionNames=['Home','Blog','Status','About'];groups.forEach((group,i)=>{const section=sectionNames[i];let submenu=group.querySelector('.submenu');if(!submenu){submenu=document.createElement('div');submenu.className='submenu';group.appendChild(submenu);}submenu.innerHTML='';const items=categories.filter(c=>c.section===section&&c.published!==false);items.forEach(cat=>{const a=document.createElement('a');a.href=categoryHref(cat);a.textContent=cat.name;a.addEventListener('click',e=>{e.preventDefault();history.pushState({},'',a.href);renderCurrentRoute();submenu.closest('.nav-group')?.classList.remove('open');});submenu.appendChild(a);});const trigger=group.querySelector('.nav-trigger');if(section==='Status'&&!items.length){trigger.addEventListener('click',()=>{history.pushState({},'','?section=status');renderCurrentRoute();},{once:true});}});}
+document.querySelectorAll('.nav-trigger').forEach(button=>button.addEventListener('click',()=>{const group=button.closest('.nav-group');const wasOpen=group.classList.contains('open');document.querySelectorAll('.nav-group').forEach(item=>{item.classList.remove('open');item.querySelector('.nav-trigger')?.setAttribute('aria-expanded','false');});if(!wasOpen&&group.querySelector('.submenu')?.children.length){group.classList.add('open');button.setAttribute('aria-expanded','true');}}));
+document.addEventListener('click',event=>{if(!event.target.closest('.nav-group'))document.querySelectorAll('.nav-group').forEach(item=>{item.classList.remove('open');item.querySelector('.nav-trigger')?.setAttribute('aria-expanded','false');});});
+const storiesView=document.getElementById('stories-view');
+function safeText(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;el.textContent=text||'';return el;}
+function youtubeId(url){try{const u=new URL(url);if(u.hostname.includes('youtu.be'))return u.pathname.slice(1);if(u.hostname.includes('youtube.com'))return u.searchParams.get('v')||u.pathname.split('/').filter(Boolean).pop();}catch{}return '';}
+function addMedia(container,item){if(item.imageUrl){const wrap=document.createElement('div');wrap.className='media-block';const img=document.createElement('img');img.src=item.imageUrl;img.alt=item.title||'Imagen';img.loading='lazy';wrap.appendChild(img);container.appendChild(wrap);}if(item.audioUrl){const wrap=document.createElement('div');wrap.className='media-block';const audio=document.createElement('audio');audio.controls=true;audio.preload='metadata';audio.src=item.audioUrl;wrap.appendChild(audio);container.appendChild(wrap);}if(item.youtubeUrl){const id=youtubeId(item.youtubeUrl);if(id){const wrap=document.createElement('div');wrap.className='media-block';const load=safeText('button','admin-btn','Cargar video de YouTube');load.type='button';load.addEventListener('click',()=>{const frame=document.createElement('iframe');frame.className='youtube-frame';frame.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(id);frame.title='Video de YouTube';frame.loading='lazy';frame.referrerPolicy='strict-origin-when-cross-origin';frame.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';frame.allowFullscreen=true;wrap.replaceChildren(frame);},{once:true});wrap.appendChild(load);container.appendChild(wrap);}}}
+function categoryHref(category){return '/'+encodeURIComponent(category.slug);}
+function storyHref(post){return '/story/'+encodeURIComponent(post.slug);}
+function currentRoute(){
+ const params=new URLSearchParams(location.search);
+ if(params.get('story'))return {type:'story',slug:params.get('story')};
+ if(params.get('category'))return {type:'category',slug:params.get('category')};
+ const parts=location.pathname.split('/').filter(Boolean).map(decodeURIComponent);
+ if(parts[0]==='story'&&parts[1])return {type:'story',slug:parts[1]};
+ if(parts.length===1)return {type:'category',slug:parts[0]};
+ return {type:'home'};
 }
-function saveData(key,value){
-    try{localStorage.setItem(key,value)}catch(e){}
+function renderLinkedText(container,content){
+ const source=String(content||'');
+ const pattern=/\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]*)\)/g;
+ let last=0,match;
+ while((match=pattern.exec(source))){
+  if(match.index>last)container.appendChild(document.createTextNode(source.slice(last,match.index)));
+  const a=document.createElement('a');a.textContent=match[1];a.href=match[2];
+  if(/^https?:\/\//i.test(match[2])){a.target='_blank';a.rel='noopener noreferrer';}
+  else a.addEventListener('click',e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();history.pushState({},'',a.getAttribute('href'));renderCurrentRoute();window.scrollTo(0,0);});
+  container.appendChild(a);last=pattern.lastIndex;
+ }
+ if(last<source.length)container.appendChild(document.createTextNode(source.slice(last)));
 }
-function updateTime(){
-    const el=document.getElementById("local-time");
-    if(el)el.textContent="Hora: "+new Date().toLocaleTimeString("es-EC",{hour:"2-digit",minute:"2-digit"});
+function showUnavailable(){
+ storiesView.classList.remove('visible');storiesView.innerHTML='';
+ const panel=document.createElement('section');panel.className='unavailable';
+ panel.appendChild(safeText('h2','','UPS!!'));
+ panel.appendChild(safeText('p','','Este contenido aún no está disponible'));
+ panel.appendChild(safeText('p','','0-SITE'));
+ storiesView.appendChild(panel);storiesView.classList.add('visible');document.title='UPS!! · 0-SITE';
 }
-updateTime();
-setInterval(updateTime,1000);
-
-/* ORDEN PERSONALIZADO */
-
-function hasCustomOrder(item){
-    return typeof item.order==="number"&&Number.isFinite(item.order);
+function renderCurrentRoute(){
+ const route=currentRoute();storiesView.classList.add('visible');storiesView.innerHTML='';
+ if(route.type==='story'){
+  const post=posts.find(p=>p.slug===route.slug&&p.published!==false);
+  if(!post){showUnavailable();return;}
+  document.title=post.title+' · 0-SITE';
+  storiesView.appendChild(safeText('h2','stories-heading',post.categoryName||'0-SITE'));
+  storiesView.appendChild(safeText('h1','story-title',post.title));
+  storiesView.appendChild(safeText('div','story-meta',post.date||''));addMedia(storiesView,post);
+  const body=safeText('div','story-full','');renderLinkedText(body,post.content);storiesView.appendChild(body);
+  const nav=document.createElement('nav');nav.className='story-navigation';
+  const same=posts.filter(p=>p.categoryId===post.categoryId&&p.published!==false).sort((a,b)=>(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
+  const idx=same.findIndex(p=>p.slug===post.slug),prev=same[idx-1],next=same[idx+1];
+  if(prev){const a=safeText('a','','‹ Anterior');a.href=storyHref(prev);nav.appendChild(a);}else nav.appendChild(document.createElement('span'));
+  if(next){const a=safeText('a','','Siguiente ›');a.href=storyHref(next);nav.appendChild(a);}else nav.appendChild(document.createElement('span'));
+  storiesView.appendChild(nav);return;
+ }
+ if(route.type==='category'){
+  const cat=categories.find(c=>c.slug===route.slug&&c.published!==false);
+  if(!cat){showUnavailable();return;}
+  document.title=cat.name+' · 0-SITE';storiesView.appendChild(safeText('h2','stories-heading',cat.name));
+  const list=posts.filter(p=>p.categoryId===route.slug&&p.published!==false);
+  if(!list.length){storiesView.appendChild(safeText('p','stories-empty','Todavía no hay publicaciones en esta categoría.'));return;}
+  list.forEach(post=>{const card=document.createElement('article');card.className='story-card';card.appendChild(safeText('h3','story-title',post.title));card.appendChild(safeText('div','story-meta',post.date||''));
+   if(post.imageUrl){const img=document.createElement('img');img.src=post.imageUrl;img.alt=post.title;img.loading='lazy';img.style.maxWidth='100%';card.appendChild(img);}
+   const preview=safeText('p','story-preview','');renderLinkedText(preview,String(post.content||'').split(/\r?\n/).slice(0,15).join('\n'));card.appendChild(preview);
+   const a=safeText('a','read-more','Seguir leyendo');a.href=storyHref(post);a.addEventListener('click',e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();history.pushState({},'',a.href);renderCurrentRoute();window.scrollTo(0,0);});card.appendChild(a);storiesView.appendChild(card);
+  });return;
+ }
+ if(location.hash==='#stories'){const stories=categories.find(c=>c.slug==='stories'&&c.published!==false);if(stories){history.replaceState({},'','/stories');renderCurrentRoute();return;}}
+ storiesView.classList.remove('visible');document.title='0-SITE';
 }
+window.addEventListener('popstate',renderCurrentRoute);
 
-function compareRecords(a,b){
-    if(hasCustomOrder(a)&&hasCustomOrder(b)){
-        return a.order-b.order;
-    }
-
-    const ta=a.createdAt?.toMillis?.()||0;
-    const tb=b.createdAt?.toMillis?.()||0;
-    return tb-ta;
+function renderAdminLists(){const catList=document.getElementById('category-list');catList.innerHTML='';categories.forEach(c=>{const row=document.createElement('div');row.className='admin-item';const info=safeText('span','',c.name+' · '+c.section);const state=safeText('small','',c.published===false?'Oculta':'Publicada');info.appendChild(document.createElement('br'));info.appendChild(state);const actions=document.createElement('div');actions.className='admin-item-actions';const edit=safeText('button','admin-btn','Editar');edit.type='button';edit.onclick=()=>{document.getElementById('category-id').value=c.id;document.getElementById('category-name').value=c.name;document.getElementById('category-slug').value=c.slug;document.getElementById('category-section').value=c.section;document.getElementById('category-published').checked=c.published!==false;};const del=safeText('button','admin-btn danger','Eliminar');del.type='button';del.onclick=async()=>{if(confirm('¿Eliminar esta categoría?')){await deleteDoc(doc(db,'categories',c.id));await loadData();}};actions.append(edit,del);row.append(info,actions);catList.appendChild(row);});
+ const select=document.getElementById('post-category');select.innerHTML='';categories.forEach(c=>{const opt=document.createElement('option');opt.value=c.slug;opt.textContent=c.section+' / '+c.name;select.appendChild(opt);});
+ const internalSelect=document.getElementById('internal-link-target');if(internalSelect){internalSelect.innerHTML='<option value="">Enlazar a una sección o historia…</option>';categories.filter(c=>c.published!==false).forEach(c=>{const o=document.createElement('option');o.value=categoryHref(c);o.textContent='Sección: '+c.name;internalSelect.appendChild(o);});posts.filter(p=>p.published!==false).forEach(p=>{const o=document.createElement('option');o.value=storyHref(p);o.textContent='Historia: '+p.title;internalSelect.appendChild(o);});}
+ const postList=document.getElementById('post-list');postList.innerHTML='';posts.forEach(p=>{const row=document.createElement('div');row.className='admin-item';const info=safeText('span','',p.title||p.slug);info.appendChild(document.createElement('br'));info.appendChild(safeText('small','',p.published===false?'Oculta':'Publicada'));const actions=document.createElement('div');actions.className='admin-item-actions';const edit=safeText('button','admin-btn','Editar');edit.type='button';edit.onclick=()=>{document.getElementById('post-id').value=p.id;document.getElementById('post-title').value=p.title||'';document.getElementById('post-slug').value=p.slug||'';document.getElementById('post-category').value=p.categoryId||'';document.getElementById('post-content').value=p.content||'';document.getElementById('post-image').value=p.imageUrl||'';document.getElementById('post-audio').value=p.audioUrl||'';document.getElementById('post-video').value=p.youtubeUrl||'';document.getElementById('post-published').checked=p.published!==false;};const del=safeText('button','admin-btn danger','Eliminar');del.type='button';del.onclick=async()=>{if(confirm('¿Eliminar esta publicación?')){await deleteDoc(doc(db,'posts',p.id));await loadData();}};actions.append(edit,del);row.append(info,actions);postList.appendChild(row);});}
+function resetCategory(){document.getElementById('category-form').reset();document.getElementById('category-id').value='';document.getElementById('category-published').checked=true;}
+function resetPost(){document.getElementById('post-form').reset();document.getElementById('post-id').value='';document.getElementById('post-published').checked=true;}
+document.getElementById('category-reset').addEventListener('click',resetCategory);document.getElementById('post-reset').addEventListener('click',resetPost);
+document.getElementById('category-form').addEventListener('submit',async e=>{e.preventDefault();try{const slug=slugify(document.getElementById('category-slug').value);if(!slug)throw new Error('Escribe un nombre de URL válido.');const id=document.getElementById('category-id').value||slug;await setDoc(doc(db,'categories',id),{name:document.getElementById('category-name').value.trim(),slug,section:document.getElementById('category-section').value,published:document.getElementById('category-published').checked,updatedAt:serverTimestamp()},{merge:true});resetCategory();await loadData();adminStatus.textContent='Categoría guardada.';}catch(err){adminStatus.textContent=err.message;adminStatus.className='admin-status error';}});
+async function uploadMedia(file){if(!file)return '';const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const path=`site-media/${auth.currentUser.uid}/${Date.now()}-${safeName}`;const fileRef=ref(storage,path);await uploadBytes(fileRef,file,{contentType:file.type});return await getDownloadURL(fileRef);}
+function insertEditorLink(target){
+ const field=document.getElementById('post-content');const start=field.selectionStart,end=field.selectionEnd;
+ const selected=field.value.slice(start,end).trim();
+ if(!selected){alert('Primero selecciona una palabra o frase del contenido.');field.focus();return;}
+ const safeTarget=String(target||'').trim();if(!safeTarget)return;
+ const replacement='['+selected+']('+safeTarget+')';
+ field.setRangeText(replacement,start,end,'end');field.focus();
 }
-
-function sortRecords(items){
-    return [...items].sort(compareRecords);
-}
-
-async function prepareNextOrder(collectionName,menu,category,excludeId=null){
-    const snapshot=await firestore.collection(collectionName)
-        .where("menu","==",menu)
-        .get();
-
-    const records=[];
-
-    snapshot.forEach(doc=>{
-        if(doc.id===excludeId)return;
-
-        const data=doc.data();
-
-        if(data.category===category){
-            records.push({id:doc.id,...data});
-        }
-    });
-
-    const ordered=sortRecords(records);
-    const batch=firestore.batch();
-
-    ordered.forEach((item,index)=>{
-        batch.update(
-            firestore.collection(collectionName).doc(item.id),
-            {order:index}
-        );
-    });
-
-    if(ordered.length){
-        await batch.commit();
-    }
-
-    return ordered.length;
-}
-
-async function moveRecord(collectionName,records,index,direction,reloadFunction){
-    const ordered=sortRecords(records);
-    const newIndex=index+direction;
-
-    if(newIndex<0||newIndex>=ordered.length)return;
-
-    const first=ordered[index];
-    const second=ordered[newIndex];
-
-    if(first.menu!==second.menu||first.category!==second.category)return;
-
-    [ordered[index],ordered[newIndex]]=[ordered[newIndex],ordered[index]];
-
-    const batch=firestore.batch();
-    const collection=firestore.collection(collectionName);
-
-    ordered.forEach((item,position)=>{
-        batch.update(collection.doc(item.id),{
-            order:position
-        });
-    });
-
-    try{
-        await batch.commit();
-        await reloadFunction();
-    }catch(error){
-        console.error("Error cambiando el orden:",error);
-        alert("No se pudo guardar el nuevo orden. Comprueba tu conexión e inténtalo de nuevo.");
-    }
-}
-
-/* AUTENTICACIÓN Y PRESENCIA */
-
-auth.onAuthStateChanged(async user=>{
-    currentUser=user;
-
-    if(!user){
-        try{await auth.signInAnonymously()}
-        catch(error){console.error("Error de autenticación anónima:",error)}
-        return;
-    }
-
-    if(user.uid===ADMIN_UID && sessionStorage.getItem("0site_admin_panel_open")==="1"){
-        const adminScreen=document.getElementById("admin-screen");
-        document.getElementById("admin-login").style.display="none";
-        document.getElementById("admin-dashboard").style.display="block";
-        adminScreen.style.display="block";
-
-        const savedTab=localStorage.getItem("0site_admin_tab")||"contenido";
-        const allowedTabs=["contenido","gestor","archivos","configuracion"];
-        const tab=allowedTabs.includes(savedTab)?savedTab:(savedTab==="publicaciones"?"contenido":"contenido");
-
-        document.querySelectorAll(".admin-tab").forEach(button=>{
-            button.classList.toggle("active",button.dataset.adminTab===tab);
-        });
-        renderAdminTab(tab);
-    }
-
-    
+document.getElementById('link-external').addEventListener('click',()=>{
+ const raw=prompt('Pega la URL externa (debe comenzar con https://):','https://');if(!raw)return;
+ try{const url=new URL(raw.trim());if(!['https:','http:'].includes(url.protocol))throw new Error();insertEditorLink(url.href);}catch{alert('Introduce una URL válida que comience con https://');}
+});
+document.getElementById('link-internal').addEventListener('click',()=>{
+ const target=document.getElementById('internal-link-target').value;if(target)insertEditorLink(target);else alert('Primero selecciona una categoría o historia.');
 });
 
-/* RUTAS COMPARTIBLES */
-function routeSlug(value){
-    return String(value||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
-}
-function sectionPath(section){return "/"+String(section).toLowerCase();}
-function categoryPath(section,title){return "/"+routeSlug(title);}
-function changePublicUrl(path,replace=false){
-    if(location.pathname!==path){history[replace?"replaceState":"pushState"]({},"",path);}
-}
-
-/* MENÚS PÚBLICOS (OCULTA LAS CATEGORÍAS MARCADAS COMO HIDDEN) */
-function buildPublicMenus(){
-    Object.keys(sections).filter(section=>section!=="INICIO").forEach(section=>{
-        const menu=document.getElementById("menu-"+section);
-        if(!menu)return;
-        menu.innerHTML="";
-        sections[section]
-            .filter(item=>!item.hidden)
-            .forEach(item=>{
-                const button=document.createElement("button");
-                button.textContent=item.title;
-                button.addEventListener("click",()=>showCategory(section,item.title,item.description,true));
-                menu.appendChild(button);
-            });
-    });
-}
-buildPublicMenus();
-
-async function loadCategorySettings(){
-    try{
-        const doc=await firestore.collection("configuracion").doc("__categorias").get();
-        if(doc.exists&&doc.data()?.sections){
-            applySectionSettings(doc.data().sections);
-            buildPublicMenus();
-        }
-    }catch(error){
-        console.warn("Se mantienen las categorías predeterminadas:",error);
-    }
-}
-const categorySettingsPromise=loadCategorySettings();
-
-document.querySelectorAll(".nav-button").forEach(button=>{
-    button.addEventListener("click",event=>{
-        event.stopPropagation();
-
-        const menu=document.getElementById("menu-"+button.dataset.menu);
-        const wasOpen=menu.classList.contains("open");
-
-        closeMenus();
-
-        if(!wasOpen){
-            menu.classList.add("open");
-            button.classList.add("active");
-        }
-    });
-});
-
-function closeMenus(){
-    document.querySelectorAll(".dropdown").forEach(m=>m.classList.remove("open"));
-    document.querySelectorAll(".nav-button").forEach(b=>b.classList.remove("active"));
-}
-
-document.addEventListener("click",event=>{
-    if(!event.target.closest(".nav-item"))closeMenus();
-});
-
-/* INTERCEPTAR CLICS EN ENLACES INTERNOS DENTRO DEL CONTENIDO */
-document.getElementById("content-area").addEventListener("click",event=>{
-    const anchor=event.target.closest("a");
-    if(!anchor)return;
-
-    const rawHref=anchor.getAttribute("href")||"";
-    if(!rawHref)return;
-
-    let url;
-    try{
-        url=new URL(rawHref,location.origin);
-    }catch(e){
-        return;
-    }
-
-    const sameSiteHost=url.hostname.replace(/^www\./i,"")===location.hostname.replace(/^www\./i,"");
-    if(sameSiteHost&&(url.pathname==="/"||url.pathname==="/index.html")){
-        event.preventDefault();
-        showInicio();
-        window.scrollTo({top:0,behavior:"smooth"});
-        return;
-    }
-
-    if(url.origin===location.origin){
-        const parts=url.pathname.split("/").filter(Boolean).map(p=>{try{return decodeURIComponent(p)}catch(e){return p}});
-        if(parts.length===1){
-            const slug=routeSlug(parts[0]);
-            const allCategories=Object.entries(sections).flatMap(([section,items])=>items.map(item=>({section,item})));
-            const match=allCategories.find(({item})=>routeSlug(item.title)===slug);
-            if(match){
-                event.preventDefault();
-                showCategory(match.section,match.item.title,match.item.description,true);
-                window.scrollTo({top:0,behavior:"smooth"});
-                return;
-            }
-        }
-        if(parts.length>=2){
-            const sec=parts[0].toUpperCase();
-            if(sections[sec]){
-                const wanted=routeSlug(parts.slice(1).join("/"));
-                const cat=sections[sec].find(item=>routeSlug(item.title)===wanted);
-                if(cat){
-                    event.preventDefault();
-                    showCategory(sec,cat.title,cat.description,true);
-                    window.scrollTo({top:0,behavior:"smooth"});
-                    return;
-                }
-            }
-        }
-    }
-});
-
-
-/* CONTENIDO HTML SEGURO */
-
-function validHexColor(value){
-    return typeof value==="string"&&/^#[0-9a-fA-F]{6}$/.test(value);
-}
-
-function safeInlineFontFamily(value){
-    const allowed=["Arial","Verdana","Tahoma","Trebuchet MS","Georgia","Times New Roman","Garamond","Courier New"];
-    if(typeof value!=="string")return "";
-    return allowed.includes(value.replace(/["']/g,"").trim())?value.replace(/["']/g,"").trim():"";
-}
-function safeInlineFontSize(value){
-    if(typeof value!=="string")return "";
-    const match=value.match(/^([8-9]|[1-6][0-9]|7[0-2])px$/);
-    return match?match[0]:"";
-}
-function safeInlineColor(value){
-    if(typeof value!=="string")return "";
-    if(/^#[0-9a-fA-F]{6}$/.test(value))return value;
-
-    const rgb=value.match(/^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/i);
-    if(!rgb)return "";
-
-    const channels=rgb.slice(1).map(Number);
-    if(channels.some(channel=>channel<0||channel>255))return "";
-    return `rgb(${channels.join(",")})`;
-}
-
-function safeHtml(html){
-    const parser=new DOMParser();
-    const doc=parser.parseFromString(String(html||""),"text/html");
-    const allowed=["P","DIV","BR","B","STRONG","I","EM","U","A","SPAN","UL","OL","LI","IMG"];
-
-    function clean(parent){
-        [...parent.childNodes].forEach(node=>{
-            if(node.nodeType===Node.TEXT_NODE)return;
-
-            if(node.nodeType!==Node.ELEMENT_NODE){
-                node.remove();
-                return;
-            }
-
-            if(!allowed.includes(node.tagName)){
-                const children=[...node.childNodes];
-                node.replaceWith(...children);
-
-                children.forEach(child=>{
-                    if(child.nodeType===Node.ELEMENT_NODE)clean(child);
-                });
-
-                return;
-            }
-
-            if(node.tagName==="IMG"){
-                const rawSrc=node.getAttribute("src")||"";
-                let imageUrl;
-
-                try{
-                    imageUrl=new URL(rawSrc,location.href);
-                }catch(e){
-                    node.remove();
-                    return;
-                }
-
-                if(!["http:","https:"].includes(imageUrl.protocol)){
-                    node.remove();
-                    return;
-                }
-
-                const alt=node.getAttribute("alt")||"Imagen";
-                const rawWidth=node.style.width||node.getAttribute("width")||"auto";
-                const safeWidth=/^(?:auto|(?:[1-9]\d?|100)%)$/.test(String(rawWidth).trim())
-                    ?String(rawWidth).trim():"auto";
-
-                [...node.attributes].forEach(attr=>node.removeAttribute(attr.name));
-
-                node.setAttribute("src",imageUrl.href);
-                node.setAttribute("alt",alt.slice(0,200));
-                node.setAttribute("loading","lazy");
-                node.setAttribute("referrerpolicy","no-referrer");
-                node.style.width=safeWidth;
-                node.style.maxWidth="100%";
-                node.style.height="auto";
-
-                return;
-            }
-
-            const savedColor=(node.tagName==="A"||node.tagName==="SPAN")?(node.style.color||""):"";
-            const savedFontFamily=node.tagName==="SPAN"?(node.style.fontFamily||""):"";
-            const savedFontSize=node.tagName==="SPAN"?(node.style.fontSize||""):"";
-
-            [...node.attributes].forEach(attr=>{
-                const name=attr.name.toLowerCase();
-                const keepLinkAttribute=node.tagName==="A"&&["href","target","rel"].includes(name);
-                const keepSafeStyle=(node.tagName==="A"||node.tagName==="SPAN")&&name==="style";
-                if(!keepLinkAttribute&&!keepSafeStyle)node.removeAttribute(attr.name);
-            });
-
-            node.removeAttribute("style");
-            const safeColor=safeInlineColor(savedColor);
-            const safeFamily=safeInlineFontFamily(savedFontFamily);
-            const safeSize=safeInlineFontSize(savedFontSize);
-            if(safeColor)node.style.color=safeColor;
-            if(node.tagName==="SPAN"&&safeFamily)node.style.fontFamily=safeFamily;
-            if(node.tagName==="SPAN"&&safeSize)node.style.fontSize=safeSize;
-
-            if(node.tagName==="A"){
-                try{
-                    const rawHref=(node.getAttribute("href")||"").trim();
-                    const url=new URL(rawHref,location.origin);
-
-                    if(!["http:","https:","mailto:"].includes(url.protocol)){
-                        const children=[...node.childNodes];
-                        node.replaceWith(...children);
-
-                        children.forEach(child=>{
-                            if(child.nodeType===Node.ELEMENT_NODE)clean(child);
-                        });
-
-                        return;
-                    }
-
-                    if(url.origin===location.origin){
-                        node.setAttribute("href",url.pathname+url.search+url.hash);
-                        node.removeAttribute("target");
-                        node.removeAttribute("rel");
-                    }else{
-                        node.setAttribute("href",url.href);
-                        node.setAttribute("target","_blank");
-                        node.setAttribute("rel","noopener noreferrer");
-                    }
-
-                }catch(e){
-                    const children=[...node.childNodes];
-                    node.replaceWith(...children);
-
-                    children.forEach(child=>{
-                        if(child.nodeType===Node.ELEMENT_NODE)clean(child);
-                    });
-
-                    return;
-                }
-            }
-
-            clean(node);
-        });
-    }
-
-    clean(doc.body);
-    return doc.body.innerHTML;
-}
-
-/* DETECTAR IMÁGENES */
-
-function isImageUrl(rawUrl){
-    try{
-        const url=new URL(rawUrl);
-        return /\.(avif|bmp|gif|jpe?g|png|svg|webp)$/i.test(url.pathname);
-    }catch(e){
-        return false;
-    }
-}
-
-function clearContentListeners(){
-    activeContentListeners.forEach(unsub=>{
-        try{unsub();}catch(e){}
-    });
-    activeContentListeners=[];
-}
-
-/* MOSTRAR CATEGORÍAS */
-
-async function showCategory(section,title,description,updateUrl=false){
-    closeMenus();
-    if(updateUrl)changePublicUrl(categoryPath(section,title));
-
-    // Cualquier categoría abierta confirma que la carta inicial ya fue superada.
-    saveData("gardenEntered","yes");
-    saveData("gardenCategory",JSON.stringify({
-        section,title,description
-    }));
-
-    clearContentListeners();
-    const content=document.getElementById("content-area");
-    const token=++currentContentToken;
-
-    content.innerHTML="";
-
-    const showHeader = (section==="INICIO") ||
-                       (section==="ARC" && title==="Rutas caducadas");
-
-    if(showHeader){
-        const desc=document.createElement("p");
-        desc.className="content-description";
-        desc.textContent=description;
-        if(section!=="INICIO"){
-            const heading=document.createElement("h2");
-            heading.className="content-title";
-            heading.textContent=title;
-            content.append(heading,desc);
-        }else{
-            content.appendChild(desc);
-        }
-    }
-
-    if(section==="ARC"&&title==="Rutas caducadas"){
-        const archive=document.createElement("div");
-        archive.className="publication";
-        archive.setAttribute("data-static","true");
-        archive.style.marginTop="18px";
-        archive.style.padding="15px";
-        archive.style.border="1px solid #303030";
-        archive.style.background="#090909";
-        archive.innerHTML=`
-            <p style="font:10px monospace;letter-spacing:1.5px;color:#888;margin:0 0 12px">ARCHIVO 004 // RUTAS CADUCADAS</p>
-            <h3 style="font-size:15px;font-weight:normal;letter-spacing:1px;color:#d0d0d0;margin:0 0 10px">REGISTRO DE CONEXIÓN PERDIDO</h3>
-            <p style="font-size:12px;line-height:1.7;color:#999;margin:0 0 15px">Algunos destinos dejaron de responder. Otros desaparecieron sin dejar rastro. Solo quedan direcciones incompletas y nombres almacenados en registros antiguos.</p>
-            <div style="border-top:1px solid #292929;padding-top:12px;margin-top:10px">
-                <p style="display:flex;align-items:center;gap:7px;font:10px monospace;letter-spacing:1px;color:#888;margin:0 0 7px"><img src="https://i.ibb.co/bj8644FP/IMG-1108.webp" alt="" width="14" height="14" style="width:14px;height:14px;object-fit:contain;display:block"> TOR / ONION</p>
-                <a href="http://nbeox5nr6owgw4fic3tfom2g3xo5sr4523zlkw3ird3isohb3mkbevrn.onion" target="_blank" rel="noopener noreferrer" style="display:block;overflow-wrap:anywhere;color:#bdbdbd;font-size:11px;line-height:1.7;text-decoration:underline;text-decoration-color:#555">nbeox5nr6owgw4fic3tfom2g3xo5sr4523zlkw3ird3isohb3mkbevrn.onion</a>
-                <p style="font:10px monospace;color:#777;margin:7px 0 0">ESTADO: DESTINO NO VERIFICADO</p>
-            </div>
-            <div style="border-top:1px solid #292929;padding-top:12px;margin-top:12px">
-                <p style="display:flex;align-items:center;gap:7px;font:10px monospace;letter-spacing:1px;color:#888;margin:0 0 7px"><img src="https://i.ibb.co/6JZkzTqQ/IMG-1109.png" alt="" width="14" height="14" style="width:14px;height:14px;object-fit:contain;display:block"> I2P / EEPSITE</p>
-                <a href="http://archivo-perdido.i2p" target="_blank" rel="noopener noreferrer" style="display:block;overflow-wrap:anywhere;color:#bdbdbd;font-size:11px;line-height:1.7;text-decoration:underline;text-decoration-color:#555">archivo-perdido.i2p</a>
-                <p style="font:10px monospace;color:#777;margin:7px 0 0">ESTADO: REGISTRO INACTIVO</p>
-            </div>
-        `;
-        content.appendChild(archive);
-    }
-
-    const loading=document.createElement("p");
-    loading.className="admin-status";
-    loading.textContent="Consultando registros...";
-    content.appendChild(loading);
-
-    try{
-        clearContentListeners();
-
-        function renderContent(pubDocs, fileDocs){
-            if(token!==currentContentToken)return;
-            const existingPubs = content.querySelectorAll(".publication:not([data-static])");
-            existingPubs.forEach(el => el.remove());
-            const existingLoading = content.querySelector(".admin-status");
-            if(existingLoading) existingLoading.remove();
-
-            const orderedPublications=sortRecords(pubDocs);
-            orderedPublications.forEach(item=>{
-                const article=document.createElement("article");
-                article.className="publication publication-font-modern";
-                if(item.title){
-                    const h=document.createElement("h3");
-                    if(item.titleHtml)h.innerHTML=safeHtml(item.titleHtml);
-                    else h.textContent=item.title;
-                    if(validHexColor(item.titleColor))h.style.color=item.titleColor;
-                    const titleFont=safeInlineFontFamily(item.titleFontFamily||"");
-                    const titleSize=safeInlineFontSize(item.titleFontSize||"");
-                    if(titleFont)h.style.fontFamily=titleFont;
-                    if(titleSize)h.style.fontSize=titleSize;
-                    article.appendChild(h);
-                }
-                const body=document.createElement("div");
-                body.className="publication-body";
-                body.innerHTML=safeHtml(item.bodyHtml||"");
-                const bodyFont=safeInlineFontFamily(item.bodyFontFamily||"");
-                const bodySize=safeInlineFontSize(item.bodyFontSize||"");
-                if(bodyFont)body.style.fontFamily=bodyFont;
-                if(bodySize)body.style.fontSize=bodySize;
-                if(validHexColor(item.bodyColor))body.style.color=item.bodyColor;
-                body.querySelectorAll("p, div").forEach(node=>{
-                    const hasContent=node.querySelector("img, a, ul, ol, video, iframe");
-                    if(!node.textContent.trim()&&!hasContent)node.remove();
-                });
-                body.querySelectorAll("br + br").forEach(br=>br.remove());
-                if(section==="HOME"&&title==="Relatos"){
-                    article.appendChild(body);
-                    content.appendChild(article);
-                    const lineHeight=parseFloat(getComputedStyle(body).lineHeight)||20;
-                    const lineCount=Math.ceil(body.scrollHeight/lineHeight);
-                    if(lineCount>=6){
-                        body.classList.add("relato-preview-body");
-                        const readMore=document.createElement("button");
-                        readMore.type="button";
-                        readMore.className="read-more-button";
-                        readMore.textContent="Seguir leyendo";
-                        readMore.addEventListener("click",()=>openRelato(item,true,orderedPublications));
-                        article.appendChild(readMore);
-                    }
-                }else{
-                    article.appendChild(body);
-                    content.appendChild(article);
-                }
-            });
-
-            const orderedFiles=sortRecords(fileDocs);
-            orderedFiles.forEach(item=>{
-                const article=document.createElement("article");
-                article.className="publication";
-                const h=document.createElement("h3");
-                h.textContent=item.title||"Archivo";
-                const p=document.createElement("p");
-                p.className="publication-body";
-                p.textContent=item.description||"";
-                article.append(h,p);
-                if(isImageUrl(item.url||"")){
-                    const img=document.createElement("img");
-                    img.className="file-image";
-                    img.src=item.url;
-                    img.alt=item.title||"Imagen";
-                    img.loading="lazy";
-                    img.referrerPolicy="no-referrer";
-                    img.onerror=()=>{
-                        img.remove();
-                        const a=document.createElement("a");
-                        a.href=item.url;
-                        a.target="_blank";
-                        a.rel="noopener noreferrer";
-                        a.textContent=item.linkLabel||"Abrir archivo";
-                        article.appendChild(a);
-                    };
-                    article.appendChild(img);
-                }else{
-                    const a=document.createElement("a");
-                    a.href=item.url||"#";
-                    a.target="_blank";
-                    a.rel="noopener noreferrer";
-                    a.textContent=item.linkLabel||"Abrir archivo";
-                    article.appendChild(a);
-                }
-                content.appendChild(article);
-            });
-
-            if(!pubDocs.length&&!fileDocs.length&&!(section==="ARC"&&title==="Rutas caducadas")){
-                const empty=document.createElement("p");
-                empty.className="admin-status";
-                empty.textContent="No hay publicaciones en esta sección.";
-                content.appendChild(empty);
-            }
-        }
-
-        const pubQuery = firestore.collection("publicaciones").where("menu","==",section).where("category","==",title);
-        const unsubPub = pubQuery.onSnapshot(snapshot=>{
-            const docs=[];
-            snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-            renderContent(docs, window._currentFiles||[]);
-        }, err=>console.error(err));
-        activeContentListeners.push(unsubPub);
-
-        const fileQuery = firestore.collection("archivos").where("menu","==",section).where("category","==",title);
-        const unsubFile = fileQuery.onSnapshot(snapshot=>{
-            const files=[];
-            snapshot.forEach(doc=>files.push({id:doc.id,...doc.data()}));
-            window._currentFiles=files;
-            pubQuery.get().then(snap=>{
-                const docs=[];
-                snap.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-                renderContent(docs, files);
-            });
-        }, err=>console.error(err));
-        activeContentListeners.push(unsubFile);
-
-        Promise.all([pubQuery.get(), fileQuery.get()]).then(([pSnap, fSnap])=>{
-            const docs=[], files=[];
-            pSnap.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-            fSnap.forEach(doc=>files.push({id:doc.id,...doc.data()}));
-            window._currentFiles=files;
-            renderContent(docs, files);
-        });
-
-        return;
-
-    }catch(error){
-        console.error("Error cargando contenido:",error);
-
-        if(token===currentContentToken){
-            loading.textContent="No se pudo cargar el contenido. Comprueba las reglas de Firestore.";
-        }
-    }
-}
-
-/* RELATOS: cada historia tiene una dirección propia y se abre como página, no como ventana flotante. */
-function renderRelatoDetail(item,updateUrl=false,relatoList=[]){
-    closeMenus();
-    if(updateUrl)changePublicUrl("/"+routeSlug(item.title));
-    clearContentListeners();
-    const content=document.getElementById("content-area");
-    ++currentContentToken;
-    content.innerHTML="";
-    const heading=document.createElement("h2");
-    heading.className="content-title";
-    heading.textContent=item.title||"Relato";
-    const article=document.createElement("article");
-    article.className="publication publication-font-modern";
-    const body=document.createElement("div");
-    body.className="publication-body relato-detail-body";
-    body.innerHTML=safeHtml(item.bodyHtml||"");
-    const bodyFont=safeInlineFontFamily(item.bodyFontFamily||"");
-    const bodySize=safeInlineFontSize(item.bodyFontSize||"");
-    if(bodyFont)body.style.fontFamily=bodyFont;
-    if(bodySize)body.style.fontSize=bodySize;
-    if(validHexColor(item.bodyColor))body.style.color=item.bodyColor;
-    article.appendChild(body);
-    content.append(heading,article);
-
-    const ordered=sortRecords(relatoList);
-    const currentIndex=ordered.findIndex(record=>record.id===item.id);
-    if(currentIndex>=0){
-        const nav=document.createElement("nav");
-        nav.className="relato-navigation";
-        nav.setAttribute("aria-label","Navegación entre relatos");
-        const previous=document.createElement("button");
-        previous.type="button";
-        previous.className="relato-nav-button";
-        previous.textContent="‹ Anterior";
-        previous.hidden=currentIndex===0;
-        previous.addEventListener("click",()=>openRelato(ordered[currentIndex-1],true,ordered));
-        const next=document.createElement("button");
-        next.type="button";
-        next.className="relato-nav-button";
-        next.textContent="Siguiente ›";
-        next.hidden=currentIndex===ordered.length-1;
-        next.addEventListener("click",()=>openRelato(ordered[currentIndex+1],true,ordered));
-        nav.append(previous,next);
-        content.appendChild(nav);
-    }
-    saveData("gardenEntered","yes");
-}
-
-async function openRelatoBySlug(slug,updateUrl=false){
-    const content=document.getElementById("content-area");
-    const token=++currentContentToken;
-    clearContentListeners();
-    content.innerHTML='<p class="admin-status">Recuperando relato...</p>';
-    try{
-        const snapshot=await firestore.collection("publicaciones")
-            .where("menu","==","HOME").where("category","==","Relatos").get();
-        const relatos=[];
-        snapshot.forEach(doc=>relatos.push({id:doc.id,...doc.data()}));
-        const ordered=sortRecords(relatos);
-        const found=ordered.find(item=>routeSlug(item.title)===slug);
-        if(token!==currentContentToken)return;
-        if(found)renderRelatoDetail(found,updateUrl,ordered);
-        else{
-            content.innerHTML="";
-            const message=document.createElement("p");
-            message.className="admin-status";
-            message.textContent="Este relato no está disponible.";
-            content.appendChild(message);
-        }
-    }catch(error){
-        if(token!==currentContentToken)return;
-        content.innerHTML="";
-        const message=document.createElement("p");
-        message.className="admin-status";
-        message.textContent="No se pudo recuperar este relato.";
-        content.appendChild(message);
-        console.error("Error cargando relato:",error);
-    }
-}
-
-function openRelato(item,updateUrl=false,relatoList=null){
-    if(!item||!item.title)return;
-    if(Array.isArray(relatoList)){
-        renderRelatoDetail(item,updateUrl,relatoList);
-        window.scrollTo({top:0,behavior:"smooth"});
-        return;
-    }
-    openRelatoBySlug(routeSlug(item.title),updateUrl);
-    window.scrollTo({top:0,behavior:"smooth"});
-}
-
-function showSectionLanding(section,updateUrl=false){
-    closeMenus();
-    if(updateUrl)changePublicUrl(sectionPath(section));
-    saveData("gardenSection",section);
-    const content=document.getElementById("content-area");
-    ++currentContentToken;
-    content.innerHTML="";
-    const heading=document.createElement("h2");
-    heading.className="content-title";
-    heading.textContent=section+" // DIRECTORIO";
-    const description=document.createElement("p");
-    description.className="content-description";
-    description.textContent="Selecciona una categoría para abrir sus registros.";
-    content.append(heading,description);
-    (sections[section]||[])
-        .filter(item=>!item.hidden)
-        .forEach(item=>{
-            const button=document.createElement("button");
-            button.type="button";
-            button.className="section-category";
-            const name=document.createElement("strong");
-            name.textContent=item.title;
-            const detail=document.createElement("span");
-            detail.textContent=item.description;
-            button.append(name,detail);
-            button.addEventListener("click",()=>showCategory(section,item.title,item.description,true));
-            content.appendChild(button);
-        });
-}
-
-function renderRouteFromPath(){
-    const parts=location.pathname.split("/").filter(Boolean).map(part=>{try{return decodeURIComponent(part)}catch(e){return part}});
-    if(!parts.length)return false;
-    const slug=routeSlug(parts.join("/"));
-    const allCategories=Object.entries(sections).flatMap(([section,items])=>items.map(item=>({section,item})));
-
-    // URL pública corta (funciona tanto para categorías visibles como ocultas): /2nd-round, /los-red-room, etc.
-    if(parts.length===1){
-        const direct=allCategories.find(({item})=>routeSlug(item.title)===slug);
-        if(direct){
-            const letter=document.getElementById("letter-screen");
-            const home=document.getElementById("home-screen");
-            if(letter){letter.style.display="none";letter.style.opacity="0";}
-            if(home){home.style.display="block";home.style.opacity="1";}
-            saveData("gardenEntered","yes");
-            showCategory(direct.section,direct.item.title,direct.item.description,false);
-            return true;
-        }
-    }
-
-    // Las historias de HOME/Relatos usan una ruta propia: /nombre-del-relato
-    if(parts.length===1&&slug!=="index-html"){
-        openRelatoBySlug(slug,false);
-        const letter=document.getElementById("letter-screen");
-        const home=document.getElementById("home-screen");
-        if(letter){letter.style.display="none";letter.style.opacity="0";}
-        if(home){home.style.display="block";home.style.opacity="1";}
-        saveData("gardenEntered","yes");
-        return true;
-    }
-
-    // Compatibilidad con enlaces anteriores: /ARC/registros-viejos
-    const section=parts[0].toUpperCase();
-    if(!sections[section])return false;
-    const letter=document.getElementById("letter-screen");
-    const home=document.getElementById("home-screen");
-    if(letter){letter.style.display="none";letter.style.opacity="0";}
-    if(home){home.style.display="block";home.style.opacity="1";}
-    saveData("gardenEntered","yes");
-    if(parts.length===1){showSectionLanding(section,false);return true;}
-    const wanted=routeSlug(parts.slice(1).join("/"));
-    const category=(sections[section]||[]).find(item=>routeSlug(item.title)===wanted);
-    if(category){showCategory(section,category.title,category.description,false);return true;}
-    showSectionLanding(section,false);
-    return true;
-}
-window.addEventListener("popstate",()=>{
-    if(!renderRouteFromPath()&&(location.pathname==="/"||location.pathname==="/index.html"))showInicio();
-});
-
-function showInicio(){
-    closeMenus();
-    if(location.pathname!=="/")changePublicUrl("/");
-    const letter=document.getElementById("letter-screen");
-    const home=document.getElementById("home-screen");
-    if(letter){letter.style.display="none";letter.style.opacity="0";}
-    if(home){home.style.display="block";home.style.opacity="1";}
-    saveData("gardenEntered","yes");
-    showCategory("INICIO","Portada",sections.INICIO[0].description,false);
-}
-
-function showHome(){
-    showCategory("HOME","Entrada",sections.HOME[0].description);
-}
-
-document.getElementById("home-logo").addEventListener("click",showInicio);
-
-function restoreCategory(){
-    const content=document.getElementById("content-area");
-    const saved=getSaved("gardenCategory");
-
-    if(!saved){
-        showInicio();
-        return;
-    }
-
-    try{
-        const data=JSON.parse(saved);
-
-        if(data.section==="INICIO"){
-            showInicio();
-            return;
-        }
-
-        const valid=sections[data.section]?.find(item=>item.title===data.title);
-
-        if(valid)showCategory(data.section,valid.title,valid.description);
-        else showInicio();
-
-    }catch(e){
-        content.innerHTML="";
-    }
-}
-
-/* CARTA DE ENTRADA */
-
-function typeWriter(){
-    if(typingStarted)return;
-
-    typingStarted=true;
-
-    const message=messages[Math.floor(Math.random()*messages.length)];
-    const textElement=document.getElementById("typed-text");
-    const cursor=document.getElementById("cursor");
-    const signatureElement=document.getElementById("letter-signature");
-    let index=0;
-
-    function type(){
-        if(index<message.length){
-            const character=message.charAt(index);
-
-            textElement.textContent+=character;
-            index++;
-
-            setTimeout(type,character==="\n"?350:32);
-
-        }else{
-            cursor.style.display="none";
-            if(signatureElement)signatureElement.classList.add("show");
-            setTimeout(showHomeScreen,2500);
-        }
-    }
-
-    type();
-}
-
-function showHomeScreen(){
-    if(transitionStarted)return;
-
-    transitionStarted=true;
-
-    const letter=document.getElementById("letter-screen");
-    const home=document.getElementById("home-screen");
-
-    letter.style.opacity="0";
-
-    setTimeout(()=>{
-        letter.style.display="none";
-        home.style.display="block";
-
-        setTimeout(()=>home.style.opacity="1",100);
-
-        saveData("gardenEntered","yes");
-        showInicio();
-
-    },1500);
-}
-
-async function initializePage(){
-    typingStarted=false;
-    // Espera la configuración remota antes de interpretar rutas de categorías nuevas.
-    await categorySettingsPromise;
-    if(renderRouteFromPath())return;
-    transitionStarted=false;
-
-    const letter=document.getElementById("letter-screen");
-    const home=document.getElementById("home-screen");
-
-    // gardenCategory también sirve como prueba de que el visitante ya entró.
-    if(getSaved("gardenEntered")==="yes"||Boolean(getSaved("gardenCategory"))){
-        saveData("gardenEntered","yes");
-        letter.style.display="none";
-        letter.style.opacity="0";
-        home.style.display="block";
-        home.style.opacity="1";
-        showInicio();
-        return;
-    }
-
-    letter.style.display="flex";
-    home.style.display="none";
-    home.style.opacity="0";
-    typeWriter();
-}
-
-/* ACCESO OCULTO */
-
-document.getElementById("home-logo").addEventListener("click",()=>{
-    logoClicks++;
-
-    if(logoTimer)clearTimeout(logoTimer);
-
-    if(logoClicks>=3){
-        logoClicks=0;
-        openAdmin();
-        return;
-    }
-
-    logoTimer=setTimeout(()=>{
-        logoClicks=0;
-    },2000);
-});
-
-function openAdmin(){
-    sessionStorage.setItem("0site_admin_panel_open","1");
-    document.getElementById("admin-screen").style.display="block";
-    document.getElementById("admin-login-status").textContent="";
-    document.getElementById("admin-password").value="";
-    syncAdminEmailField();
-
-    if(currentUser && currentUser.uid===ADMIN_UID){
-        document.getElementById("admin-login").style.display="none";
-        document.getElementById("admin-dashboard").style.display="block";
-        const savedTab=localStorage.getItem("0site_admin_tab")||"contenido";
-        const allowedTabs=["contenido","gestor","archivos","configuracion"];
-        const tab=allowedTabs.includes(savedTab)?savedTab:(savedTab==="publicaciones"?"contenido":"contenido");
-        document.querySelectorAll(".admin-tab").forEach(button=>{
-            button.classList.toggle("active",button.dataset.adminTab===tab);
-        });
-        renderAdminTab(tab);
-    }else{
-        document.getElementById("admin-login").style.display="block";
-        document.getElementById("admin-dashboard").style.display="none";
-    }
-}
-
-/* CERRAR PANEL ADMINISTRATIVO */
-
-document.getElementById("admin-close").addEventListener("click",()=>{
-    sessionStorage.removeItem("0site_admin_panel_open");
-    document.getElementById("admin-screen").style.display="none";
-});
-
-/* LOGIN ADMINISTRADOR */
-
-document.getElementById("admin-login-button").addEventListener("click",async()=>{
-    const rememberedEmail=localStorage.getItem(ADMIN_EMAIL_KEY)||"";
-    const email=rememberedEmail||document.getElementById("admin-email").value.trim();
-    const password=document.getElementById("admin-password").value;
-    const status=document.getElementById("admin-login-status");
-    const button=document.getElementById("admin-login-button");
-
-    if((!email&&!rememberedEmail)||!password){
-        status.textContent=rememberedEmail?"Introduce la contraseña.":"Introduce correo y contraseña.";
-        return;
-    }
-
-    button.disabled=true;
-    status.textContent="Verificando acceso...";
-
-    try{
-        await auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-        const credential=await auth.signInWithEmailAndPassword(email,password);
-
-        if(credential.user.uid!==ADMIN_UID){
-            await auth.signOut();
-            status.textContent="Acceso denegado.";
-            return;
-        }
-
-        localStorage.setItem(ADMIN_EMAIL_KEY,email);
-        sessionStorage.setItem("0site_admin_panel_open","1");
-        syncAdminEmailField();
-
-        document.getElementById("admin-login").style.display="none";
-        document.getElementById("admin-dashboard").style.display="block";
-
-        localStorage.setItem("0site_admin_tab","contenido");
-        renderAdminTab("contenido");
-
-    }catch(error){
-        console.error(error);
-        status.textContent="No se pudo iniciar sesión. Revisa tus datos.";
-
-    }finally{
-        button.disabled=false;
-    }
-});
-
-document.querySelectorAll(".admin-tab").forEach(button=>{
-    button.addEventListener("click",()=>{
-        document.querySelectorAll(".admin-tab").forEach(b=>b.classList.remove("active"));
-
-        button.classList.add("active");
-        editingId=null;
-        localStorage.setItem("0site_admin_tab",button.dataset.adminTab);
-
-        renderAdminTab(button.dataset.adminTab);
-    });
-});
-
-/* SELECTORES DE MENÚ Y CATEGORÍA (INCLUYE CATEGORÍAS OCULTAS PARA QUE EL ADMIN PUBLIQUE EN ELLAS) */
-
-function menuOptions(selected="HOME"){
-    return Object.keys(sections).map(key=>
-        `<option value="${key}" ${key===selected?"selected":""}>${key}</option>`
-    ).join("");
-}
-
-function categoryOptions(menu,selected=""){
-    return sections[menu]
-        .map(item=>{
-            const suffix=item.hidden?" [OCULTA]":"";
-            return `<option value="${item.title}" ${item.title===selected?"selected":""}>${item.title}${suffix}</option>`;
-        }).join("");
-}
-
-function fillCategorySelect(menuSelect,categorySelect,selected=""){
-    categorySelect.innerHTML=categoryOptions(menuSelect.value,selected);
-}
-
-function addLocationSelectors(menuValue="HOME",categoryValue="Entrada"){
-    return `
-    <label class="admin-status">MENÚ DONDE SE PUBLICARÁ</label>
-    <select class="admin-select" id="record-menu">${menuOptions(menuValue)}</select>
-
-    <label class="admin-status">CATEGORÍA</label>
-    <select class="admin-select" id="record-category">${categoryOptions(menuValue,categoryValue)}</select>`;
-}
-
-/* EDITOR DE CONTENIDO: BARRA ÚNICA PARA TÍTULO Y CONTENIDO */
-
-function editorToolbar(){
-    return `
-    <div class="formato-panel" aria-label="Formato de texto">
-        <h4>Formato de texto</h4>
-        <div class="formato-select-row">
-            <select id="editor-font-family" aria-label="Fuente">
-                <option value="Arial">Arial</option>
-                <option value="Verdana">Verdana</option>
-                <option value="Tahoma">Tahoma</option>
-                <option value="Trebuchet MS">Trebuchet MS</option>
-                <option value="Georgia">Georgia</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Garamond">Garamond</option>
-                <option value="Courier New">Courier New</option>
-            </select>
-            <select id="editor-font-size" aria-label="Tamaño del texto">
-                <option value="12">12 px</option>
-                <option value="14">14 px</option>
-                <option value="16" selected>16 px</option>
-                <option value="18">18 px</option>
-                <option value="22">22 px</option>
-                <option value="28">28 px</option>
-                <option value="32">32 px</option>
-            </select>
-        </div>
-        <div class="formato-biu">
-            <button type="button" data-command="bold" aria-label="Negrita"><b>B</b></button>
-            <button type="button" data-command="italic" aria-label="Cursiva"><i>I</i></button>
-            <button type="button" data-command="underline" aria-label="Subrayado"><u>U</u></button>
-        </div>
-        <div class="formato-biu" style="margin-top:6px;">
-            <button type="button" data-command="justifyLeft" title="Alinear izquierda">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
-            </button>
-            <button type="button" data-command="justifyCenter" title="Centrar">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="6" y1="12" x2="18" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
-            </button>
-            <button type="button" data-command="justifyRight" title="Alinear derecha">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="9" y1="12" x2="21" y2="12"/><line x1="6" y1="18" x2="21" y2="18"/></svg>
-            </button>
-        </div>
-        <div class="formato-divider"></div>
-        <div class="formato-icons">
-            <button type="button" title="Color del texto" id="color-trigger" style="position:relative;">
-                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-                <input type="color" id="editor-text-color" value="#c5c5c5" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" aria-label="Color del texto">
-            </button>
-            <button type="button" id="insert-link" title="Insertar enlace (interno /ruta o externo https://)">
-                <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-            </button>
-            <button type="button" id="remove-link" title="Quitar enlace">
-                <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/><line x1="4" y1="20" x2="20" y2="4"/></svg>
-            </button>
-            <button type="button" id="insert-image" title="Insertar imagen">
-                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
-            </button>
-        </div>
-        <select id="editor-image-size" class="formato-image-size" aria-label="Tamaño de imagen">
-            <option value="auto">Tamaño de imagen · Original</option>
-            <option value="25%">25%</option>
-            <option value="50%">50%</option>
-            <option value="70%">70%</option>
-            <option value="100%">100%</option>
-        </select>
-    </div>`;
-}
-
-function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
-
-    function forceWhiteOnPaste(editor){
-        editor.addEventListener("paste", e=>{
-            e.preventDefault();
-            const text = (e.clipboardData || window.clipboardData).getData("text/plain");
-            document.execCommand("insertText", false, text);
-            const sel = window.getSelection();
-            if(sel && sel.rangeCount){
-                const range = sel.getRangeAt(0);
-                const span = document.createElement("span");
-                span.style.color = "#dedede";
-                try{
-                    range.surroundContents(span);
-                }catch(err){
-                    editor.style.color = "#dedede";
-                }
-            }
-            editor.style.color = "#dedede";
-        });
-    }
-    forceWhiteOnPaste(titleEditor);
-    forceWhiteOnPaste(bodyEditor);
-
-    let activeEditor=titleEditor;
-    let selectedEditorImage=null;
-    const savedRanges=new Map([[titleEditor,null],[bodyEditor,null]]);
-    const fontPicker=document.getElementById("editor-font-family");
-    const sizePicker=document.getElementById("editor-font-size");
-    const colorPicker=document.getElementById("editor-text-color");
-    const imageSizePicker=document.getElementById("editor-image-size");
-
-    function rememberSelection(editor=activeEditor){
-        const selection=window.getSelection();
-        if(!selection||!selection.rangeCount)return;
-        const range=selection.getRangeAt(0);
-        if(editor.contains(range.commonAncestorContainer)){
-            savedRanges.set(editor,range.cloneRange());
-        }
-    }
-    function restoreSelection(editor=activeEditor){
-        const range=savedRanges.get(editor);
-        editor.focus();
-        if(!range)return false;
-        try{
-            const selection=window.getSelection();
-            selection.removeAllRanges();
-            selection.addRange(range);
-            return true;
-        }catch(error){return false;}
-    }
-
-    [titleEditor,bodyEditor].forEach(editor=>{
-        editor.addEventListener("focus",()=>{activeEditor=editor;});
-        editor.addEventListener("keyup",()=>rememberSelection(editor));
-        editor.addEventListener("mouseup",()=>rememberSelection(editor));
-        editor.addEventListener("touchend",()=>setTimeout(()=>rememberSelection(editor),50));
-        editor.addEventListener("selectionchange",()=>rememberSelection(editor));
-        editor.addEventListener("click",event=>{
-            activeEditor=editor;
-            const image=event.target?.closest?.("img");
-            if(image&&editor.contains(image))selectedEditorImage=image;
-        });
-        editor.addEventListener("touchend",event=>{
-            activeEditor=editor;
-            const image=event.target?.closest?.("img");
-            if(image&&editor.contains(image))selectedEditorImage=image;
-        },{passive:true});
-    });
-    document.addEventListener("selectionchange",()=>{
-        [titleEditor,bodyEditor].forEach(editor=>rememberSelection(editor));
-    });
-
-    function applyInlineStyle(property,value){
-        const editor=activeEditor;
-        restoreSelection(editor);
-        const selection=window.getSelection();
-        const range=selection&&selection.rangeCount?selection.getRangeAt(0):null;
-        if(range&&!range.collapsed&&editor.contains(range.commonAncestorContainer)){
-            const span=document.createElement("span");
-            span.style[property]=value;
-            try{
-                span.appendChild(range.extractContents());
-                range.insertNode(span);
-                const next=document.createRange();next.selectNodeContents(span);
-                selection.removeAllRanges();selection.addRange(next);
-                savedRanges.set(editor,next.cloneRange());
-            }catch(error){console.error("No se pudo aplicar el formato",error);}
-        }else{
-            editor.style[property]=value;
-            if(property==="color"&&editor===titleEditor){
-                const titleColor=document.getElementById("record-title-color");
-                if(titleColor&&/^#[0-9a-f]{6}$/i.test(value))titleColor.value=value;
-            }
-        }
-    }
-
-    document.querySelectorAll("[data-command]").forEach(button=>{
-        button.addEventListener("mousedown",event=>event.preventDefault());
-        button.addEventListener("click",()=>{
-            restoreSelection(activeEditor);
-            document.execCommand(button.dataset.command,false,null);
-            rememberSelection(activeEditor);
-        });
-    });
-    fontPicker.addEventListener("change",()=>applyInlineStyle("fontFamily",fontPicker.value));
-    sizePicker.addEventListener("change",()=>applyInlineStyle("fontSize",sizePicker.value+"px"));
-    colorPicker.addEventListener("input",()=>applyInlineStyle("color",colorPicker.value));
-
-    imageSizePicker.addEventListener("change",event=>{
-        if(!selectedEditorImage||!selectedEditorImage.isConnected||!([titleEditor,bodyEditor].some(editor=>editor.contains(selectedEditorImage)))){
-            selectedEditorImage=null;
-            alert("Toca primero la imagen que quieres cambiar y después selecciona su tamaño.");
-            return;
-        }
-        selectedEditorImage.style.width=event.target.value;
-        selectedEditorImage.style.maxWidth="100%";
-        selectedEditorImage.style.height="auto";
-    });
-
-    const insertButton=document.getElementById("insert-link");
-    function handleInsertLink(event){
-        event.preventDefault();
-        event.stopPropagation();
-        const editor=activeEditor;
-        if(!restoreSelection(editor)){
-            alert("Selecciona primero la palabra o frase que quieres enlazar.");
-            return;
-        }
-        const selection=window.getSelection();
-        if(!selection||selection.isCollapsed){
-            alert("Selecciona primero una palabra o frase.");
-            return;
-        }
-        const raw=prompt("Introduce la ruta interna (ej: /2nd-round) o URL (https://...)");
-        if(!raw)return;
-        const trimmed=raw.trim();
-        let url;
-        try{
-            url=new URL(trimmed,location.origin);
-        }catch(e){
-            alert("La dirección no es válida.");
-            return;
-        }
-        if(!["http:","https:","mailto:"].includes(url.protocol)){
-            alert("Solo se permiten enlaces http, https, mailto o rutas internas (/ruta).");
-            return;
-        }
-        const finalHref=url.origin===location.origin?(url.pathname+url.search+url.hash):url.href;
-        document.execCommand("createLink",false,finalHref);
-        editor.querySelectorAll("a").forEach(a=>{
-            const aHref=a.getAttribute("href")||"";
-            try{
-                const parsed=new URL(aHref,location.origin);
-                if(parsed.origin===location.origin){
-                    a.removeAttribute("target");
-                    a.removeAttribute("rel");
-                }else{
-                    a.target="_blank";
-                    a.rel="noopener noreferrer";
-                }
-            }catch(e){}
-        });
-        rememberSelection(editor);
-    }
-    insertButton.addEventListener("click",handleInsertLink);
-    insertButton.addEventListener("touchend",handleInsertLink);
-    document.getElementById("remove-link").addEventListener("mousedown",event=>event.preventDefault());
-    document.getElementById("remove-link").addEventListener("click",()=>{
-        restoreSelection(activeEditor);document.execCommand("unlink",false,null);rememberSelection(activeEditor);
-    });
-    const imageButton=document.getElementById("insert-image");
-    imageButton.addEventListener("mousedown",event=>event.preventDefault());
-    imageButton.addEventListener("click",()=>{
-        const editor=activeEditor;restoreSelection(editor);
-        const raw=prompt("Pega la dirección directa de la imagen (JPG, PNG, GIF o WEBP)");
-        if(!raw)return;
-        let url;
-        try{url=new URL(raw.trim());}catch(e){alert("La dirección no es válida.");return;}
-        if(!["http:","https:"].includes(url.protocol)){alert("Solo se permiten direcciones http o https.");return;}
-        if(!/\.(avif|bmp|gif|jpe?g|png|svg|webp)$/i.test(url.pathname)&&!confirm("La dirección no termina en una extensión de imagen conocida. ¿Quieres intentarlo de todas formas?"))return;
-        const img=document.createElement("img");img.src=url.href;img.alt="Imagen";img.loading="lazy";img.referrerPolicy="no-referrer";
-        const selection=window.getSelection();
-        if(selection&&selection.rangeCount&&editor.contains(selection.anchorNode)){
-            const range=selection.getRangeAt(0);range.deleteContents();range.insertNode(img);
-            const space=document.createTextNode(" ");img.after(space);range.setStartAfter(space);range.collapse(true);
-            selection.removeAllRanges();selection.addRange(range);
-        }else editor.appendChild(img);
-        selectedEditorImage=img;rememberSelection(editor);
-    });
-
-    const titleFont=safeInlineFontFamily(editData?.titleFontFamily||"");
-    const titleSize=safeInlineFontSize(editData?.titleFontSize||"");
-    const bodyFont=safeInlineFontFamily(editData?.bodyFontFamily||"");
-    const bodySize=safeInlineFontSize(editData?.bodyFontSize||"");
-    if(titleFont)titleEditor.style.fontFamily=titleFont;
-    if(titleSize)titleEditor.style.fontSize=titleSize;
-    if(validHexColor(editData?.titleColor))titleEditor.style.color=editData.titleColor;
-    if(bodyFont)bodyEditor.style.fontFamily=bodyFont;
-    if(bodySize)bodyEditor.style.fontSize=bodySize;
-    if(validHexColor(editData?.bodyColor))bodyEditor.style.color=editData.bodyColor;
-    fontPicker.value=titleFont||bodyFont||"Arial";
-    sizePicker.value=(titleSize||bodySize||"16px").replace("px","");
-    colorPicker.value=validHexColor(titleEditor.style.color)?titleEditor.style.color:(validHexColor(bodyEditor.style.color)?bodyEditor.style.color:"#c5c5c5");
-}
-
-/* PANEL ADMINISTRATIVO */
-
-function renderAdminTab(tab){
-    const panel=document.getElementById("admin-panel-content");
-    if(tab==="contenido"){renderPublicationEditor();return;}
-    if(tab==="gestor"){renderPublicationManager();return;}
-    if(tab==="archivos"){renderFileEditor();return;}
-    if(tab==="configuracion"){renderConfiguration();return;}
-}
-
-/* PUBLICACIONES */
-
-function renderPublicationEditor(editData=null){
-    const panel=document.getElementById("admin-panel-content");
-    const menu=editData?.menu&&editData.menu!=="INICIO"?editData.menu:"HOME";
-    const category=editData?.menu!=="INICIO"&&editData?.category?editData.category:"Entrada";
-    panel.innerHTML=`
-    <div class="admin-box">
-        <p class="admin-subtitle">${editData?"EDITAR PUBLICACIÓN":"NUEVA PUBLICACIÓN"}</p>
-        ${addLocationSelectors(menu,category)}
-        ${editorToolbar()}
-        <label class="admin-status" for="record-title">TÍTULO</label>
-        <div class="admin-input rich-editor title-editor" id="record-title" contenteditable="true" role="textbox" aria-label="Título" data-placeholder="" style="min-height:48px;overflow-wrap:anywhere"></div>
-        <label class="admin-status" for="rich-editor">CONTENIDO</label>
-        <div class="rich-editor" id="rich-editor" contenteditable="true" role="textbox" aria-label="Contenido" spellcheck="true"></div>
-        <div class="admin-actions">
-            <button class="admin-button" id="record-save">${editData?"GUARDAR CAMBIOS":"PUBLICAR"}</button>
-            <button class="admin-button" id="record-cancel">CANCELAR</button>
-        </div>
-        <p class="admin-status" id="record-status"></p>
-    </div>`;
-
-    const menuSelect=document.getElementById("record-menu");
-    const categorySelect=document.getElementById("record-category");
-    menuSelect.addEventListener("change",()=>fillCategorySelect(menuSelect,categorySelect));
-    const titleEditor=document.getElementById("record-title");
-    const bodyEditor=document.getElementById("rich-editor");
-    titleEditor.innerHTML=editData?.titleHtml?safeHtml(editData.titleHtml):String(editData?.title||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-    bodyEditor.innerHTML=safeHtml(editData?.bodyHtml||"");
-    setupPublicationEditor(titleEditor,bodyEditor,editData);
-
-    document.getElementById("record-cancel").addEventListener("click",()=>{
-        if(editData){
-            gestorTargetLocation={section:editData.menu&&editData.menu!=="INICIO"?editData.menu:"HOME",category:editData.menu!=="INICIO"&&editData.category?editData.category:"Entrada"};
-        }
-        editingId=null;
-        document.querySelectorAll(".admin-tab").forEach(button=>button.classList.toggle("active",button.dataset.adminTab==="gestor"));
-        localStorage.setItem("0site_admin_tab","gestor");
-        renderAdminTab("gestor");
-    });
-
-    document.getElementById("record-save").addEventListener("click",async()=>{
-        const title=titleEditor.innerText.trim();
-        const titleHtml=safeHtml(titleEditor.innerHTML);
-        const bodyHtml=safeHtml(bodyEditor.innerHTML);
-        const status=document.getElementById("record-status");
-        const saveButton=document.getElementById("record-save");
-        const hasImage=!!bodyEditor.querySelector("img");
-        const hasText=!!bodyEditor.textContent.trim();
-        if((!title&&!hasImage)||(!hasText&&!hasImage)){
-            status.textContent="Completa el título y el contenido, o inserta una imagen en el contenido.";return;
-        }
-        saveButton.disabled=true;status.textContent="Guardando publicación...";
-        const newMenu=menuSelect.value;
-        const newCategory=categorySelect.value;
-        const sameLocation=editData&&editData.menu===newMenu&&editData.category===newCategory;
-        const data={
-            menu:newMenu,category:newCategory,title,titleHtml,
-            titleColor:validHexColor(titleEditor.style.color)?titleEditor.style.color:"#cccccc",
-            titleFontFamily:safeInlineFontFamily(titleEditor.style.fontFamily)||"",
-            titleFontSize:safeInlineFontSize(titleEditor.style.fontSize)||"",
-            bodyColor:validHexColor(bodyEditor.style.color)?bodyEditor.style.color:"",
-            bodyFontFamily:safeInlineFontFamily(bodyEditor.style.fontFamily)||"",
-            bodyFontSize:safeInlineFontSize(bodyEditor.style.fontSize)||"",
-            bodyHtml,
-            updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-        };
-        try{
-            if(editingId){
-                if(sameLocation&&hasCustomOrder(editData))data.order=editData.order;
-                else data.order=await prepareNextOrder("publicaciones",newMenu,newCategory,editingId);
-                await firestore.collection("publicaciones").doc(editingId).update(data);
-                editingId=null;
-                gestorTargetLocation={section:newMenu,category:newCategory};
-                document.querySelectorAll(".admin-tab").forEach(button=>button.classList.toggle("active",button.dataset.adminTab==="gestor"));
-                localStorage.setItem("0site_admin_tab","gestor");
-                renderAdminTab("gestor");
-                return;
-            }else{
-                data.order=await prepareNextOrder("publicaciones",newMenu,newCategory);
-                data.createdAt=firebase.firestore.FieldValue.serverTimestamp();
-                await firestore.collection("publicaciones").add(data);
-                status.textContent="Publicación publicada correctamente.";
-            }
-            editingId=null;
-            titleEditor.innerHTML="";bodyEditor.innerHTML="";
-            titleEditor.removeAttribute("style");bodyEditor.removeAttribute("style");
-            document.getElementById("editor-font-family").value="Arial";
-            document.getElementById("editor-font-size").value="16";
-            document.getElementById("editor-text-color").value="#c5c5c5";
-            document.getElementById("editor-image-size").value="auto";
-            saveButton.textContent="PUBLICAR";
-            setTimeout(()=>{if(document.getElementById("record-status"))document.getElementById("record-status").textContent="";},3500);
-        }catch(error){
-            console.error(error);status.textContent="No se pudo guardar. Comprueba las reglas de Firestore.";
-        }finally{saveButton.disabled=false;}
-    });
-}
-
-async function renderPublicationManager(){
-    const panel=document.getElementById("admin-panel-content");
-    panel.innerHTML=`<div class="admin-box"><p class="admin-subtitle">GESTOR DE PUBLICACIONES</p><div id="gestor-publication-list" class="admin-status">Cargando publicaciones...</div></div>`;
-    await loadPublicationList();
-}
-
-async function loadPublicationList(keepOpenState=null){
-    const list=document.getElementById("gestor-publication-list");
-    if(!list)return;
-    const openSections=new Set();
-    const openCategories=new Set();
-    if(keepOpenState){
-        keepOpenState.sections.forEach(s=>openSections.add(s));
-        keepOpenState.categories.forEach(c=>openCategories.add(c));
-    }else{
-        list.querySelectorAll("details.publication-group[open]").forEach(el=>{
-            if(el.dataset.section)openSections.add(el.dataset.section);
-        });
-        list.querySelectorAll("details.publication-category[open]").forEach(el=>{
-            if(el.dataset.key)openCategories.add(el.dataset.key);
-        });
-    }
-    if(gestorTargetLocation){
-        openSections.add(gestorTargetLocation.section);
-        openCategories.add(gestorTargetLocation.section+"::"+gestorTargetLocation.category);
-        gestorTargetLocation=null;
-    }
-    try{
-        const snapshot=await firestore.collection("publicaciones").get();
-        if(!document.getElementById("gestor-publication-list"))return;
-        list.innerHTML="";
-        if(snapshot.empty){list.textContent="No hay publicaciones todavía.";return;}
-        const docs=[];snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-        const sectionsOrder=["INICIO","HOME","SHA","SEC","OBL","ARC"];
-        const categories={};
-        docs.forEach(item=>{
-            const section=item.menu||"SIN SECCIÓN";const category=item.category||"Sin categoría";
-            categories[section]??={};categories[section][category]??=[];categories[section][category].push(item);
-        });
-        [...new Set([...sectionsOrder,...Object.keys(categories)])].forEach(section=>{
-            if(!categories[section])return;
-            const sectionBox=document.createElement("details");sectionBox.className="publication-group";
-            sectionBox.dataset.section=section;
-            if(openSections.has(section))sectionBox.open=true;
-            const sectionTitle=document.createElement("summary");sectionTitle.textContent=section;sectionBox.appendChild(sectionTitle);
-            Object.keys(categories[section]).sort((a,b)=>a.localeCompare(b)).forEach(category=>{
-                const categoryBox=document.createElement("details");categoryBox.className="publication-category";
-                const catKey=section+"::"+category;
-                categoryBox.dataset.key=catKey;
-                if(openCategories.has(catKey))categoryBox.open=true;
-                const isHiddenCat=(sections[section]||[]).find(c=>c.title===category)?.hidden;
-                const categoryTitle=document.createElement("summary");
-                categoryTitle.textContent=category+(isHiddenCat?" [OCULTA]":"");
-                categoryBox.appendChild(categoryTitle);
-                sortRecords(categories[section][category]).forEach(item=>{
-                    const row=document.createElement("div");row.className="admin-record";
-                    const label=document.createElement("span");label.textContent=item.title||"Sin título";
-                    const actions=document.createElement("div");actions.className="admin-actions";
-                    const ordered = sortRecords(categories[section][category]);
-                    const pos = ordered.findIndex(r => r.id === item.id);
-
-                    const up=document.createElement("button");
-                    up.className="move-button";
-                    up.textContent="↑";
-                    up.title="Subir";
-                    up.disabled = pos === 0;
-                    up.addEventListener("click", () => {
-                        moveRecord("publicaciones", ordered, pos, -1, loadPublicationList);
-                    });
-
-                    const down=document.createElement("button");
-                    down.className="move-button";
-                    down.textContent="↓";
-                    down.title="Bajar";
-                    down.disabled = pos === ordered.length - 1;
-                    down.addEventListener("click", () => {
-                        moveRecord("publicaciones", ordered, pos, 1, loadPublicationList);
-                    });
-
-                    const edit=document.createElement("button");edit.textContent="EDITAR";
-                    edit.addEventListener("click",()=>{
-                        editingId=item.id;
-                        document.querySelectorAll(".admin-tab").forEach(button=>button.classList.toggle("active",button.dataset.adminTab==="contenido"));
-                        localStorage.setItem("0site_admin_tab","contenido");
-                        renderPublicationEditor(item);
-                    });
-                    const remove=document.createElement("button");remove.textContent="ELIMINAR";remove.className="admin-danger";
-                    remove.addEventListener("click",async()=>{
-                        if(!confirm("¿Eliminar esta publicación definitivamente?"))return;
-                        try{await firestore.collection("publicaciones").doc(item.id).delete();await loadPublicationList();}
-                        catch(error){console.error(error);alert("No se pudo eliminar. Comprueba las reglas de Firestore.");}
-                    });
-                    actions.append(up, down, edit, remove);row.append(label,actions);categoryBox.appendChild(row);
-                });
-                sectionBox.appendChild(categoryBox);
-            });
-            list.appendChild(sectionBox);
-        });
-    }catch(error){console.error(error);list.textContent="No se pudieron cargar las publicaciones. Revisa las reglas de Firestore.";}
-}
-
-function refreshPublicationManagement(){if(document.getElementById("gestor-publication-list"))loadPublicationList();}
-
-/* ARCHIVOS */
-
-function renderFileEditor(editData=null){
-    const panel=document.getElementById("admin-panel-content");
-
-    const menu=editData?.menu&&editData.menu!=="INICIO"?editData.menu:"HOME";
-    const category=editData?.menu!=="INICIO"&&editData?.category?editData.category:"Entrada";
-
-    panel.innerHTML=`
-    <div class="admin-box">
-        <p class="admin-subtitle">${editData?"EDITAR ARCHIVO":"AÑADIR ARCHIVO"}</p>
-
-        ${addLocationSelectors(menu,category)}
-
-        <label class="admin-status">NOMBRE DEL ARCHIVO</label>
-        <input class="admin-input" id="file-title" placeholder="Nombre o título">
-
-        <label class="admin-status">DESCRIPCIÓN</label>
-        <textarea class="admin-textarea" id="file-description" placeholder="Descripción breve"></textarea>
-
-        <label class="admin-status">DIRECCIÓN DEL ARCHIVO</label>
-        <input class="admin-input" id="file-url" type="url" placeholder="https://...">
-
-        <label class="admin-status">TEXTO DEL ENLACE</label>
-        <input class="admin-input" id="file-label" placeholder="Abrir archivo">
-
-        <p class="admin-hint">Si la dirección corresponde a una imagen JPG, PNG, GIF, WEBP, AVIF o SVG, se mostrará directamente. Los demás archivos conservarán el enlace.</p>
-
-        <div class="admin-actions">
-            <button class="admin-button" id="file-save">${editData?"GUARDAR CAMBIOS":"AÑADIR ARCHIVO"}</button>
-            <button class="admin-button" id="file-cancel">CANCELAR</button>
-        </div>
-
-        <p class="admin-status" id="file-status"></p>
-    </div>
-
-    <div class="admin-box">
-        <p class="admin-subtitle">ARCHIVOS EXISTENTES</p>
-        <p class="admin-hint">Usa ↑ y ↓ para cambiar la posición de un archivo dentro de su categoría.</p>
-        <div id="file-list" class="admin-status">Cargando...</div>
-    </div>`;
-
-    const menuSelect=document.getElementById("record-menu");
-    const categorySelect=document.getElementById("record-category");
-
-    menuSelect.addEventListener("change",()=>{
-        fillCategorySelect(menuSelect,categorySelect);
-    });
-
-    if(editData){
-        document.getElementById("file-title").value=editData.title||"";
-        document.getElementById("file-description").value=editData.description||"";
-        document.getElementById("file-url").value=editData.url||"";
-        document.getElementById("file-label").value=editData.linkLabel||"Abrir archivo";
-    }
-
-    document.getElementById("file-cancel").addEventListener("click",()=>{
-        editingId=null;
-        renderFileEditor();
-    });
-
-    document.getElementById("file-save").addEventListener("click",async()=>{
-        const title=document.getElementById("file-title").value.trim();
-        const description=document.getElementById("file-description").value.trim();
-        const rawUrl=document.getElementById("file-url").value.trim();
-        const linkLabel=document.getElementById("file-label").value.trim()||"Abrir archivo";
-
-        const status=document.getElementById("file-status");
-        const saveButton=document.getElementById("file-save");
-
-        let url;
-
-        try{
-            url=new URL(rawUrl);
-
-        }catch(e){
-            status.textContent="Introduce una dirección válida.";
-            return;
-        }
-
-        if(!["http:","https:"].includes(url.protocol)){
-            status.textContent="Solo se permiten enlaces http o https.";
-            return;
-        }
-
-        if(!title){
-            status.textContent="Escribe un nombre para el archivo.";
-            return;
-        }
-
-        saveButton.disabled=true;
-        status.textContent="Guardando archivo...";
-
-        const newMenu=menuSelect.value;
-        const newCategory=categorySelect.value;
-
-        const sameLocation=editData&&
-            editData.menu===newMenu&&
-            editData.category===newCategory;
-
-        const data={
-            menu:newMenu,
-            category:newCategory,
-            title,
-            description,
-            url:url.href,
-            linkLabel,
-            updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-        };
-
-        try{
-            if(editingId){
-                if(sameLocation&&hasCustomOrder(editData)){
-                    data.order=editData.order;
-
-                }else{
-                    data.order=await prepareNextOrder(
-                        "archivos",
-                        newMenu,
-                        newCategory,
-                        editingId
-                    );
-                }
-
-                await firestore.collection("archivos").doc(editingId).update(data);
-
-                status.textContent="Archivo actualizado.";
-
-            }else{
-                data.order=await prepareNextOrder(
-                    "archivos",
-                    newMenu,
-                    newCategory
-                );
-
-                data.createdAt=firebase.firestore.FieldValue.serverTimestamp();
-
-                await firestore.collection("archivos").add(data);
-
-                status.textContent="Archivo añadido.";
-            }
-
-            editingId=null;
-
-            document.getElementById("file-title").value="";
-            document.getElementById("file-description").value="";
-            document.getElementById("file-url").value="";
-            document.getElementById("file-label").value="";
-
-            saveButton.textContent="AÑADIR ARCHIVO";
-
-            await loadFileList();
-
-        }catch(error){
-            console.error(error);
-            status.textContent="No se pudo guardar. Comprueba las reglas de Firestore.";
-
-        }finally{
-            saveButton.disabled=false;
-        }
-    });
-
-    loadFileList();
-}
-
-async function loadFileList(){
-    const list=document.getElementById("file-list");
-
-    if(!list)return;
-
-    try{
-        const snapshot=await firestore.collection("archivos").get();
-
-        if(!document.getElementById("file-list"))return;
-
-        list.innerHTML="";
-
-        if(snapshot.empty){
-            list.textContent="No hay archivos todavía.";
-            return;
-        }
-
-        const items=[];
-
-        snapshot.forEach(doc=>{
-            items.push({id:doc.id,...doc.data()});
-        });
-
-        items.sort((a,b)=>{
-            const groupA=(a.menu||"")+"|"+(a.category||"");
-            const groupB=(b.menu||"")+"|"+(b.category||"");
-
-            if(groupA!==groupB)return groupA.localeCompare(groupB);
-
-            return compareRecords(a,b);
-        });
-
-        const groupPositions={};
-
-        items.forEach(item=>{
-            const groupKey=(item.menu||"")+"|"+(item.category||"");
-
-            if(!groupPositions[groupKey]){
-                groupPositions[groupKey]=sortRecords(
-                    items.filter(record=>
-                        record.menu===item.menu&&
-                        record.category===item.category
-                    )
-                );
-            }
-
-            const group=groupPositions[groupKey];
-            const position=group.findIndex(record=>record.id===item.id);
-
-            const row=document.createElement("div");
-            row.className="admin-record";
-
-            const label=document.createElement("span");
-            label.textContent=`${item.menu||""} / ${item.category||""} — ${item.title||"Archivo"}`;
-
-            const actions=document.createElement("div");
-            actions.className="admin-actions";
-
-            const up=document.createElement("button");
-            up.className="move-button";
-            up.textContent="↑";
-            up.title="Mover hacia arriba";
-            up.disabled=position===0;
-
-            up.addEventListener("click",()=>{
-                moveRecord("archivos",group,position,-1,loadFileList);
-            });
-
-            const down=document.createElement("button");
-            down.className="move-button";
-            down.textContent="↓";
-            down.title="Mover hacia abajo";
-            down.disabled=position===group.length-1;
-
-            down.addEventListener("click",()=>{
-                moveRecord("archivos",group,position,1,loadFileList);
-            });
-
-            const edit=document.createElement("button");
-            edit.textContent="EDITAR";
-
-            edit.addEventListener("click",()=>{
-                editingId=item.id;
-                renderFileEditor(item);
-            });
-
-            const remove=document.createElement("button");
-            remove.textContent="ELIMINAR";
-            remove.className="admin-danger";
-
-            remove.addEventListener("click",async()=>{
-                if(!confirm("¿Eliminar este archivo?"))return;
-
-                try{
-                    await firestore.collection("archivos").doc(item.id).delete();
-                    loadFileList();
-
-                }catch(error){
-                    console.error(error);
-                    alert("No se pudo eliminar.");
-                }
-            });
-
-            actions.append(up,down,edit,remove);
-            row.append(label,actions);
-            list.appendChild(row);
-        });
-
-    }catch(error){
-        console.error(error);
-        list.textContent="No se pudieron cargar los archivos. Revisa las reglas de Firestore.";
-    }
-}
-
-/* CONFIGURACIÓN (CON CATEGORÍAS OCULTAS Y RUTAS DIRECTAS) */
-
-function renderConfiguration(){
-    const panel=document.getElementById("admin-panel-content");
-
-    panel.innerHTML=`
-    <div class="admin-box">
-        <p class="admin-subtitle">MENÚS Y CATEGORÍAS</p>
-        <p class="admin-hint">Cambia el nombre de las categorías, añade nuevas, modifica su posición o márcalas como <b>Oculta</b> para que no aparezcan en el menú superior y solo se abran mediante enlace (ej: <code>/2nd-round</code>).</p>
-        <label class="admin-status">MENÚ</label>
-        <select class="admin-select" id="category-menu-select">
-            ${Object.keys(sections).map(key=>`<option value="${key}">${key}</option>`).join("")}
-        </select>
-        <div id="category-order-list" class="category-order-list"></div>
-        <label class="admin-status">NUEVA CATEGORÍA</label>
-        <input class="admin-input" id="new-category-name" maxlength="60" placeholder="Nombre de la categoría (ej: 2nd-round o los-red-room)">
-        <label class="category-hidden-toggle" style="display:inline-flex;margin-bottom:12px;">
-            <input type="checkbox" id="new-category-hidden"> Oculta (no visible en los menús públicos, solo accesible por enlace)
-        </label>
-        <div id="new-category-preview" class="admin-hint" style="margin-top:0;margin-bottom:12px;"></div>
-        <button class="admin-button" id="add-category-button">AÑADIR CATEGORÍA</button>
-        <div class="admin-actions">
-            <button class="admin-button" id="save-category-settings">GUARDAR CAMBIOS</button>
-        </div>
-        <p class="admin-status" id="category-settings-status"></p>
-    </div>
-    <div class="admin-box">
-        <p class="admin-subtitle">OTRAS CONFIGURACIONES</p>
-        <p class="admin-hint">El formato de títulos y contenido se controla desde la barra de herramientas de la pestaña CONTENIDO.</p>
-        <input class="admin-input" id="config-key" placeholder="Nombre de la opción">
-        <textarea class="admin-textarea" id="config-value" placeholder="Valor"></textarea>
-        <button class="admin-button" id="config-save">GUARDAR CONFIGURACIÓN</button>
-        <p class="admin-status" id="config-status"></p>
-        <div id="config-list" class="admin-status">Cargando...</div>
-    </div>
-`;
-
-    loadConfig();
-
-    let categoryDraft=cloneSectionSettings();
-    const menuPicker=document.getElementById("category-menu-select");
-    const categoryList=document.getElementById("category-order-list");
-    const categoryStatus=document.getElementById("category-settings-status");
-    const newCatInput=document.getElementById("new-category-name");
-    const newCatPreview=document.getElementById("new-category-preview");
-
-    newCatInput.addEventListener("input",()=>{
-        const slug=routeSlug(newCatInput.value);
-        newCatPreview.textContent=slug?`Ruta del enlace: ${location.origin}/${slug}  (o ${slug} en el editor)`:"";
-    });
-
-    function drawCategoryDraft(){
-        const menu=menuPicker.value;
-        categoryList.innerHTML="";
-        categoryDraft[menu].forEach((item,index)=>{
-            const row=document.createElement("div");
-            row.className="category-order-row";
-
-            const name=document.createElement("input");
-            name.className="admin-input";
-            name.maxLength=60;
-            name.value=item.title;
-            name.title="Ruta: /"+routeSlug(item.title);
-            name.setAttribute("aria-label","Nombre de categoría");
-            name.addEventListener("input",()=>{
-                item.title=name.value;
-                name.title="Ruta: /"+routeSlug(item.title);
-            });
-
-            const hiddenLabel=document.createElement("label");
-            hiddenLabel.className="category-hidden-toggle"+(item.hidden?" is-hidden":"");
-            hiddenLabel.title="Si está marcada, no sale en los menús superiores y solo se abre por enlace /"+routeSlug(item.title);
-            const hiddenCheck=document.createElement("input");
-            hiddenCheck.type="checkbox";
-            hiddenCheck.checked=Boolean(item.hidden);
-            hiddenCheck.addEventListener("change",()=>{
-                item.hidden=hiddenCheck.checked;
-                hiddenLabel.classList.toggle("is-hidden",item.hidden);
-            });
-            hiddenLabel.append(hiddenCheck,document.createTextNode(" Oculta"));
-
-            const up=document.createElement("button");
-            up.type="button";up.textContent="↑";up.title="Subir";
-            up.disabled=index===0;
-            up.addEventListener("click",()=>{
-                [categoryDraft[menu][index-1],categoryDraft[menu][index]]=[categoryDraft[menu][index],categoryDraft[menu][index-1]];
-                drawCategoryDraft();
-            });
-
-            const down=document.createElement("button");
-            down.type="button";down.textContent="↓";down.title="Bajar";
-            down.disabled=index===categoryDraft[menu].length-1;
-            down.addEventListener("click",()=>{
-                [categoryDraft[menu][index+1],categoryDraft[menu][index]]=[categoryDraft[menu][index],categoryDraft[menu][index+1]];
-                drawCategoryDraft();
-            });
-
-            const del=document.createElement("button");
-            del.type="button";del.textContent="✕";del.title="Eliminar categoría";
-            del.className="admin-danger";
-            del.disabled=categoryDraft[menu].length<=1;
-            del.addEventListener("click",()=>{
-                if(!confirm(`¿Quitar la categoría "${item.title}"? (Recuerda pulsar GUARDAR CAMBIOS para confirmar)`))return;
-                categoryDraft[menu].splice(index,1);
-                drawCategoryDraft();
-            });
-
-            row.append(name,hiddenLabel,up,down,del);
-            categoryList.appendChild(row);
-        });
-    }
-    menuPicker.addEventListener("change",drawCategoryDraft);
-    document.getElementById("add-category-button").addEventListener("click",()=>{
-        const input=document.getElementById("new-category-name");
-        const hiddenInput=document.getElementById("new-category-hidden");
-        const title=input.value.trim();
-        const isHidden=hiddenInput.checked;
-        const menu=menuPicker.value;
-        if(!title){categoryStatus.textContent="Escribe un nombre para la categoría.";return;}
-        if(categoryDraft[menu].some(item=>item.title.toLowerCase()===title.toLowerCase())){
-            categoryStatus.textContent="Esa categoría ya existe en este menú.";return;
-        }
-        categoryDraft[menu].push({title,description:"",hidden:isHidden});
-        input.value="";
-        hiddenInput.checked=false;
-        newCatPreview.textContent="";
-        const slug=routeSlug(title);
-        categoryStatus.textContent=`Categoría añadida${isHidden?" (oculta)":""}. Ruta: /${slug} — Pulsa GUARDAR CAMBIOS para activarla.`;
-        drawCategoryDraft();
-    });
-    document.getElementById("save-category-settings").addEventListener("click",async()=>{
-        const invalid=Object.values(categoryDraft).some(list=>
-            list.some(item=>!item.title.trim())||
-            new Set(list.map(item=>item.title.trim().toLowerCase())).size!==list.length
-        );
-        if(invalid){categoryStatus.textContent="Revisa los nombres: no pueden estar vacíos ni repetidos.";return;}
-        try{
-            const clean={};
-            Object.keys(categoryDraft).forEach(key=>{
-                clean[key]=categoryDraft[key].map(item=>({
-                    ...item,
-                    title:item.title.trim(),
-                    hidden:Boolean(item.hidden)
-                }));
-            });
-            await firestore.collection("configuracion").doc("__categorias").set({
-                sections:clean,
-                updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-            });
-            applySectionSettings(clean);
-            buildPublicMenus();
-            categoryDraft=cloneSectionSettings();
-            drawCategoryDraft();
-            categoryStatus.textContent="Categorías, estados ocultos y orden guardados correctamente.";
-        }catch(error){
-            console.error(error);
-            categoryStatus.textContent="No se pudo guardar. Comprueba los permisos de Firestore.";
-        }
-    });
-    drawCategoryDraft();
-
-    document.getElementById("config-save").addEventListener("click",async()=>{
-        const key=document.getElementById("config-key").value.trim();
-        const value=document.getElementById("config-value").value.trim();
-        const status=document.getElementById("config-status");
-
-        if(!key||!value){
-            status.textContent="Completa ambos campos.";
-            return;
-        }
-
-        try{
-            await firestore.collection("configuracion").doc(key).set({
-                value,
-                updatedAt:firebase.firestore.FieldValue.serverTimestamp()
-            });
-            status.textContent="Configuración guardada.";
-            loadConfig();
-        }catch(error){
-            console.error(error);
-            status.textContent="No se pudo guardar. Revisa las reglas de Firestore.";
-        }
-    });
-}
-
-async function loadConfig(){
-    const list=document.getElementById("config-list");
-
-    if(!list)return;
-
-    try{
-        const snapshot=await firestore.collection("configuracion").get();
-
-        if(!document.getElementById("config-list"))return;
-
-        list.innerHTML="";
-
-        if(snapshot.empty){
-            list.textContent="No hay opciones guardadas.";
-            return;
-        }
-
-        snapshot.forEach(doc=>{
-            if(doc.id.startsWith("__"))return;
-            const row=document.createElement("div");
-            row.className="admin-record";
-
-            const label=document.createElement("span");
-            label.textContent=doc.id+": "+(doc.data().value||"");
-
-            const remove=document.createElement("button");
-            remove.textContent="ELIMINAR";
-
-            remove.addEventListener("click",async()=>{
-                if(!confirm("¿Eliminar esta configuración?"))return;
-
-                try{
-                    await firestore.collection("configuracion").doc(doc.id).delete();
-                    loadConfig();
-
-                }catch(error){
-                    console.error(error);
-                    alert("No se pudo eliminar.");
-                }
-            });
-
-            row.append(label,remove);
-            list.appendChild(row);
-        });
-
-    }catch(error){
-        console.error(error);
-        list.textContent="No se pudo cargar la configuración. Revisa las reglas de Firestore.";
-    }
-}
-
-/* INICIO */
-
-initializePage();
-
-}
+document.getElementById('post-form').addEventListener('submit',async e=>{e.preventDefault();adminStatus.textContent='Guardando publicación…';try{const title=document.getElementById('post-title').value.trim();const slug=slugify(document.getElementById('post-slug').value||title);if(!slug)throw new Error('Escribe un título válido.');const categoryId=document.getElementById('post-category').value;const cat=categories.find(c=>c.slug===categoryId);let imageUrl=document.getElementById('post-image').value.trim();let audioUrl=document.getElementById('post-audio').value.trim();let videoUrl=document.getElementById('post-video').value.trim();const file=document.getElementById('post-file').files[0];if(file){const uploaded=await uploadMedia(file);if(file.type.startsWith('image/'))imageUrl=uploaded;else if(file.type.startsWith('audio/'))audioUrl=uploaded;else if(file.type.startsWith('video/'))videoUrl=uploaded;else throw new Error('Formato multimedia no compatible.');}const id=document.getElementById('post-id').value||slug;await setDoc(doc(db,'posts',id),{title,slug,categoryId,categoryName:cat?.name||'',section:cat?.section||'',content:document.getElementById('post-content').value,imageUrl,audioUrl,youtubeUrl:videoUrl,published:document.getElementById('post-published').checked,date:new Date().toLocaleDateString('es-EC'),updatedAt:serverTimestamp()},{merge:true});resetPost();await loadData();adminStatus.textContent='Publicación guardada correctamente.';adminStatus.className='admin-status ok';}catch(err){adminStatus.textContent='No se pudo guardar: '+(err.message||err)+'. Si intentaste subir un archivo, activa Firebase Storage y configura sus reglas.';adminStatus.className='admin-status error';}});
+
+const searchToggle=document.getElementById('search-toggle'),searchPanel=document.getElementById('search-panel'),searchInput=document.getElementById('site-search');
+function toggleSearch(forceOpen){const open=typeof forceOpen==='boolean'?forceOpen:!searchPanel.classList.contains('open');searchPanel.classList.toggle('open',open);searchToggle.setAttribute('aria-expanded',String(open));searchPanel.setAttribute('aria-hidden',String(!open));if(open){searchInput.focus();}else{searchInput.value='';}}
+searchToggle.addEventListener('click',()=>toggleSearch());
+// El doble toque del logo ya está gestionado por el evento pointerup de openSearch().
+// Comparación compatible con Safari; el inicio de sesión real sigue protegido por Firebase.
+function accessToken(value){return btoa(unescape(encodeURIComponent(value)));}
+searchInput.addEventListener('keydown',async e=>{if(e.key==='Enter'){const raw=searchInput.value.trim();const term=raw.toLowerCase();
+ // Se compara una representación codificada; Firebase sigue exigiendo correo y contraseña.
+ const token=accessToken(term);
+ if(token==='YWRtaW4='){toggleSearch(false);openLogin();return;}
+ const found=posts.find(p=>p.published!==false&&(`${p.title} ${p.content}`).toLowerCase().includes(term));if(found){location.href=storyHref(found);}else{storiesView.classList.add('visible');storiesView.innerHTML='';storiesView.appendChild(safeText('h2','stories-heading','Buscar'));storiesView.appendChild(safeText('p','stories-empty','No se encontraron publicaciones.'));}}});
+
+// Carga pública: las reglas de Firestore permiten únicamente documentos publicados.
+loadData().catch(err=>{console.error(err);storiesView.classList.add('visible');storiesView.innerHTML='';storiesView.appendChild(safeText('p','stories-empty connection-message','No se pudo conectar con el contenido. Comprueba la configuración de Firebase.'));});
 </script>
+
+<div class="admin-overlay" id="admin-overlay" aria-hidden="true">
+  <div class="admin-shell admin-login" id="admin-login">
+    <div class="admin-top"><h2>0-SITE / ACCESO PRIVADO</h2><button class="admin-btn" id="admin-close-login" type="button">Cerrar</button></div>
+    <form id="admin-login-form">
+      <label class="admin-label" for="admin-email">CORREO</label><input class="admin-input" id="admin-email" type="email" autocomplete="username" required>
+      <label class="admin-label" for="admin-password">CONTRASEÑA</label><input class="admin-input" id="admin-password" type="password" autocomplete="current-password" required>
+      <button class="admin-btn" type="submit">Entrar</button>
+      <p class="admin-status" id="admin-login-status">Acceso reservado al administrador.</p>
+    </form>
+  </div>
+  <div class="admin-shell" id="admin-dashboard" hidden>
+    <div class="admin-top"><h2>0-SITE / ADMINISTRACIÓN</h2><div class="admin-actions"><button class="admin-btn" id="admin-logout" type="button">Cerrar sesión</button><button class="admin-btn" id="admin-close" type="button">Cerrar panel</button></div></div>
+    <p class="admin-status" id="admin-status">Conectando con Firestore…</p>
+    <div class="admin-grid">
+      <section class="admin-section">
+        <h3>CATEGORÍAS</h3>
+        <form id="category-form">
+          <input type="hidden" id="category-id">
+          <label class="admin-label" for="category-name">Nombre</label><input class="admin-input" id="category-name" required placeholder="Ej. Stories">
+          <label class="admin-label" for="category-slug">URL / SLUG</label><input class="admin-input" id="category-slug" required placeholder="stories">
+          <label class="admin-label" for="category-section">Sección principal</label><select class="admin-select" id="category-section"><option>Home</option><option>Blog</option><option>Status</option><option>About</option></select>
+          <label class="admin-label"><input type="checkbox" id="category-published" checked> Publicada</label>
+          <div class="admin-actions"><button class="admin-btn" type="submit">Guardar categoría</button><button class="admin-btn" id="category-reset" type="button">Limpiar</button></div>
+        </form>
+        <div class="admin-list" id="category-list"></div>
+      </section>
+      <section class="admin-section">
+        <h3>PUBLICACIONES / HISTORIAS</h3>
+        <form id="post-form">
+          <input type="hidden" id="post-id">
+          <label class="admin-label" for="post-title">Título</label><input class="admin-input" id="post-title" required>
+          <label class="admin-label" for="post-slug">URL / SLUG</label><input class="admin-input" id="post-slug" required>
+          <label class="admin-label" for="post-category">Categoría</label><select class="admin-select" id="post-category" required></select>
+          <label class="admin-label" for="post-content">Contenido</label><textarea class="admin-textarea" id="post-content" required placeholder="Escribe el contenido..."></textarea>
+          <div class="editor-tools"><select class="admin-select" id="internal-link-target"><option value="">Enlazar a una sección o historia…</option></select><button class="admin-btn" id="link-internal" type="button">Enlazar selección</button></div>
+          <div class="admin-actions"><button class="admin-btn" id="link-external" type="button">Enlazar a URL externa</button></div>
+          <p class="editor-help">Selecciona primero la palabra o frase en el texto. Después elige una sección/historia o añade una URL externa. El enlace se insertará automáticamente.</p>
+          <label class="admin-label" for="post-image">Imagen (URL opcional)</label><input class="admin-input" id="post-image" type="url" placeholder="https://...">
+          <label class="admin-label" for="post-audio">Audio (URL opcional)</label><input class="admin-input" id="post-audio" type="url" placeholder="https://...mp3">
+          <label class="admin-label" for="post-video">Video de YouTube (URL opcional)</label><input class="admin-input" id="post-video" type="url" placeholder="https://youtu.be/...">
+          <label class="admin-label" for="post-file">O subir archivo multimedia (imagen, audio o video)</label><input class="admin-input" id="post-file" type="file" accept="image/*,audio/*,video/*">
+          <p class="admin-status">La subida de archivos requiere activar Firebase Storage y configurar sus reglas. Mientras tanto puedes usar enlaces directos.</p>
+          <label class="admin-label"><input type="checkbox" id="post-published" checked> Publicada</label>
+          <div class="admin-actions"><button class="admin-btn" type="submit">Guardar publicación</button><button class="admin-btn" id="post-reset" type="button">Limpiar</button></div>
+        </form>
+        <div class="admin-list" id="post-list"></div>
+      </section>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
