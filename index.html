@@ -13,9 +13,9 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-html{min-height:100%;background:#020303 url("https://i.ibb.co/DDskCf3v/IMG-1297.png") center top / cover no-repeat}
+html{min-height:100%;background:#020303}
 body{min-height:100vh;position:relative;background:transparent}
-body::before{content:none}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png");background-position:center center;background-repeat:no-repeat;background-size:cover;width:100vw;height:100vh;height:100svh}
 #letter-screen{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:none;justify-content:center;align-items:stretch;padding:42px 7vw;background:#000;transition:opacity 1.5s ease}
 .letter{width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65)}
 .letter-header{display:flex;justify-content:space-between;gap:15px;color:#746d62;font-family:monospace;font-size:11px;margin-bottom:28px;letter-spacing:1px;padding-bottom:15px;border-bottom:1px solid rgba(80,70,55,.2)}
@@ -59,8 +59,8 @@ body::before{content:none}
   94%{opacity:1}
 }
 .blink-title{animation:signalFlicker 2s infinite}
-#home-screen{position:relative;z-index:1;display:none;opacity:0;min-height:100vh;padding:65px 20px 25px;transition:opacity 1.5s ease}
-.container{width:100%;max-width:930px;margin:auto}
+#home-screen{position:relative;z-index:1;display:none;opacity:0;min-height:100vh;min-height:100svh;padding:65px 20px 25px;transition:opacity 1.5s ease}
+.container{width:100%;max-width:930px;margin:auto;display:flex;flex-direction:column;min-height:calc(100vh - 90px);min-height:calc(100svh - 90px)}
 .main-title{text-align:center;font-size:clamp(30px,6vw,48px);font-weight:normal;letter-spacing:5px;color:#e5e5e5;margin-bottom:35px;text-shadow:0 0 15px rgba(255,255,255,.12)}
 .home-image{width:auto;max-width:min(76vw,280px);height:auto;max-height:190px;aspect-ratio:auto;margin:0 auto;display:block;object-fit:contain;filter:none;border:0;box-shadow:none;cursor:pointer;transition:opacity .3s}
 .home-image:hover{opacity:.86}
@@ -154,7 +154,9 @@ nav{
 .editor-help{font-size:10px;color:#666;line-height:1.8;margin:10px 0}
 .admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
 .admin-danger{border-color:#633!important;color:#c99!important}
-footer{border-top:1px solid #292929;padding:25px 10px;text-align:center;color:#666;font-family:monospace;font-size:11px;letter-spacing:1px;line-height:2}
+footer{border-top:0;padding:0 6px;text-align:center;color:#666;font-family:monospace;font-size:clamp(8px,2.2vw,11px);letter-spacing:.55px;line-height:1.4;margin-top:auto;white-space:nowrap;transform:none}
+.container{position:relative;padding-bottom:34px}
+.container footer{position:absolute;left:0;right:0;bottom:14px;margin:0}
 @keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:600px){
  .letter{padding:27px 20px}
@@ -491,6 +493,8 @@ nav{gap:2px}
 
 /* Fondo VHS: conserva la ilustración original y añade interferencia sutil */
 html{background:#020303}
+body > #letter-screen, body > #home-screen, body > #admin-screen{position:relative;z-index:1}
+#admin-screen{z-index:500}
 html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.20) 0px,rgba(0,0,0,.20) 1px,rgba(25,35,20,.07) 2px,transparent 3px),linear-gradient(90deg,rgba(30,70,30,.08),transparent 48%,rgba(90,0,0,.07));opacity:.55;mix-blend-mode:screen}
 
 
@@ -631,7 +635,7 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
 
     <section class="content-area" id="content-area"></section>
 
-    <footer>2026 • 0-Site<br>¿Esto es real?, intenta averiguarlo</footer>
+    <footer>2026 • 0-Site&nbsp;&nbsp;¿Esto es real?, intenta averiguarlo</footer>
 </div>
 </main>
 
