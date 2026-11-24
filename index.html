@@ -20,8 +20,7 @@
 html,body{min-height:100%;background:#020303}
 body{min-height:100vh;min-height:100svh;position:relative;display:flex;justify-content:center;align-items:center;padding:42px 7vw;overflow-x:hidden;overflow-y:auto}
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png");background-position:center center;background-repeat:no-repeat;background-size:cover}
-.letter{position:relative;z-index:1;width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65);visibility:hidden;opacity:0;transition:opacity 1.1s ease,transform 1.1s ease,visibility 0s linear 1.1s}
-.letter.show{visibility:visible;opacity:1;transition:opacity 1.1s ease,transform 1.1s ease,visibility 0s}
+.letter{position:relative;z-index:1;width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65);transition:opacity 1.1s ease,transform 1.1s ease}
 .letter.leave{opacity:0;transform:translateY(-8px);pointer-events:none}
 #home-screen{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity 1.2s ease;pointer-events:none}
 #home-screen.show{opacity:1;visibility:visible;pointer-events:auto}
@@ -170,7 +169,7 @@ h1{font-size:20px;font-weight:normal;letter-spacing:4px;text-align:left;margin:3
 </section>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js';
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserSessionPersistence } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
 import { getFirestore, collection, doc, getDocs, getDoc, setDoc, deleteDoc, query, where, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-storage.js';
 
@@ -185,8 +184,9 @@ const firebaseConfig = {
 const ADMIN_UID = 'bMbb9efM9jaqf7vi1EOywWmMWBI2';
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-// La sesión administrativa se conserva solo durante la sesión del navegador.
-await setPersistence(auth, browserSessionPersistence);
+// Mantiene la sesión administrativa incluso al cerrar y volver a abrir el navegador.
+// Solo se elimina al pulsar 'Cerrar sesión' o al borrar los datos del sitio.
+await setPersistence(auth, browserLocalPersistence);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
@@ -212,7 +212,7 @@ updateTime();setInterval(updateTime,60000);document.getElementById('current-year
 let welcomeAlreadySeen=false;
 try{welcomeAlreadySeen=localStorage.getItem('0site-welcome-seen')==='1';}catch(e){welcomeAlreadySeen=false;}
 if(welcomeAlreadySeen){document.querySelector('.letter').style.display='none';document.getElementById('home-screen').classList.add('show');}
-else{try{localStorage.setItem('0site-welcome-seen','1');}catch(e){}document.querySelector('.letter').classList.add('show');typeNext();}
+else{try{localStorage.setItem('0site-welcome-seen','1');}catch(e){}typeNext();}
 
 const overlay=document.getElementById('admin-overlay');
 const loginBox=document.getElementById('admin-login');
@@ -220,7 +220,7 @@ const dashboard=document.getElementById('admin-dashboard');
 const loginStatus=document.getElementById('admin-login-status');
 const adminStatus=document.getElementById('admin-status');
 let isAdmin=false, categories=[], posts=[];
-function openLogin(){overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');loginBox.hidden=false;dashboard.hidden=true;}
+async function openLogin(){overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');if(auth.currentUser&&auth.currentUser.uid===ADMIN_UID){try{await showDashboard();}catch(err){loginStatus.textContent=err.message||'No se pudo abrir el panel.';}}else{loginBox.hidden=false;dashboard.hidden=true;}}
 function closePanel(){overlay.classList.remove('open');overlay.setAttribute('aria-hidden','true');}
 document.getElementById('admin-close-login').addEventListener('click',closePanel);
 document.getElementById('admin-close').addEventListener('click',closePanel);
@@ -245,7 +245,7 @@ document.getElementById('admin-login-form').addEventListener('submit',async e=>{
  catch(err){loginStatus.textContent=err.message||'No se pudo iniciar sesión.';loginStatus.className='admin-status error';}
 });
 document.getElementById('admin-logout').addEventListener('click',async()=>{await signOut(auth);isAdmin=false;closePanel();});
-onAuthStateChanged(auth,async user=>{if(user&&user.uid===ADMIN_UID){isAdmin=true;}else{isAdmin=false;}});
+onAuthStateChanged(auth,async user=>{isAdmin=!!(user&&user.uid===ADMIN_UID);if(isAdmin&&overlay.classList.contains('open')&&dashboard.hidden){try{await showDashboard();}catch(err){adminStatus.textContent=err.message||'No se pudo restaurar la sesión.';adminStatus.className='admin-status error';}}else if(!isAdmin&&overlay.classList.contains('open')){loginBox.hidden=false;dashboard.hidden=true;}});
 
 function slugify(value){return value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');}
 document.getElementById('category-name').addEventListener('input',e=>{if(!document.getElementById('category-id').value)document.getElementById('category-slug').value=slugify(e.target.value);});
