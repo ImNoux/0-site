@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>0-SITE</title>
+<title></title>
 
 <meta name="description" content="Un lugar entre lo que recuerdas y lo que nunca ocurrió.">
 
@@ -582,19 +582,19 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
 
     <nav id="navigation" aria-label="Navegación principal">
         <div class="nav-item">
-            <button class="nav-button" data-menu="HOME" aria-expanded="false">HOME</button>
+            <button class="nav-button" data-menu="HOME" aria-expanded="false">&lt; HOME &gt;</button>
             <div class="dropdown" id="menu-HOME"></div>
         </div>
         <div class="nav-item">
-            <button class="nav-button" data-menu="BLOG" aria-expanded="false">BLOG</button>
+            <button class="nav-button" data-menu="BLOG" aria-expanded="false">&lt; BLOG &gt;</button>
             <div class="dropdown" id="menu-BLOG"></div>
         </div>
         <div class="nav-item">
-            <button class="nav-button" data-menu="STATUS" aria-expanded="false">STATUS</button>
+            <button class="nav-button" data-menu="STATUS" aria-expanded="false">&lt; STATUS &gt;</button>
             <div class="dropdown" id="menu-STATUS"></div>
         </div>
         <div class="nav-item">
-            <button class="nav-button" data-menu="ABOUT" aria-expanded="false">ABOUT</button>
+            <button class="nav-button" data-menu="ABOUT" aria-expanded="false">&lt; ABOUT &gt;</button>
             <div class="dropdown" id="menu-ABOUT"></div>
         </div>
     </nav>
@@ -1848,6 +1848,9 @@ async function initializePage(){
     letter.style.display="flex";
     home.style.display="none";
     home.style.opacity="0";
+    // Registrar la primera entrada antes de iniciar la animación:
+    // si el visitante actualiza durante la carta, no volverá a aparecer.
+    saveData("gardenEntered","yes");
     typeWriter();
 }
 
