@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title></title>
+<title>0-SITE - stories and more</title>
 
-<meta name="description" content="Un lugar entre lo que recuerdas y lo que nunca ocurrió.">
+<meta name="description" content="Stories, art, experiments and more. Explore ideas, creative work and stories from 0-SITE.">
 
 <link rel="icon" type="image/png" href="/favicon.PNG">
 <link rel="shortcut icon" type="image/png" href="/favicon.PNG">
@@ -15,15 +15,40 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html{min-height:100%;background:#020303}
 body{min-height:100vh;position:relative;background:transparent}
-body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png");background-position:center center;background-repeat:no-repeat;background-size:contain}
-#letter-screen{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:flex;justify-content:center;align-items:stretch;padding:42px 7vw;background:#000;transition:opacity 1.5s ease}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png");background-position:center center;background-repeat:no-repeat;background-size:cover;width:100vw;height:100vh;height:100svh}
+#letter-screen{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:none;justify-content:center;align-items:stretch;padding:42px 7vw;background:#000;transition:opacity 1.5s ease}
 .letter{width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65)}
 .letter-header{display:flex;justify-content:space-between;gap:15px;color:#746d62;font-family:monospace;font-size:11px;margin-bottom:28px;letter-spacing:1px;padding-bottom:15px;border-bottom:1px solid rgba(80,70,55,.2)}
 .letter h2{font-size:20px;font-weight:normal;letter-spacing:4px;text-align:left;margin:30px 0 22px;color:#29251f}
 #letter-text{font-size:14px;line-height:1.9;color:#49443b;white-space:normal;overflow-wrap:break-word;min-height:115px;text-align:left;word-spacing:normal;letter-spacing:normal}
 .cursor{display:inline-block;width:1px;height:15px;background:#766b5c;margin-left:2px;vertical-align:-2px;animation:blink .8s infinite}
 @keyframes blink{50%{opacity:0}}
-.signature{display:block;width:100%;margin-top:28px;padding-top:0;text-align:right;font-size:14px;font-style:italic;color:#82786a;opacity:0;transition:opacity 1s ease}.signature.show{opacity:1}.signature.show{opacity:1}
+.signature{display:block;width:100%;margin-top:28px;padding-top:0;text-align:right;font-size:14px;font-style:italic;color:#82786a;opacity:0;transition:opacity 1s ease}.signature.show{opacity:1}
+
+/* Carta de bienvenida compacta: altura según su contenido */
+#letter-screen{
+    min-height:100vh;
+    min-height:100svh;
+    align-items:center;
+    padding:24px 7vw;
+}
+#letter-screen .letter{
+    width:min(100%, 560px);
+    min-height:0;
+    height:auto;
+    padding:28px 26px;
+    margin:auto;
+}
+#letter-screen .letter-header{margin-bottom:20px}
+#letter-screen .letter h2{margin:22px 0 16px}
+#letter-screen #letter-text{min-height:0}
+#letter-screen .signature{margin-top:22px}
+@media(max-width:480px){
+    #letter-screen{padding:22px 7vw}
+    #letter-screen .letter{padding:24px 22px}
+    #letter-screen .letter-header{font-size:10px;gap:8px;letter-spacing:.7px}
+}
+.signature.show{opacity:1}
 @keyframes signalFlicker{
   0%,82%,100%{opacity:1;text-shadow:0 0 15px rgba(255,255,255,.12)}
   84%{opacity:.15;text-shadow:-2px 0 rgba(255,255,255,.45),2px 0 rgba(180,180,180,.35)}
@@ -585,9 +610,7 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
     <img id="home-logo" class="home-image"
     src="https://i.ibb.co/1tch1QYB/A5-F21995-9-A54-476-F-80-E9-D3-A54-EDCF9-A0.png"
     alt="Logo" title="Volver al inicio">
-    <p class="image-caption">Un jardín para los perdidos.</p>
-
-    <nav id="navigation" aria-label="Navegación principal">
+<nav id="navigation" aria-label="Navegación principal">
         <div class="nav-item">
             <button class="nav-button" data-menu="HOME" aria-expanded="false">&lt; HOME &gt;</button>
             <div class="dropdown" id="menu-HOME"></div>
@@ -708,7 +731,7 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
         }
 
         if(!window.firebase)throw new Error("Firebase no está disponible.");
-        startGarden();
+        startSite();
     }
 
     loadAll().catch(error=>{
@@ -720,7 +743,7 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
     });
 })();
 
-function startGarden(){
+function startSite(){
 
 const firebaseConfig={
     apiKey:"AIzaSyCy9q0OAdTcvLiR4ycWP5Nnk9VoW17jbL4",
@@ -1174,7 +1197,7 @@ document.getElementById("content-area").addEventListener("click",event=>{
             const home=document.getElementById("home-screen");
             if(letter){letter.style.display="none";letter.style.opacity="0";}
             if(home){home.style.display="block";home.style.opacity="1";}
-            saveData("gardenEntered","yes");
+            saveData("siteEntered","yes");
             openRelatoBySlug(routeSlug(parts.slice(1).join("/")),true);
             window.scrollTo({top:0,behavior:"smooth"});
             return;
@@ -1383,7 +1406,7 @@ async function showCategory(section,title,description,updateUrl=false){
     closeMenus();
     if(updateUrl)changePublicUrl(categoryPath(section,title));
 
-    saveData("gardenCategory",JSON.stringify({
+    saveData("siteCategory",JSON.stringify({
         section,title,description
     }));
 
@@ -1611,7 +1634,7 @@ function renderRelatoDetail(item,updateUrl=false,relatoList=[]){
         nav.append(previous,next);
         content.appendChild(nav);
     }
-    saveData("gardenEntered","yes");
+    saveData("siteEntered","yes");
 }
 
 async function openRelatoBySlug(slug,updateUrl=false){
@@ -1660,7 +1683,7 @@ function openRelato(item,updateUrl=false,relatoList=null){
 function showSectionLanding(section,updateUrl=false){
     closeMenus();
     if(updateUrl)changePublicUrl(sectionPath(section));
-    saveData("gardenSection",section);
+    saveData("siteSection",section);
     const content=document.getElementById("content-area");
     ++currentContentToken;
     content.innerHTML="";
@@ -1696,7 +1719,7 @@ function renderRouteFromPath(){
         const home=document.getElementById("home-screen");
         if(letter){letter.style.display="none";letter.style.opacity="0";}
         if(home){home.style.display="block";home.style.opacity="1";}
-        saveData("gardenEntered","yes");
+        saveData("siteEntered","yes");
         openRelatoBySlug(routeSlug(parts.slice(1).join("/")),false);
         return true;
     }
@@ -1710,7 +1733,7 @@ function renderRouteFromPath(){
             const home=document.getElementById("home-screen");
             if(letter){letter.style.display="none";letter.style.opacity="0";}
             if(home){home.style.display="block";home.style.opacity="1";}
-            saveData("gardenEntered","yes");
+            saveData("siteEntered","yes");
             showCategory(direct.section,direct.item.title,direct.item.description,false);
             return true;
         }
@@ -1723,24 +1746,10 @@ function renderRouteFromPath(){
         const home=document.getElementById("home-screen");
         if(letter){letter.style.display="none";letter.style.opacity="0";}
         if(home){home.style.display="block";home.style.opacity="1";}
-        saveData("gardenEntered","yes");
+        saveData("siteEntered","yes");
         return true;
     }
 
-    // Compatibilidad con enlaces anteriores: /ARC/registros-viejos
-    const section=parts[0].toUpperCase();
-    if(!sections[section])return false;
-    const letter=document.getElementById("letter-screen");
-    const home=document.getElementById("home-screen");
-    if(letter){letter.style.display="none";letter.style.opacity="0";}
-    if(home){home.style.display="block";home.style.opacity="1";}
-    saveData("gardenEntered","yes");
-    if(parts.length===1){showSectionLanding(section,false);return true;}
-    const wanted=routeSlug(parts.slice(1).join("/"));
-    const category=(sections[section]||[]).find(item=>routeSlug(item.title)===wanted);
-    if(category){showCategory(section,category.title,category.description,false);return true;}
-    showSectionLanding(section,false);
-    return true;
 }
 window.addEventListener("popstate",()=>{
     if(!renderRouteFromPath()&&(location.pathname==="/"||location.pathname==="/index.html"))showInicio();
@@ -1753,7 +1762,7 @@ function showInicio(){
     const home=document.getElementById("home-screen");
     if(letter){letter.style.display="none";letter.style.opacity="0";}
     if(home){home.style.display="block";home.style.opacity="1";}
-    saveData("gardenEntered","yes");
+    saveData("siteEntered","yes");
     showCategory("INICIO","Portada",sections.INICIO[0].description,false);
 }
 
@@ -1765,7 +1774,7 @@ document.getElementById("home-logo").addEventListener("click",showInicio);
 
 function restoreCategory(){
     const content=document.getElementById("content-area");
-    const saved=getSaved("gardenCategory");
+    const saved=getSaved("siteCategory");
 
     if(!saved){
         showInicio();
@@ -1838,7 +1847,7 @@ function showHomeScreen(){
 
         setTimeout(()=>home.style.opacity="1",100);
 
-        saveData("gardenEntered","yes");
+        saveData("siteEntered","yes");
         showInicio();
 
     },1500);
@@ -1850,7 +1859,7 @@ async function initializePage(){
     const home=document.getElementById("home-screen");
 
     // Si ya entró antes, ocultar la carta inmediatamente, sin esperar a Firebase.
-    if(getSaved("gardenEntered")==="yes"){
+    if(getSaved("siteEntered")==="yes"){
         if(letter){letter.style.display="none";letter.style.opacity="0";}
         if(home){home.style.display="block";home.style.opacity="1";}
         transitionStarted=true;
@@ -1861,12 +1870,12 @@ async function initializePage(){
     }
 
     // Guardar la primera visita antes de cualquier espera o animación.
-    saveData("gardenEntered","yes");
+    saveData("siteEntered","yes");
     await categorySettingsPromise;
     if(renderRouteFromPath())return;
 
     transitionStarted=false;
-    if(letter)letter.style.display="flex";
+    if(letter){letter.style.display="flex";letter.style.opacity="1";}
     if(home){home.style.display="none";home.style.opacity="0";}
     typeWriter();
 }
