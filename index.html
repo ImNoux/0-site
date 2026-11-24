@@ -149,6 +149,26 @@ h1{font-size:20px;font-weight:normal;letter-spacing:4px;text-align:left;margin:3
 .word-editor{border-color:#777}
 @media(max-width:650px){.admin-shell{padding:17px}.admin-top h2{font-size:16px;letter-spacing:2px}.admin-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.admin-tab{padding:10px 4px;font-size:9px}.admin-section{padding:15px}.admin-item{align-items:flex-start}}
 
+
+/* Panel clásico: conserva la identidad visual antigua sin alterar los menús públicos nuevos. */
+.admin-directory-title{margin:2px 0 16px;color:#777;font:10px/1.6 monospace;letter-spacing:2px;text-align:center}
+.admin-section{background:#080808;border:1px solid #292929}
+.admin-section h3{font-family:monospace;font-size:10px;font-weight:normal;letter-spacing:2px;color:#999}
+.admin-label{display:block;margin:13px 0 5px;color:#888;font:10px monospace;letter-spacing:1.6px;text-transform:uppercase}
+.admin-input,.admin-select,.admin-textarea{width:100%;background:#080808;border:1px solid #333;color:#ddd;padding:12px;font-family:Georgia,serif;font-size:13px;border-radius:0;outline:none;margin:5px 0 12px}
+.admin-input:focus,.admin-select:focus,.admin-textarea:focus{border-color:#777}
+#post-title{font-family:Georgia,serif;font-size:16px;min-height:46px}
+.word-toolbar{background:#100b0c;border:1px solid #713038;border-bottom:0}
+.word-toolbar button,.word-toolbar select,.word-toolbar input{background:#211416;border:1px solid #713038;color:#ddd}
+.word-editor{min-height:250px;background:#080808;border:1px solid #393c40;color:#dedede;font:15px/1.7 Georgia,serif;padding:14px}
+.word-editor:focus{border-color:#777;box-shadow:none}
+.word-editor a{color:#c5a4a4}
+.admin-status{color:#888}
+.admin-tab{background:#170d0f;border:1px solid #713038;color:#aaa}
+.admin-tab[aria-selected="true"],.admin-tab:hover{color:#fff;border-color:#b34b56;background:#35151a}
+.admin-item{background:transparent;border-bottom:1px solid #292929}
+@media(max-width:650px){.admin-directory-title{font-size:9px}.word-editor{min-height:210px}}
+
 </style>
 </head>
 <body>
@@ -421,7 +441,7 @@ async function movePost(post,direction){try{const ordered=[...posts].sort((a,b)=
 function resetCategory(){document.getElementById('category-form').reset();document.getElementById('category-id').value='';document.getElementById('category-published').checked=true;}
 function resetPost(){document.getElementById('post-form').reset();document.getElementById('post-id').value='';document.getElementById('post-published').checked=true;document.getElementById('post-image-link-url').value='';document.getElementById('post-editor').innerHTML='';}
 document.getElementById('category-reset').addEventListener('click',resetCategory);document.getElementById('post-reset').addEventListener('click',resetPost);
-document.getElementById('category-form').addEventListener('submit',async e=>{e.preventDefault();try{const slug=slugify(document.getElementById('category-slug').value);if(!slug)throw new Error('Escribe un nombre de URL válido.');const id=document.getElementById('category-id').value||slug;await setDoc(doc(db,'categories',id),{name:document.getElementById('category-name').value.trim(),slug,section:document.getElementById('category-section').value,published:document.getElementById('category-published').checked,updatedAt:serverTimestamp()},{merge:true});resetCategory();await loadData();adminStatus.textContent='Categoría guardada.';}catch(err){adminStatus.textContent=err.message;adminStatus.className='admin-status error';}});
+document.getElementById('category-form').addEventListener('submit',async e=>{e.preventDefault();try{const categoryName=document.getElementById('category-name').value.trim();const slug=slugify(document.getElementById('category-slug').value||categoryName);if(!slug)throw new Error('Escribe un nombre de categoría válido.');const id=document.getElementById('category-id').value||slug;await setDoc(doc(db,'categories',id),{name:categoryName,slug,section:document.getElementById('category-section').value,published:document.getElementById('category-published').checked,updatedAt:serverTimestamp()},{merge:true});resetCategory();await loadData();adminStatus.textContent='Categoría guardada.';}catch(err){adminStatus.textContent=err.message;adminStatus.className='admin-status error';}});
 async function uploadMedia(file){if(!file)return '';const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');const path=`site-media/${auth.currentUser.uid}/${Date.now()}-${safeName}`;const fileRef=ref(storage,path);await uploadBytes(fileRef,file,{contentType:file.type});return await getDownloadURL(fileRef);}
 function insertEditorLink(target){
  const field=document.getElementById('post-content');const start=field.selectionStart,end=field.selectionEnd;
@@ -481,7 +501,7 @@ loadData().catch(err=>{console.error(err);storiesView.classList.add('visible');s
     </form>
   </div>
   <div class="admin-shell" id="admin-dashboard" hidden>
-    <div class="admin-top"><h2>𝕰𝖑 𝖀́𝖑𝖙𝖎𝖒𝖔 𝕵𝖆𝖗𝖉𝖎́𝖓</h2><div class="admin-actions"><button class="admin-btn" id="admin-logout" type="button">Cerrar sesión</button><button class="admin-btn" id="admin-close" type="button">Cerrar panel</button></div></div>
+    <div class="admin-top"><h2>𝕰𝖑 𝖀́𝖑𝖙𝖎𝖒𝖔 𝕵𝖆𝖗𝖉𝖎́𝖓</h2><p class="admin-directory-title">DIRECTORIO DE ADMINISTRACIÓN</p><div class="admin-actions"><button class="admin-btn" id="admin-logout" type="button">Cerrar sesión</button><button class="admin-btn" id="admin-close" type="button">Cerrar panel</button></div></div>
     <p class="admin-status" id="admin-status">Conectando con Firestore…</p>
     <div class="admin-tabs" role="tablist" aria-label="Secciones de administración">
       <button class="admin-tab" type="button" role="tab" aria-selected="true" data-pane="content">Contenido</button>
@@ -494,7 +514,7 @@ loadData().catch(err=>{console.error(err);storiesView.classList.add('visible');s
         <form id="post-form">
           <input type="hidden" id="post-id">
           <label class="admin-label" for="post-title">Título</label><input class="admin-input" id="post-title" required>
-          <label class="admin-label" for="post-slug">URL / SLUG</label><input class="admin-input" id="post-slug" required>
+          <input type="hidden" id="post-slug">
           <label class="admin-label" for="post-category">Categoría</label><select class="admin-select" id="post-category" required></select>
           <label class="admin-label" for="post-editor">CONTENIDO · EDITOR VISUAL PARA TODAS LAS CATEGORÍAS</label>
           <div class="word-toolbar" role="toolbar" aria-label="Formato del contenido">
@@ -531,7 +551,7 @@ loadData().catch(err=>{console.error(err);storiesView.classList.add('visible');s
         <form id="category-form">
           <input type="hidden" id="category-id">
           <label class="admin-label" for="category-name">Nombre</label><input class="admin-input" id="category-name" required placeholder="Ej. Stories">
-          <label class="admin-label" for="category-slug">URL / SLUG</label><input class="admin-input" id="category-slug" required placeholder="stories">
+          <input type="hidden" id="category-slug">
           <label class="admin-label" for="category-section">Sección principal</label><select class="admin-select" id="category-section"><option>Home</option><option>Blog</option><option>Status</option><option>About</option></select>
           <label class="admin-label"><input type="checkbox" id="category-published" checked> Publicada</label>
           <div class="admin-actions"><button class="admin-btn" type="submit">Guardar categoría</button><button class="admin-btn" id="category-reset" type="button">Limpiar</button></div>
