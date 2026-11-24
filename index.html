@@ -20,7 +20,8 @@
 html,body{min-height:100%;background:#020303}
 body{min-height:100vh;min-height:100svh;position:relative;display:flex;justify-content:center;align-items:center;padding:42px 7vw;overflow-x:hidden;overflow-y:auto}
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png");background-position:center center;background-repeat:no-repeat;background-size:cover}
-.letter{position:relative;z-index:1;width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65);transition:opacity 1.1s ease,transform 1.1s ease}
+.letter{position:relative;z-index:1;width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65);visibility:hidden;opacity:0;transition:opacity 1.1s ease,transform 1.1s ease,visibility 0s linear 1.1s}
+.letter.show{visibility:visible;opacity:1;transition:opacity 1.1s ease,transform 1.1s ease,visibility 0s}
 .letter.leave{opacity:0;transform:translateY(-8px);pointer-events:none}
 #home-screen{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity 1.2s ease;pointer-events:none}
 #home-screen.show{opacity:1;visibility:visible;pointer-events:auto}
@@ -211,7 +212,7 @@ updateTime();setInterval(updateTime,60000);document.getElementById('current-year
 let welcomeAlreadySeen=false;
 try{welcomeAlreadySeen=localStorage.getItem('0site-welcome-seen')==='1';}catch(e){welcomeAlreadySeen=false;}
 if(welcomeAlreadySeen){document.querySelector('.letter').style.display='none';document.getElementById('home-screen').classList.add('show');}
-else{try{localStorage.setItem('0site-welcome-seen','1');}catch(e){}typeNext();}
+else{try{localStorage.setItem('0site-welcome-seen','1');}catch(e){}document.querySelector('.letter').classList.add('show');typeNext();}
 
 const overlay=document.getElementById('admin-overlay');
 const loginBox=document.getElementById('admin-login');
