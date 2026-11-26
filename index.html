@@ -15,7 +15,7 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html{min-height:100%;background:#020303}
 body{min-height:100vh;position:relative;background:transparent}
-body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png");background-position:center center;background-repeat:no-repeat;background-size:cover;width:100vw;height:100vh;height:100svh}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:var(--route-background-image, url("https://i.ibb.co/DDskCf3v/IMG-1297.png"));background-color:var(--route-background-color, #020303);background-position:center center;background-repeat:no-repeat;background-size:cover;width:100vw;height:100vh;height:100svh}
 #letter-screen{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:none;justify-content:center;align-items:stretch;padding:42px 7vw;background:#000;transition:opacity 1.5s ease}
 .letter{width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65)}
 .letter-header{display:flex;justify-content:space-between;gap:15px;color:#746d62;font-family:monospace;font-size:11px;margin-bottom:28px;letter-spacing:1px;padding-bottom:15px;border-bottom:1px solid rgba(80,70,55,.2)}
@@ -155,6 +155,7 @@ nav{
 .admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
 .admin-danger{border-color:#633!important;color:#c99!important}
 footer{border-top:0;padding:0 6px;text-align:center;color:#666;font-family:monospace;font-size:clamp(8px,2.2vw,11px);letter-spacing:.55px;line-height:1.4;margin-top:auto;white-space:nowrap;transform:none}
+.status-date{display:block;margin:-1px 0 1.1em;color:#666;font-size:11px;line-height:1.5;font-family:Arial,Helvetica,sans-serif;letter-spacing:.2px}
 .container{position:relative;padding-bottom:34px}
 .container footer{position:absolute;left:0;right:0;bottom:-16px;margin:0}
 @keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -635,13 +636,13 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
 
     <section class="content-area" id="content-area"></section>
 
-    <footer>2026 • 0-Site&nbsp;&nbsp;¿Esto es real?, intenta averiguarlo</footer>
+    <footer><span id="current-year"></span> • 0-Site&nbsp;&nbsp;¿Esto es real?, intenta averiguarlo</footer>
 </div>
 </main>
 
 <section id="admin-screen">
 <div class="admin-wrap">
-    <h2 class="admin-heading">𝕰𝖑 𝖀́𝖑𝖙𝖎𝖒𝖔 𝕵𝖆𝖗𝖉𝖎́𝖓</h2>
+    <h2 class="admin-heading">0-SITE</h2>
 
     <div id="admin-login" class="admin-box">
         <p class="admin-subtitle">ACCESO RESTRINGIDO · ADMINISTRACIÓN</p>
@@ -762,6 +763,7 @@ if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
 
 const auth=firebase.auth();
 const firestore=firebase.firestore();
+document.getElementById("current-year").textContent=String(new Date().getFullYear());
 
 /* Adaptador de compatibilidad: la interfaz antigua trabaja con nombres menu/category,
    pero toda la persistencia se realiza en las colecciones nuevas posts y categories. */
@@ -1422,6 +1424,54 @@ function clearContentListeners(){
     activeContentListeners=[];
 }
 
+/* APARIENCIA INDEPENDIENTE POR RUTA */
+function resetRouteAppearance(){
+    const root=document.documentElement;
+    root.style.removeProperty("--route-background-image");
+    root.style.removeProperty("--route-background-color");
+    const content=document.getElementById("content-area");
+    if(!content)return;
+    content.style.background="";
+    content.style.border="";
+    content.style.backdropFilter="";
+    content.style.webkitBackdropFilter="";
+    content.style.borderRadius="";
+    content.style.boxShadow="";
+}
+async function applyRouteAppearance(section,title,token){
+    resetRouteAppearance();
+    const slug=categorySlug(title);
+    if(!slug)return;
+    try{
+        const snap=await firestore.collection("categories").doc(slug).get();
+        if(token!==currentContentToken||!snap.exists)return;
+        const appearance=snap.data()?.appearance;
+        if(!appearance||typeof appearance!=="object")return;
+        const root=document.documentElement;
+        if(typeof appearance.backgroundImage==="string"&&/^https:\/\//i.test(appearance.backgroundImage.trim())){
+            const safeUrl=appearance.backgroundImage.trim().replace(/["\\\n\r]/g,"");
+            root.style.setProperty("--route-background-image",`url("${safeUrl}")`);
+        }
+        if(validHexColor(appearance.backgroundColor))root.style.setProperty("--route-background-color",appearance.backgroundColor);
+        const content=document.getElementById("content-area");
+        const panelColor=validHexColor(appearance.panelColor)?appearance.panelColor:"#2d2d2d";
+        const opacity=Math.max(0,Math.min(1,Number(appearance.panelOpacity??0.58)));
+        const match=panelColor.match(/^#([0-9a-f]{6})$/i);
+        if(match){
+            const value=parseInt(match[1],16);
+            const r=(value>>16)&255,g=(value>>8)&255,b=value&255;
+            content.style.background=`rgba(${r},${g},${b},${opacity})`;
+        }
+        const borderWidth=Math.max(0,Math.min(12,Number(appearance.borderWidth??0)));
+        if(borderWidth>0&&validHexColor(appearance.borderColor))content.style.border=`${borderWidth}px solid ${appearance.borderColor}`;
+        const blur=Math.max(0,Math.min(30,Number(appearance.blur??0)));
+        if(blur){content.style.backdropFilter=`blur(${blur}px)`;content.style.webkitBackdropFilter=`blur(${blur}px)`;}
+        const radius=Math.max(0,Math.min(40,Number(appearance.panelRadius??0)));
+        if(radius)content.style.borderRadius=`${radius}px`;
+        if(validHexColor(appearance.shadowColor))content.style.boxShadow=`0 12px 35px ${appearance.shadowColor}`;
+    }catch(error){console.warn("No se pudo cargar la apariencia de esta ruta:",error);}
+}
+
 /* MOSTRAR CATEGORÍAS */
 
 async function showCategory(section,title,description,updateUrl=false){
@@ -1437,6 +1487,8 @@ async function showCategory(section,title,description,updateUrl=false){
     const token=++currentContentToken;
 
     content.innerHTML="";
+    await applyRouteAppearance(section,title,token);
+    if(token!==currentContentToken)return;
 
     const showHeader = section==="INICIO";
 
@@ -1491,6 +1543,18 @@ async function showCategory(section,title,description,updateUrl=false){
                         h.addEventListener("click",()=>openRelato(item,true,orderedPublications));
                     }
                     article.appendChild(h);
+                }
+                if(section==="STATUS"&&item.statusDate){
+                    const parts=String(item.statusDate).split("-").map(Number);
+                    if(parts.length===3&&parts.every(Number.isFinite)){
+                        const date=new Date(parts[0],parts[1]-1,parts[2]);
+                        if(!Number.isNaN(date.getTime())){
+                            const dateLine=document.createElement("div");
+                            dateLine.className="status-date";
+                            dateLine.textContent=date.toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})+" by: zorg";
+                            article.appendChild(dateLine);
+                        }
+                    }
                 }
                 const body=document.createElement("div");
                 body.className="publication-body";
@@ -2356,6 +2420,11 @@ function renderPublicationEditor(editData=null){
         ${editorToolbar()}
         <label class="admin-status" for="record-title">TÍTULO</label>
         <div class="admin-input rich-editor title-editor" id="record-title" contenteditable="true" role="textbox" aria-label="Título" data-placeholder="" style="min-height:48px;overflow-wrap:anywhere"></div>
+        <div id="status-date-wrap" style="display:${menu==="STATUS"?"block":"none"}">
+            <label class="admin-status" for="status-date">FECHA DE PUBLICACIÓN</label>
+            <input class="admin-input" id="status-date" type="date" value="${editData?.statusDate||""}" aria-label="Fecha de publicación">
+            <p class="admin-hint">Esta fecha aparecerá debajo del título en STATUS. Puedes elegir cualquier día.</p>
+        </div>
         <label class="admin-status" for="rich-editor">CONTENIDO</label>
         <div class="rich-editor" id="rich-editor" contenteditable="true" role="textbox" aria-label="Contenido" spellcheck="true"></div>
         <div class="admin-actions">
@@ -2367,7 +2436,10 @@ function renderPublicationEditor(editData=null){
 
     const menuSelect=document.getElementById("record-menu");
     const categorySelect=document.getElementById("record-category");
-    menuSelect.addEventListener("change",()=>fillCategorySelect(menuSelect,categorySelect));
+    menuSelect.addEventListener("change",()=>{
+        fillCategorySelect(menuSelect,categorySelect);
+        document.getElementById("status-date-wrap").style.display=menuSelect.value==="STATUS"?"block":"none";
+    });
     const titleEditor=document.getElementById("record-title");
     const bodyEditor=document.getElementById("rich-editor");
     titleEditor.innerHTML=editData?.titleHtml?safeHtml(editData.titleHtml):String(editData?.title||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -2401,6 +2473,7 @@ function renderPublicationEditor(editData=null){
         const sameLocation=editData&&editData.menu===newMenu&&editData.category===newCategory;
         const data={
             menu:newMenu,category:newCategory,title,titleHtml,
+            statusDate:newMenu==="STATUS"?(document.getElementById("status-date")?.value||""):"",
             titleColor:validHexColor(titleEditor.style.color)?titleEditor.style.color:"#cccccc",
             titleFontFamily:safeInlineFontFamily(titleEditor.style.fontFamily)||"",
             titleFontSize:safeInlineFontSize(titleEditor.style.fontSize)||"",
@@ -2851,6 +2924,33 @@ function renderConfiguration(){
         <p class="admin-status" id="category-settings-status"></p>
     </div>
     <div class="admin-box">
+        <p class="admin-subtitle">APARIENCIA POR RUTA</p>
+        <p class="admin-hint">Personaliza una categoría sin modificar el diseño del resto de 0-SITE. Puedes usar imágenes, GIF o WebP animado mediante una URL HTTPS directa.</p>
+        <label class="admin-status" for="appearance-route">RUTA</label>
+        <select class="admin-select" id="appearance-route"></select>
+        <label class="admin-status" for="appearance-bg-image">IMAGEN DE FONDO · URL HTTPS (OPCIONAL)</label>
+        <input class="admin-input" id="appearance-bg-image" type="url" placeholder="https://.../fondo.gif">
+        <label class="admin-status" for="appearance-bg-color">COLOR DE FONDO DE PÁGINA</label>
+        <input class="admin-input" id="appearance-bg-color" type="color" value="#020303">
+        <label class="admin-status" for="appearance-panel-color">COLOR DEL PANEL</label>
+        <input class="admin-input" id="appearance-panel-color" type="color" value="#2d2d2d">
+        <label class="admin-status" for="appearance-panel-opacity">TRANSPARENCIA DEL PANEL · <span id="appearance-opacity-value">58%</span></label>
+        <input class="admin-input" id="appearance-panel-opacity" type="range" min="0" max="100" value="58">
+        <label class="admin-status" for="appearance-border-color">COLOR DEL BORDE</label>
+        <input class="admin-input" id="appearance-border-color" type="color" value="#333333">
+        <label class="admin-status" for="appearance-border-width">GROSOR DEL BORDE · <span id="appearance-border-value">0 px</span></label>
+        <input class="admin-input" id="appearance-border-width" type="range" min="0" max="12" value="0">
+        <label class="admin-status" for="appearance-blur">DESENFOQUE DEL FONDO · <span id="appearance-blur-value">0 px</span></label>
+        <input class="admin-input" id="appearance-blur" type="range" min="0" max="30" value="0">
+        <label class="admin-status" for="appearance-radius">REDONDEO DEL PANEL · <span id="appearance-radius-value">0 px</span></label>
+        <input class="admin-input" id="appearance-radius" type="range" min="0" max="40" value="0">
+        <div class="admin-actions">
+            <button class="admin-button" id="appearance-save">GUARDAR APARIENCIA</button>
+            <button class="admin-button" id="appearance-reset">RESTABLECER RUTA</button>
+        </div>
+        <p class="admin-status" id="appearance-status"></p>
+    </div>
+    <div class="admin-box">
         <p class="admin-subtitle">OTRAS CONFIGURACIONES</p>
         <p class="admin-hint">El formato de títulos y contenido se controla desde la barra de herramientas de la pestaña CONTENIDO.</p>
         <input class="admin-input" id="config-key" placeholder="Nombre de la opción">
@@ -2862,6 +2962,97 @@ function renderConfiguration(){
 `;
 
     loadConfig();
+
+    const appearanceRoute=document.getElementById("appearance-route");
+    const appearanceStatus=document.getElementById("appearance-status");
+    const appearanceFields={
+        backgroundImage:document.getElementById("appearance-bg-image"),
+        backgroundColor:document.getElementById("appearance-bg-color"),
+        panelColor:document.getElementById("appearance-panel-color"),
+        panelOpacity:document.getElementById("appearance-panel-opacity"),
+        borderColor:document.getElementById("appearance-border-color"),
+        borderWidth:document.getElementById("appearance-border-width"),
+        blur:document.getElementById("appearance-blur"),
+        panelRadius:document.getElementById("appearance-radius")
+    };
+    function refreshAppearanceLabels(){
+        document.getElementById("appearance-opacity-value").textContent=appearanceFields.panelOpacity.value+"%";
+        document.getElementById("appearance-border-value").textContent=appearanceFields.borderWidth.value+" px";
+        document.getElementById("appearance-blur-value").textContent=appearanceFields.blur.value+" px";
+        document.getElementById("appearance-radius-value").textContent=appearanceFields.panelRadius.value+" px";
+    }
+    Object.values(appearanceFields).filter(el=>el.type==="range").forEach(el=>el.addEventListener("input",refreshAppearanceLabels));
+    function populateAppearanceRoutes(){
+        const current=appearanceRoute.value;
+        appearanceRoute.innerHTML="";
+        Object.entries(cloneSectionSettings()).forEach(([menu,items])=>items.forEach(item=>{
+            const option=document.createElement("option");
+            option.value=categorySlug(item.title);
+            option.textContent=`/${option.value} · ${menu}`;
+            appearanceRoute.appendChild(option);
+        }));
+        if([...appearanceRoute.options].some(option=>option.value===current))appearanceRoute.value=current;
+    }
+    async function loadAppearanceEditor(){
+        const slug=appearanceRoute.value;
+        Object.entries(appearanceFields).forEach(([key,el])=>{
+            if(key==="backgroundImage")el.value="";
+            else if(key==="backgroundColor")el.value="#020303";
+            else if(key==="panelColor")el.value="#2d2d2d";
+            else if(key==="panelOpacity")el.value=58;
+            else if(key==="borderColor")el.value="#333333";
+            else el.value=0;
+        });
+        refreshAppearanceLabels();
+        if(!slug)return;
+        appearanceStatus.textContent="Cargando apariencia...";
+        try{
+            const snap=await firestore.collection("categories").doc(slug).get();
+            const data=snap.exists?snap.data()?.appearance||{}:{};
+            if(appearanceRoute.value!==slug)return;
+            if(typeof data.backgroundImage==="string")appearanceFields.backgroundImage.value=data.backgroundImage;
+            if(validHexColor(data.backgroundColor))appearanceFields.backgroundColor.value=data.backgroundColor;
+            if(validHexColor(data.panelColor))appearanceFields.panelColor.value=data.panelColor;
+            if(Number.isFinite(Number(data.panelOpacity)))appearanceFields.panelOpacity.value=Math.round(Number(data.panelOpacity)*100);
+            if(validHexColor(data.borderColor))appearanceFields.borderColor.value=data.borderColor;
+            if(Number.isFinite(Number(data.borderWidth)))appearanceFields.borderWidth.value=data.borderWidth;
+            if(Number.isFinite(Number(data.blur)))appearanceFields.blur.value=data.blur;
+            if(Number.isFinite(Number(data.panelRadius)))appearanceFields.panelRadius.value=data.panelRadius;
+            refreshAppearanceLabels();
+            appearanceStatus.textContent=snap.exists?"Apariencia cargada.":"Esta ruta todavía no tiene una apariencia personalizada.";
+        }catch(error){console.error(error);appearanceStatus.textContent="No se pudo cargar. Revisa los permisos de lectura.";}
+    }
+    populateAppearanceRoutes();
+    appearanceRoute.addEventListener("change",loadAppearanceEditor);
+    document.getElementById("appearance-save").addEventListener("click",async()=>{
+        const slug=appearanceRoute.value;
+        const imageUrl=appearanceFields.backgroundImage.value.trim();
+        if(imageUrl&&!/^https:\/\//i.test(imageUrl)){appearanceStatus.textContent="La imagen debe usar una URL HTTPS directa.";return;}
+        const appearance={
+            backgroundImage:imageUrl,
+            backgroundColor:appearanceFields.backgroundColor.value,
+            panelColor:appearanceFields.panelColor.value,
+            panelOpacity:Number(appearanceFields.panelOpacity.value)/100,
+            borderColor:appearanceFields.borderColor.value,
+            borderWidth:Number(appearanceFields.borderWidth.value),
+            blur:Number(appearanceFields.blur.value),
+            panelRadius:Number(appearanceFields.panelRadius.value)
+        };
+        try{
+            await firestore.collection("categories").doc(slug).set({appearance,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+            appearanceStatus.textContent="Apariencia guardada para /"+slug+".";
+        }catch(error){console.error(error);appearanceStatus.textContent="No se pudo guardar. Comprueba las reglas de Firestore.";}
+    });
+    document.getElementById("appearance-reset").addEventListener("click",async()=>{
+        const slug=appearanceRoute.value;
+        if(!confirm("¿Restablecer la apariencia personalizada de /"+slug+"?"))return;
+        try{
+            await firestore.collection("categories").doc(slug).set({appearance:firebase.firestore.FieldValue.delete(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+            await loadAppearanceEditor();
+            appearanceStatus.textContent="Apariencia restablecida para /"+slug+".";
+        }catch(error){console.error(error);appearanceStatus.textContent="No se pudo restablecer. Comprueba las reglas de Firestore.";}
+    });
+    loadAppearanceEditor();
 
     let categoryDraft=cloneSectionSettings();
     const menuPicker=document.getElementById("category-menu-select");
