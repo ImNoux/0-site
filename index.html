@@ -26,7 +26,7 @@
 html{min-height:100%;background:#020303}
 body{min-height:100vh;position:relative;background:transparent}
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:var(--route-background-image, url("https://i.ibb.co/DDskCf3v/IMG-1297.png"));background-color:var(--route-background-color, #020303);background-position:center center;background-repeat:no-repeat;background-size:cover;width:100vw;height:100vh;height:100svh}
-html.route-appearance-pending body::before{background-image:none!important;background-color:#020303!important}
+html.route-appearance-pending body::before{background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png")!important;background-color:#020303!important;background-position:center center!important;background-repeat:no-repeat!important;background-size:cover!important}
 #letter-screen{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:none;justify-content:center;align-items:stretch;padding:42px 7vw;background:#000;transition:opacity 1.5s ease}
 .letter{width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65)}
 .letter-header{display:flex;justify-content:space-between;gap:15px;color:#746d62;font-family:monospace;font-size:11px;margin-bottom:28px;letter-spacing:1px;padding-bottom:15px;border-bottom:1px solid rgba(80,70,55,.2)}
@@ -166,7 +166,7 @@ nav{
 .admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
 .admin-danger{border-color:#633!important;color:#c99!important}
 footer{border-top:0;padding:0 6px;text-align:center;color:#666;font-family:monospace;font-size:clamp(8px,2.2vw,11px);letter-spacing:.55px;line-height:1.4;margin-top:auto;white-space:nowrap;transform:none}
-.status-date{display:block;margin:-1px 0 1.1em;color:#666;font-size:11px;line-height:1.5;font-family:Arial,Helvetica,sans-serif;letter-spacing:.2px}
+.status-date{display:block;margin:-1px 0 1.1em;color:#777;font-size:12px;line-height:1.5;font-family:Arial,Helvetica,sans-serif;letter-spacing:.2px}.status-first-divider{border:0;border-top:1px solid rgba(130,130,130,.55);margin:22px 0 8px;width:100%;max-width:700px}
 .container{position:relative;padding-bottom:34px}
 .container footer{position:absolute;left:0;right:0;bottom:-16px;margin:0}
 @keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -1381,16 +1381,21 @@ function safeHtml(html){
                 const rawWidth=node.style.width||node.getAttribute("width")||"auto";
                 const safeWidth=/^(?:auto|(?:[1-9]\d?|100)%)$/.test(String(rawWidth).trim())
                     ?String(rawWidth).trim():"auto";
+                const rawAlign=node.getAttribute("data-align")||"left";
+                const safeAlign=["left","center","right"].includes(rawAlign)?rawAlign:"left";
 
                 [...node.attributes].forEach(attr=>node.removeAttribute(attr.name));
 
                 node.setAttribute("src",imageUrl.href);
+                node.setAttribute("data-align",safeAlign);
                 node.setAttribute("alt",alt.slice(0,200));
                 node.setAttribute("loading","lazy");
                 node.setAttribute("referrerpolicy","no-referrer");
                 node.style.width=safeWidth;
                 node.style.maxWidth="100%";
                 node.style.height="auto";
+                node.style.setProperty("margin-left",safeAlign==="right"?"auto":(safeAlign==="center"?"auto":"0"),"important");
+                node.style.setProperty("margin-right",safeAlign==="left"?"auto":(safeAlign==="center"?"auto":"0"),"important");
 
                 return;
             }
@@ -1573,6 +1578,29 @@ async function applyRouteAppearance(section,title,token){
     await refresh();
 }
 
+/* STATUS: fecha relativa y metadatos */
+function statusRelativeTime(item){
+    if(item.statusTimeText&&String(item.statusTimeText).trim())return String(item.statusTimeText).trim();
+    let date=null;
+    if(item.statusDate){
+        const parts=String(item.statusDate).split("-").map(Number);
+        if(parts.length===3&&parts.every(Number.isFinite))date=new Date(parts[0],parts[1]-1,parts[2]);
+    }
+    if(!date&&item.createdAt){
+        if(typeof item.createdAt.toDate==="function")date=item.createdAt.toDate();
+        else if(item.createdAt instanceof Date)date=item.createdAt;
+        else if(typeof item.createdAt.seconds==="number")date=new Date(item.createdAt.seconds*1000);
+    }
+    if(!date||Number.isNaN(date.getTime()))return "recién publicado";
+    const seconds=Math.max(0,Math.floor((Date.now()-date.getTime())/1000));
+    if(seconds<60)return "hace un momento";
+    const minutes=Math.floor(seconds/60);if(minutes<60)return `hace ${minutes} ${minutes===1?"minuto":"minutos"}`;
+    const hours=Math.floor(minutes/60);if(hours<24)return `hace ${hours} ${hours===1?"hora":"horas"}`;
+    const days=Math.floor(hours/24);if(days<30)return `hace ${days} ${days===1?"día":"días"}`;
+    const months=Math.floor(days/30);if(months<12)return `hace ${months} ${months===1?"mes":"meses"}`;
+    const years=Math.floor(days/365);return `hace ${years} ${years===1?"año":"años"}`;
+}
+
 /* MOSTRAR CATEGORÍAS */
 
 async function showCategory(section,title,description,updateUrl=false){
@@ -1588,7 +1616,7 @@ async function showCategory(section,title,description,updateUrl=false){
     const token=++currentContentToken;
 
     content.innerHTML="";
-    await applyRouteAppearance(section,title,token);
+    const appearanceTask=applyRouteAppearance(section,title,token);
     if(token!==currentContentToken)return;
 
     const showHeader = section==="INICIO";
@@ -1621,10 +1649,16 @@ async function showCategory(section,title,description,updateUrl=false){
             if(token!==currentContentToken)return;
             const existingPubs = content.querySelectorAll(".publication:not([data-static])");
             existingPubs.forEach(el => el.remove());
+            content.querySelectorAll(".status-first-divider").forEach(el=>el.remove());
             const existingLoading = content.querySelector(".admin-status");
             if(existingLoading) existingLoading.remove();
 
             const orderedPublications=sortRecords(pubDocs.filter(item=>item.published!==false));
+            if(section==="STATUS"&&categorySlug(title)==="status"&&orderedPublications.length){
+                const separator=document.createElement("hr");
+                separator.className="status-first-divider";
+                content.appendChild(separator);
+            }
             orderedPublications.forEach(item=>{
                 const article=document.createElement("article");
                 article.className="publication publication-font-modern";
@@ -1645,17 +1679,12 @@ async function showCategory(section,title,description,updateUrl=false){
                     }
                     article.appendChild(h);
                 }
-                if(item.statusDate){
-                    const parts=String(item.statusDate).split("-").map(Number);
-                    if(parts.length===3&&parts.every(Number.isFinite)){
-                        const date=new Date(parts[0],parts[1]-1,parts[2]);
-                        if(!Number.isNaN(date.getTime())){
-                            const dateLine=document.createElement("div");
-                            dateLine.className="status-date";
-                            dateLine.textContent=date.toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"})+" by: zorg";
-                            article.appendChild(dateLine);
-                        }
-                    }
+                if(section==="STATUS"&&categorySlug(title)==="status"){
+                    const meta=document.createElement("div");
+                    meta.className="status-date";
+                    const author=(item.statusAuthor||"zorg").trim();
+                    meta.textContent=(author?author+"  ✨  ":"")+statusRelativeTime(item);
+                    article.appendChild(meta);
                 }
                 const body=document.createElement("div");
                 body.className="publication-body";
@@ -2271,6 +2300,11 @@ function editorToolbar(){
                 <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
             </button>
         </div>
+        <div class="formato-biu" style="margin-top:6px;">
+            <button type="button" id="image-align-left" title="Imagen a la izquierda">↤</button>
+            <button type="button" id="image-align-center" title="Centrar imagen">↔</button>
+            <button type="button" id="image-align-right" title="Imagen a la derecha">↦</button>
+        </div>
         <select id="editor-image-size" class="formato-image-size" aria-label="Tamaño de imagen">
             <option value="auto">Tamaño de imagen · Original</option>
             <option value="25%">25%</option>
@@ -2407,6 +2441,18 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
         selectedEditorImage.style.maxWidth="100%";
         selectedEditorImage.style.height="auto";
     });
+    function alignSelectedImage(alignment){
+        if(!selectedEditorImage||!selectedEditorImage.isConnected||!([titleEditor,bodyEditor].some(editor=>editor.contains(selectedEditorImage)))){
+            alert("Toca primero la imagen que quieres alinear.");return;
+        }
+        selectedEditorImage.dataset.align=alignment;
+        selectedEditorImage.style.display="block";
+        selectedEditorImage.style.setProperty("margin-left",alignment==="right"?"auto":(alignment==="center"?"auto":"0"),"important");
+        selectedEditorImage.style.setProperty("margin-right",alignment==="left"?"auto":(alignment==="center"?"auto":"0"),"important");
+    }
+    document.getElementById("image-align-left").addEventListener("click",()=>alignSelectedImage("left"));
+    document.getElementById("image-align-center").addEventListener("click",()=>alignSelectedImage("center"));
+    document.getElementById("image-align-right").addEventListener("click",()=>alignSelectedImage("right"));
 
     const insertButton=document.getElementById("insert-link");
     function handleInsertLink(event){
@@ -2544,7 +2590,13 @@ function renderPublicationEditor(editData=null){
         <div id="publication-date-wrap">
             <label class="admin-status" for="publication-date">FECHA DE PUBLICACIÓN (OPCIONAL)</label>
             <input class="admin-input" id="publication-date" type="date" value="${editData?.statusDate||""}" aria-label="Fecha de publicación">
-            <p class="admin-hint">Puedes elegir una fecha para cualquier publicación, sin importar el menú o la categoría.</p>
+        </div>
+        <div id="status-meta-fields" style="display:none">
+            <label class="admin-status" for="status-author">AUTOR EN STATUS</label>
+            <input class="admin-input" id="status-author" maxlength="40" value="${String(editData?.statusAuthor||"zorg").replace(/&/g,"&amp;").replace(/"/g,"&quot;")}" placeholder="zorg">
+            <label class="admin-status" for="status-time-text">TIEMPO MOSTRADO (OPCIONAL)</label>
+            <input class="admin-input" id="status-time-text" maxlength="50" value="${String(editData?.statusTimeText||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;")}" placeholder="Automático: hace 1 día">
+            <p class="admin-hint">Déjalo vacío para calcular el tiempo automáticamente. También puedes escribir uno manual, como «hace 1 día».</p>
         </div>
         <label class="admin-status" for="rich-editor">CONTENIDO</label>
         <div class="rich-editor" id="rich-editor" contenteditable="true" role="textbox" aria-label="Contenido" spellcheck="true"></div>
@@ -2557,9 +2609,16 @@ function renderPublicationEditor(editData=null){
 
     const menuSelect=document.getElementById("record-menu");
     const categorySelect=document.getElementById("record-category");
+    function updateStatusEditorFields(){
+        const isStatus=menuSelect.value==="STATUS"&&categorySlug(categorySelect.value)==="status";
+        document.getElementById("status-meta-fields").style.display=isStatus?"block":"none";
+        document.getElementById("publication-date-wrap").style.display=isStatus?"block":"none";
+    }
     menuSelect.addEventListener("change",()=>{
-        fillCategorySelect(menuSelect,categorySelect);
+        fillCategorySelect(menuSelect,categorySelect);updateStatusEditorFields();
     });
+    categorySelect.addEventListener("change",updateStatusEditorFields);
+    updateStatusEditorFields();
     const titleEditor=document.getElementById("record-title");
     const bodyEditor=document.getElementById("rich-editor");
     titleEditor.innerHTML=editData?.titleHtml?safeHtml(editData.titleHtml):String(editData?.title||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -2594,6 +2653,8 @@ function renderPublicationEditor(editData=null){
         const data={
             menu:newMenu,category:newCategory,title,titleHtml,
             statusDate:document.getElementById("publication-date")?.value||"",
+            statusAuthor:document.getElementById("status-author")?.value.trim()||"zorg",
+            statusTimeText:document.getElementById("status-time-text")?.value.trim()||"",
             titleColor:validHexColor(titleEditor.style.color)?titleEditor.style.color:"#cccccc",
             titleFontFamily:safeInlineFontFamily(titleEditor.style.fontFamily)||"",
             titleFontSize:safeInlineFontSize(titleEditor.style.fontSize)||"",
@@ -2783,9 +2844,16 @@ function renderFileEditor(editData=null){
     const menuSelect=document.getElementById("record-menu");
     const categorySelect=document.getElementById("record-category");
 
+    function updateStatusEditorFields(){
+        const isStatus=menuSelect.value==="STATUS"&&categorySlug(categorySelect.value)==="status";
+        document.getElementById("status-meta-fields").style.display=isStatus?"block":"none";
+        document.getElementById("publication-date-wrap").style.display=isStatus?"block":"none";
+    }
     menuSelect.addEventListener("change",()=>{
-        fillCategorySelect(menuSelect,categorySelect);
+        fillCategorySelect(menuSelect,categorySelect);updateStatusEditorFields();
     });
+    categorySelect.addEventListener("change",updateStatusEditorFields);
+    updateStatusEditorFields();
 
     if(editData){
         document.getElementById("file-title").value=editData.title||"";
