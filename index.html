@@ -11,6 +11,16 @@
 <link rel="icon" type="image/png" href="/favicon.PNG">
 <link rel="shortcut icon" type="image/png" href="/favicon.PNG">
 
+<!-- Evita mostrar el fondo global mientras se resuelve una ruta directa. -->
+<script>
+(function(){
+  var parts=location.pathname.split('/').filter(Boolean);
+  if(parts.length===1 && !/^(story|index\.html?|favicon\.png)$/i.test(parts[0])){
+    document.documentElement.classList.add('route-appearance-pending');
+  }
+})();
+</script>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html{min-height:100%;background:#020303}
@@ -1754,6 +1764,7 @@ function renderRelatoDetail(item,updateUrl=false,relatoList=[]){
 }
 
 async function openRelatoBySlug(slug,updateUrl=false){
+    document.documentElement.classList.remove("route-appearance-pending");
     const content=document.getElementById("content-area");
     const token=++currentContentToken;
     clearContentListeners();
