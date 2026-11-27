@@ -2539,7 +2539,7 @@ function renderPublicationEditor(editData=null){
         <p class="admin-subtitle">${editData?"EDITAR PUBLICACIÓN":"NUEVA PUBLICACIÓN"}</p>
         ${addLocationSelectors(menu,category)}
         ${editorToolbar()}
-        <label class="admin-status" for="record-title">TÍTULO</label>
+        <label class="admin-status" for="record-title">TÍTULO (OPCIONAL)</label>
         <div class="admin-input rich-editor title-editor" id="record-title" contenteditable="true" role="textbox" aria-label="Título" data-placeholder="" style="min-height:48px;overflow-wrap:anywhere"></div>
         <div id="publication-date-wrap">
             <label class="admin-status" for="publication-date">FECHA DE PUBLICACIÓN (OPCIONAL)</label>
@@ -2584,8 +2584,8 @@ function renderPublicationEditor(editData=null){
         const saveButton=document.getElementById("record-save");
         const hasImage=!!bodyEditor.querySelector("img");
         const hasText=!!bodyEditor.textContent.trim();
-        if((!title&&!hasImage)||(!hasText&&!hasImage)){
-            status.textContent="Completa el título y el contenido, o inserta una imagen en el contenido.";return;
+        if(!hasText&&!hasImage){
+            status.textContent="Escribe contenido o inserta una imagen antes de publicar.";return;
         }
         saveButton.disabled=true;status.textContent="Guardando publicación...";
         const newMenu=menuSelect.value;
