@@ -166,7 +166,7 @@ nav{
 .admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
 .admin-danger{border-color:#633!important;color:#c99!important}
 footer{border-top:0;padding:0 6px;text-align:center;color:#666;font-family:monospace;font-size:clamp(8px,2.2vw,11px);letter-spacing:.55px;line-height:1.4;margin-top:auto;white-space:nowrap;transform:none}
-.status-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:9px;margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:clamp(20px,4.2vw,28px);font-weight:400;line-height:1.35}.status-author{color:#ef4444;text-decoration:underline;text-underline-offset:3px}.status-time{color:inherit;font-weight:400}.status-first-divider{border:0;border-top:1px solid rgba(130,130,130,.55);margin:26px 0 28px;width:100%;max-width:700px}
+.status-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:9px;margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:clamp(20px,4.2vw,28px);font-weight:400;line-height:1.35}.status-author{color:#ef4444;text-decoration:underline;text-underline-offset:3px}.status-time{color:#fff;font-weight:400}.status-first-divider{border:0;border-top:1px solid rgba(130,130,130,.55);margin:26px 0 28px;width:100%;max-width:700px}
 .container{position:relative;padding-bottom:34px}
 .container footer{position:absolute;left:0;right:0;bottom:-16px;margin:0}
 @keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -1604,49 +1604,16 @@ function statusRichTitleParts(item, dynamicTime=""){
     const authorFragment=authorRange?authorRange.cloneContents():document.createDocumentFragment();
     const timeFragment=timeRange?timeRange.cloneContents():document.createDocumentFragment();
     const replaceFragmentText=(fragment,value)=>{
-        // El tiempo cambia cada día, pero debe conservar los formatos que tenía
-        // el fragmento original (B, I, U y tamaño de letra), incluso si el
-        // usuario aplicó el formato a varias partes del texto.
-        const elements=[...fragment.childNodes].filter(node=>node.nodeType===Node.ELEMENT_NODE);
-        const allElements=[];
-        const collect=node=>{
-            if(node.nodeType!==Node.ELEMENT_NODE)return;
-            allElements.push(node);
-            [...node.children].forEach(collect);
-        };
-        elements.forEach(collect);
-        const tags=new Set();
-        const styles={};
-        const inspect=node=>{
-            let current=node;
-            while(current&&current.nodeType===Node.ELEMENT_NODE){
-                if(["B","STRONG","I","EM","U"].includes(current.tagName))tags.add(current.tagName);
-                if(current.tagName==="SPAN"){
-                    const size=safeInlineFontSize(current.style?.fontSize||"");
-                    const family=safeInlineFontFamily(current.style?.fontFamily||"");
-                    if(size)styles.fontSize=size;
-                    if(family)styles.fontFamily=family;
-                }
-                current=current.parentElement;
-            }
-        };
+        // El contador cambia, pero no debemos destruir los enlaces del título.
+        // Reemplazamos el texto dentro de la estructura original para conservar
+        // anchors, colores, B/I/U y tamaños aplicados desde el editor.
         const walker=document.createTreeWalker(fragment,NodeFilter.SHOW_TEXT);
-        let textNode;while((textNode=walker.nextNode()))inspect(textNode.parentElement);
-        fragment.replaceChildren(document.createTextNode(value));
-        let parent=fragment;
-        const wrap=(tag)=>{const el=document.createElement(tag.toLowerCase());parent.appendChild(el);parent=el;};
-        if(tags.has("B")||tags.has("STRONG"))wrap("strong");
-        if(tags.has("I")||tags.has("EM"))wrap("em");
-        if(tags.has("U"))wrap("u");
-        if(styles.fontSize||styles.fontFamily){
-            const span=document.createElement("span");
-            if(styles.fontSize)span.style.fontSize=styles.fontSize;
-            if(styles.fontFamily)span.style.fontFamily=styles.fontFamily;
-            parent.appendChild(span);parent=span;
-        }
-        // Move the replacement text into the innermost formatted element.
-        const replacement=fragment.firstChild;
-        if(replacement&&replacement.nodeType===Node.TEXT_NODE)parent.appendChild(replacement);
+        const textNodes=[];
+        let node;
+        while((node=walker.nextNode()))textNodes.push(node);
+        if(!textNodes.length){fragment.appendChild(document.createTextNode(value));return;}
+        textNodes[0].nodeValue=value;
+        for(let i=1;i<textNodes.length;i++)textNodes[i].nodeValue="";
     };
     replaceFragmentText(timeFragment,dynamicTime);
     const wrap=fragment=>{const div=document.createElement("div");div.appendChild(fragment);return div.innerHTML;};
@@ -1801,7 +1768,7 @@ async function showCategory(section,title,description,updateUrl=false){
                             time.className="status-time";
                             time.innerHTML=richParts.timeHtml||safeHtml(timeText);
                             const timeColor=statusTitlePartColor(item,"time");
-                            if(timeColor)time.style.color=timeColor;
+                            time.style.color=timeColor||"#fff";
                             heading.appendChild(time);
                         }
                         const titleFont=safeInlineFontFamily(item.titleFontFamily||"");
@@ -1911,33 +1878,25 @@ async function showCategory(section,title,description,updateUrl=false){
         }
 
         const pubQuery = legacyCollection("publicaciones").where("menu","==",section).where("category","==",title);
+        let cachedPublications=[];
+        let cachedFiles=window._currentFiles||[];
+        // onSnapshot entrega la primera carga y mantiene la vista sincronizada;
+        // evitamos lecturas duplicadas con get() que retrasaban y repetían el render.
         const unsubPub = pubQuery.onSnapshot(snapshot=>{
-            const docs=[];
-            snapshot.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-            renderContent(docs, window._currentFiles||[]);
+            cachedPublications=[];
+            snapshot.forEach(doc=>cachedPublications.push({id:doc.id,...doc.data()}));
+            renderContent(cachedPublications, cachedFiles);
         }, err=>console.error(err));
         activeContentListeners.push(unsubPub);
 
         const fileQuery = legacyCollection("archivos").where("menu","==",section).where("category","==",title);
         const unsubFile = fileQuery.onSnapshot(snapshot=>{
-            const files=[];
-            snapshot.forEach(doc=>files.push({id:doc.id,...doc.data()}));
-            window._currentFiles=files;
-            pubQuery.get().then(snap=>{
-                const docs=[];
-                snap.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-                renderContent(docs, files);
-            });
+            cachedFiles=[];
+            snapshot.forEach(doc=>cachedFiles.push({id:doc.id,...doc.data()}));
+            window._currentFiles=cachedFiles;
+            renderContent(cachedPublications, cachedFiles);
         }, err=>console.error(err));
         activeContentListeners.push(unsubFile);
-
-        Promise.all([pubQuery.get(), fileQuery.get()]).then(([pSnap, fSnap])=>{
-            const docs=[], files=[];
-            pSnap.forEach(doc=>docs.push({id:doc.id,...doc.data()}));
-            fSnap.forEach(doc=>files.push({id:doc.id,...doc.data()}));
-            window._currentFiles=files;
-            renderContent(docs, files);
-        });
 
         return;
 
