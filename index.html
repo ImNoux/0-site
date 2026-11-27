@@ -2642,26 +2642,27 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
             return;
         }
         const finalHref=url.origin===location.origin?(url.pathname+url.search+url.hash):url.href;
-        document.execCommand("createLink",false,finalHref);
-        editor.querySelectorAll("a").forEach(a=>{
-            /* Si el texto ya tenía color, también se asigna al enlace completo
-               para conservar el mismo color incluso en el subrayado. */
-            const coloredChild=a.querySelector("span[style]");
-            const coloredParent=a.parentElement?.closest("span[style]");
-            const selectedColor=a.style.color||coloredChild?.style.color||coloredParent?.style.color||"";
-            if(selectedColor&&safeInlineColor(selectedColor))a.style.color=selectedColor;
-            const aHref=a.getAttribute("href")||"";
-            try{
-                const parsed=new URL(aHref,location.origin);
-                if(parsed.origin===location.origin){
-                    a.removeAttribute("target");
-                    a.removeAttribute("rel");
-                }else{
-                    a.target="_blank";
-                    a.rel="noopener noreferrer";
-                }
-            }catch(e){}
-        });
+        // Crear el enlace directamente con el rango seleccionado evita que
+        // execCommand pierda o rompa el enlace cuando el texto ya tiene color.
+        const range=selection.getRangeAt(0);
+        const link=document.createElement("a");
+        link.setAttribute("href",finalHref);
+        if(url.origin!==location.origin){
+            link.target="_blank";
+            link.rel="noopener noreferrer";
+        }
+        const selectedContents=range.extractContents();
+        link.appendChild(selectedContents);
+        range.insertNode(link);
+        const coloredChild=link.querySelector("span[style]");
+        const coloredParent=link.parentElement?.closest("span[style]");
+        const selectedColor=link.style.color||coloredChild?.style.color||coloredParent?.style.color||"";
+        if(selectedColor&&safeInlineColor(selectedColor))link.style.color=selectedColor;
+        const nextRange=document.createRange();
+        nextRange.selectNodeContents(link);
+        selection.removeAllRanges();
+        selection.addRange(nextRange);
+        savedRanges.set(editor,nextRange.cloneRange());
         rememberSelection(editor);
     }
     insertButton.addEventListener("click",handleInsertLink);
