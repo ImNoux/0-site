@@ -299,7 +299,8 @@ nav{gap:2px}
 .publication h3{margin:0 0 .45em !important}
 .publication-body{max-width:560px;line-height:1.55}
 .publication-body p{margin:0 0 .45em !important;padding:0}
-.publication-body p:empty,.publication-body div:empty{display:none !important}
+.publication-status .publication-body{white-space:pre-wrap;overflow-wrap:anywhere}
+.publication-status .publication-body p:empty,.publication-status .publication-body div:empty{display:block;min-height:1em}
 .publication-body img,.publication-body .file-image,.file-image{margin:.45em 0 !important}
 .publication-body ul,.publication-body ol{margin:.45em 0 !important;padding-left:1.4em}
 .editor-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:10px 0}
@@ -1403,11 +1404,12 @@ function safeHtml(html){
             const savedColor=(node.tagName==="A"||node.tagName==="SPAN")?(node.style.color||""):"";
             const savedFontFamily=node.tagName==="SPAN"?(node.style.fontFamily||""):"";
             const savedFontSize=node.tagName==="SPAN"?(node.style.fontSize||""):"";
+            const savedAlign=(node.tagName==="P"||node.tagName==="DIV")?(node.style.textAlign||node.getAttribute("align")||""):"";
 
             [...node.attributes].forEach(attr=>{
                 const name=attr.name.toLowerCase();
                 const keepLinkAttribute=node.tagName==="A"&&["href","target","rel"].includes(name);
-                const keepSafeStyle=(node.tagName==="A"||node.tagName==="SPAN")&&name==="style";
+                const keepSafeStyle=(node.tagName==="A"||node.tagName==="SPAN"||node.tagName==="P"||node.tagName==="DIV")&&name==="style";
                 if(!keepLinkAttribute&&!keepSafeStyle)node.removeAttribute(attr.name);
             });
 
@@ -1418,6 +1420,8 @@ function safeHtml(html){
             if(safeColor)node.style.color=safeColor;
             if(node.tagName==="SPAN"&&safeFamily)node.style.fontFamily=safeFamily;
             if(node.tagName==="SPAN"&&safeSize)node.style.fontSize=safeSize;
+            const safeAlign=String(savedAlign).toLowerCase().trim();
+            if((node.tagName==="P"||node.tagName==="DIV")&&["left","center","right","justify"].includes(safeAlign))node.style.textAlign=safeAlign;
 
             if(node.tagName==="A"){
                 try{
@@ -1766,6 +1770,7 @@ async function showCategory(section,title,description,updateUrl=false){
             orderedPublications.forEach((item,publicationIndex)=>{
                 const article=document.createElement("article");
                 article.className="publication publication-font-modern";
+                if(section==="STATUS"&&categorySlug(title)==="status")article.classList.add("publication-status");
                 if(section==="BLOG"&&title==="Stories")article.dataset.storySlug=routeSlug(item.title);
                 const isStatusPublication=section==="STATUS"&&categorySlug(title)==="status";
                 // El título sigue siendo opcional también en STATUS.
@@ -1819,11 +1824,6 @@ async function showCategory(section,title,description,updateUrl=false){
                 if(bodyFont)body.style.fontFamily=bodyFont;
                 if(bodySize)body.style.fontSize=bodySize;
                 if(validHexColor(item.bodyColor))body.style.color=item.bodyColor;
-                body.querySelectorAll("p, div").forEach(node=>{
-                    const hasContent=node.querySelector("img, a, ul, ol, video, iframe");
-                    if(!node.textContent.trim()&&!hasContent)node.remove();
-                });
-                body.querySelectorAll("br + br").forEach(br=>br.remove());
                 if(section==="BLOG"&&title==="Stories"){
                     article.appendChild(body);
                     content.appendChild(article);
