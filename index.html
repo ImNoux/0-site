@@ -1578,6 +1578,32 @@ async function applyRouteAppearance(section,title,token){
     await refresh();
 }
 
+/* Recupera el color aplicado a cada fragmento del título STATUS desde el editor. */
+function statusTitlePartColor(item, part){
+    if(!item?.titleHtml)return "";
+    const holder=document.createElement("div");
+    holder.innerHTML=safeHtml(item.titleHtml);
+    const fullText=holder.textContent||"";
+    const splitAt=fullText.search(/\s/);
+    if(splitAt<0)return part==="author"?"":"";
+    const start=part==="author"?0:splitAt+1;
+    const end=part==="author"?splitAt:fullText.length;
+    const walker=document.createTreeWalker(holder,NodeFilter.SHOW_TEXT);
+    let offset=0,node;
+    while((node=walker.nextNode())){
+        const nodeStart=offset,nodeEnd=offset+node.nodeValue.length;
+        offset=nodeEnd;
+        if(nodeEnd<=start||nodeStart>=end)continue;
+        let parent=node.parentElement;
+        while(parent&&parent!==holder){
+            const color=safeInlineColor(parent.style?.color||"");
+            if(color)return color;
+            parent=parent.parentElement;
+        }
+    }
+    return "";
+}
+
 /* STATUS: fecha relativa y metadatos */
 function statusRelativeTime(item, initialText=""){
     // Si el título incluye "hace N días", N es el punto de partida y aumenta cada día.
@@ -1692,11 +1718,15 @@ async function showCategory(section,title,description,updateUrl=false){
                         const author=document.createElement("span");
                         author.className="status-author";
                         author.textContent=authorText;
+                        const authorColor=statusTitlePartColor(item,"author");
+                        if(authorColor)author.style.color=authorColor;
                         heading.appendChild(author);
                         if(timeText){
                             const time=document.createElement("span");
                             time.className="status-time";
                             time.textContent=timeText;
+                            const timeColor=statusTitlePartColor(item,"time");
+                            if(timeColor)time.style.color=timeColor;
                             heading.appendChild(time);
                         }
                         const titleFont=safeInlineFontFamily(item.titleFontFamily||"");
