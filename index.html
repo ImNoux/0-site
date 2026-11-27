@@ -1168,6 +1168,49 @@ async function loadCategorySettings(){
 // Así Safari/Chrome no confunden una categoría oculta con un relato mientras Firebase responde.
 const categorySettingsPromise=loadCategorySettings();
 
+/* Precarga únicamente la apariencia de STATUS mientras se visita la portada.
+   Reutiliza la misma clave local que applyRouteAppearance para que la ruta
+   pueda pintar el fondo sin esperar una segunda consulta a Firestore. */
+let statusAppearancePreloadPromise=null;
+function preloadStatusAppearance(){
+    if(statusAppearancePreloadPromise)return statusAppearancePreloadPromise;
+    statusAppearancePreloadPromise=(async()=>{
+        const cacheKey="0site_route_appearance_status";
+        let cachedAppearance=null;
+        try{
+            const cached=localStorage.getItem(cacheKey);
+            if(cached)cachedAppearance=JSON.parse(cached);
+        }catch(error){console.warn("No se pudo leer la apariencia precargada de STATUS:",error);}
+
+        const preloadImage=async url=>{
+            if(typeof url!=="string"||!/^https:\/\//i.test(url.trim()))return;
+            const image=new Image();
+            image.decoding="async";
+            image.src=url.trim();
+            if(typeof image.decode==="function"){
+                try{await image.decode();}catch(error){}
+            }
+        };
+
+        if(cachedAppearance?.backgroundImage)preloadImage(cachedAppearance.backgroundImage);
+
+        try{
+            const snap=await firestore.collection("categories").doc("status").get();
+            if(!snap.exists)return cachedAppearance;
+            const latest=snap.data()?.appearance;
+            if(!latest||typeof latest!=="object")return cachedAppearance;
+            try{localStorage.setItem(cacheKey,JSON.stringify(latest));}catch(error){}
+            if(latest.backgroundImage)await preloadImage(latest.backgroundImage);
+            return latest;
+        }catch(error){
+            console.warn("No se pudo precargar la apariencia de STATUS:",error);
+            return cachedAppearance;
+        }
+    })();
+    return statusAppearancePreloadPromise;
+}
+if(location.pathname==="/"||/\/index\.html?$/i.test(location.pathname))preloadStatusAppearance();
+
 document.querySelectorAll(".nav-button").forEach(button=>{
     button.addEventListener("click",event=>{
         event.stopPropagation();
@@ -1451,8 +1494,8 @@ function resetRouteAppearance(){
 }
 async function applyRouteAppearance(section,title,token){
     const root=document.documentElement;
-    const cacheKey="0site_route_appearance_"+categorySlug(title);
     const slug=categorySlug(title);
+    const cacheKey="0site_route_appearance_"+slug;
     root.classList.add("route-appearance-pending");
     resetRouteAppearance();
 
@@ -1482,34 +1525,52 @@ async function applyRouteAppearance(section,title,token){
         if(validHexColor(appearance.shadowColor))content.style.boxShadow=`0 12px 35px ${appearance.shadowColor}`;
     }
 
-    // Use the last known appearance immediately, then refresh it from Firestore.
-    if(slug){
-        try{
-            const cached=localStorage.getItem(cacheKey);
-            if(cached)paintAppearance(JSON.parse(cached));
-        }catch(error){console.warn("No se pudo leer la apariencia guardada localmente:",error);}
-    }
-
-    try{
-        if(!slug)return;
-        const snap=await firestore.collection("categories").doc(slug).get();
-        if(token!==currentContentToken)return;
-        if(!snap.exists){
-            try{localStorage.removeItem(cacheKey);}catch(error){}
-            return;
-        }
-        const appearance=snap.data()?.appearance;
-        if(appearance&&typeof appearance==="object"){
-            paintAppearance(appearance);
-            try{localStorage.setItem(cacheKey,JSON.stringify(appearance));}catch(error){}
-        }else{
-            try{localStorage.removeItem(cacheKey);}catch(error){}
-        }
-    }catch(error){
-        console.warn("No se pudo cargar la apariencia de esta ruta:",error);
-    }finally{
+    function releaseBackground(){
         if(token===currentContentToken)root.classList.remove("route-appearance-pending");
     }
+
+    if(!slug){releaseBackground();return;}
+
+    // Primero aplica la última apariencia guardada en este navegador.
+    // Muy importante: quitar la clase de espera enseguida permite que el navegador
+    // empiece a descargar la imagen, sin esperar la respuesta de Firestore.
+    let hasCache=false;
+    try{
+        const cached=localStorage.getItem(cacheKey);
+        if(cached){
+            paintAppearance(JSON.parse(cached));
+            hasCache=true;
+            releaseBackground();
+        }
+    }catch(error){console.warn("No se pudo leer la apariencia guardada localmente:",error);}
+
+    // Actualiza Firebase en segundo plano cuando ya existe una copia local.
+    // En una primera visita (sin caché), espera a Firebase para conocer la URL.
+    const refresh=async()=>{
+        try{
+            const snap=await firestore.collection("categories").doc(slug).get();
+            if(token!==currentContentToken)return;
+            if(!snap.exists){
+                try{localStorage.removeItem(cacheKey);}catch(error){}
+                if(!hasCache)releaseBackground();
+                return;
+            }
+            const appearance=snap.data()?.appearance;
+            if(appearance&&typeof appearance==="object"){
+                paintAppearance(appearance);
+                try{localStorage.setItem(cacheKey,JSON.stringify(appearance));}catch(error){}
+            }else{
+                try{localStorage.removeItem(cacheKey);}catch(error){}
+            }
+        }catch(error){
+            console.warn("No se pudo cargar la apariencia de esta ruta:",error);
+        }finally{
+            if(!hasCache)releaseBackground();
+        }
+    };
+
+    if(hasCache){ refresh(); return; }
+    await refresh();
 }
 
 /* MOSTRAR CATEGORÍAS */
@@ -2304,6 +2365,13 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
             try{
                 span.appendChild(range.extractContents());
                 range.insertNode(span);
+                if(property==="color"){
+                    const linkedNodes=[];
+                    const parentLink=span.closest("a");
+                    if(parentLink)linkedNodes.push(parentLink);
+                    span.querySelectorAll("a").forEach(link=>linkedNodes.push(link));
+                    linkedNodes.forEach(link=>{link.style.color=value;});
+                }
                 const next=document.createRange();next.selectNodeContents(span);
                 selection.removeAllRanges();selection.addRange(next);
                 savedRanges.set(editor,next.cloneRange());
@@ -2385,6 +2453,12 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
         const finalHref=url.origin===location.origin?(url.pathname+url.search+url.hash):url.href;
         document.execCommand("createLink",false,finalHref);
         editor.querySelectorAll("a").forEach(a=>{
+            /* Si el texto ya tenía color, también se asigna al enlace completo
+               para conservar el mismo color incluso en el subrayado. */
+            const coloredChild=a.querySelector("span[style]");
+            const coloredParent=a.parentElement?.closest("span[style]");
+            const selectedColor=a.style.color||coloredChild?.style.color||coloredParent?.style.color||"";
+            if(selectedColor&&safeInlineColor(selectedColor))a.style.color=selectedColor;
             const aHref=a.getAttribute("href")||"";
             try{
                 const parsed=new URL(aHref,location.origin);
