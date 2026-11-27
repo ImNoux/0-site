@@ -1603,6 +1603,10 @@ function statusRichTitleParts(item, dynamicTime=""){
     const timeRange=makeRange(splitAt+1,fullText.length);
     const authorFragment=authorRange?authorRange.cloneContents():document.createDocumentFragment();
     const timeFragment=timeRange?timeRange.cloneContents():document.createDocumentFragment();
+    // En STATUS los enlaces se colocan en el contenido, nunca en el encabezado.
+    [authorFragment,timeFragment].forEach(fragment=>{
+        fragment.querySelectorAll?.("a").forEach(link=>link.replaceWith(...link.childNodes));
+    });
     const replaceFragmentText=(fragment,value)=>{
         // El contador cambia, pero no debemos destruir los enlaces del título.
         // Reemplazamos el texto dentro de la estructura original para conservar
@@ -1688,6 +1692,24 @@ function statusRelativeTime(item, initialText=""){
     const years=Math.floor(days/365);return `hace ${years} ${years===1?"año":"años"}`;
 }
 
+// En STATUS el usuario escribe manualmente "zorg hace N días" en el contenido.
+// Solo actualizamos la parte temporal del primer renglón y dejamos intactos
+// el autor, los estilos y los enlaces del resto del contenido.
+function statusUpdateContentTime(body,item){
+    if(!body)return;
+    const walker=document.createTreeWalker(body,NodeFilter.SHOW_TEXT);
+    let node;
+    const pattern=/(\S+\s+)hace\s+(\d+)\s+d[ií]as?/i;
+    while((node=walker.nextNode())){
+        const value=node.nodeValue||"";
+        const match=value.match(pattern);
+        if(!match)continue;
+        const dynamicTime=statusRelativeTime(item,`hace ${match[2]} días`);
+        node.nodeValue=value.replace(pattern,`$1${dynamicTime}`);
+        break;
+    }
+}
+
 /* MOSTRAR CATEGORÍAS */
 
 async function showCategory(section,title,description,updateUrl=false){
@@ -1746,73 +1768,52 @@ async function showCategory(section,title,description,updateUrl=false){
                 article.className="publication publication-font-modern";
                 if(section==="BLOG"&&title==="Stories")article.dataset.storySlug=routeSlug(item.title);
                 const isStatusPublication=section==="STATUS"&&categorySlug(title)==="status";
-                // En STATUS, el encabezado completo se escribe directamente en TÍTULO.
-                // La primera publicación no muestra encabezado; desde la segunda sí.
-                if(item.title&&(!isStatusPublication||publicationIndex>0)){
-                    if(isStatusPublication){
-                        const heading=document.createElement("div");
-                        heading.className="status-heading";
-                        const rawTitle=String(item.title).trim();
-                        const splitAt=rawTitle.search(/\s/);
-                        const authorText=splitAt<0?rawTitle:rawTitle.slice(0,splitAt);
-                        const timeText=splitAt<0?statusRelativeTime(item):statusRelativeTime(item,rawTitle.slice(splitAt+1).trim());
-                        const richParts=statusRichTitleParts(item,timeText);
-                        const author=document.createElement("span");
-                        author.className="status-author";
-                        author.innerHTML=richParts.authorHtml||safeHtml(authorText);
-                        const authorColor=statusTitlePartColor(item,"author");
-                        if(authorColor)author.style.color=authorColor;
-                        heading.appendChild(author);
-                        if(timeText){
-                            const time=document.createElement("span");
-                            time.className="status-time";
-                            time.innerHTML=richParts.timeHtml||safeHtml(timeText);
-                            const timeColor=statusTitlePartColor(item,"time");
-                            time.style.color=timeColor||"#fff";
-                            heading.appendChild(time);
-                        }
-                        const titleFont=safeInlineFontFamily(item.titleFontFamily||"");
-                        const titleSize=safeInlineFontSize(item.titleFontSize||"");
-                        if(titleFont)heading.style.fontFamily=titleFont;
-                        if(titleSize)heading.style.fontSize=titleSize;
-                        article.appendChild(heading);
-                    }else{
-                        const h=document.createElement("h3");
-                        if(item.titleHtml)h.innerHTML=safeHtml(item.titleHtml);
-                        else h.textContent=item.title;
-                        // Los enlaces del título se gestionan aquí de forma explícita.
-                        // Así no dependen del estilo/color aplicado al texto ni de que
-                        // el clic llegue al manejador delegado del contenedor.
-                        h.querySelectorAll("a[href]").forEach(anchor=>{
-                            anchor.style.pointerEvents="auto";
-                            anchor.style.cursor="pointer";
-                            anchor.addEventListener("click",event=>{
-                                const rawHref=anchor.getAttribute("href")||"";
-                                let linkUrl;
-                                try{linkUrl=new URL(rawHref,location.origin);}catch(error){return;}
-                                if(linkUrl.origin===location.origin){
-                                    event.preventDefault();
-                                    event.stopPropagation();
-                                    window.location.assign(linkUrl.href);
-                                }
-                            });
+                // El título sigue siendo opcional también en STATUS.
+                // Autor y tiempo se escriben manualmente dentro del contenido.
+                if(item.title){
+                    const h=document.createElement("h3");
+                    if(item.titleHtml)h.innerHTML=safeHtml(item.titleHtml);
+                    else h.textContent=item.title;
+                    h.querySelectorAll("a[href]").forEach(anchor=>{
+                        anchor.style.pointerEvents="auto";
+                        anchor.style.cursor="pointer";
+                        anchor.addEventListener("click",event=>{
+                            const rawHref=anchor.getAttribute("href")||"";
+                            let linkUrl;
+                            try{linkUrl=new URL(rawHref,location.origin);}catch(error){return;}
+                            if(linkUrl.origin===location.origin){
+                                event.preventDefault();
+                                event.stopPropagation();
+                                window.location.assign(linkUrl.href);
+                            }
                         });
-                        if(validHexColor(item.titleColor))h.style.color=item.titleColor;
-                        const titleFont=safeInlineFontFamily(item.titleFontFamily||"");
-                        const titleSize=safeInlineFontSize(item.titleFontSize||"");
-                        if(titleFont)h.style.fontFamily=titleFont;
-                        if(titleSize)h.style.fontSize=titleSize;
-                        if(section==="BLOG"&&title==="Stories"){
-                            h.style.cursor="pointer";
-                            h.title="Abrir historia";
-                            h.addEventListener("click",()=>openRelato(item,true,orderedPublications));
-                        }
-                        article.appendChild(h);
+                    });
+                    if(validHexColor(item.titleColor))h.style.color=item.titleColor;
+                    const titleFont=safeInlineFontFamily(item.titleFontFamily||"");
+                    const titleSize=safeInlineFontSize(item.titleFontSize||"");
+                    if(titleFont)h.style.fontFamily=titleFont;
+                    if(titleSize)h.style.fontSize=titleSize;
+                    if(section==="BLOG"&&title==="Stories"){
+                        h.style.cursor="pointer";
+                        h.title="Abrir historia";
+                        h.addEventListener("click",()=>openRelato(item,true,orderedPublications));
                     }
+                    article.appendChild(h);
                 }
                 const body=document.createElement("div");
                 body.className="publication-body";
                 body.innerHTML=safeHtml(item.bodyHtml||"");
+                if(isStatusPublication){
+                    statusUpdateContentTime(body,item);
+                    // Los enlaces de STATUS viven dentro del contenido y siempre
+                    // quedan interactivos, incluso si tienen color/formato propio.
+                    body.querySelectorAll("a[href]").forEach(anchor=>{
+                        anchor.style.setProperty("pointer-events","auto","important");
+                        anchor.style.cursor="pointer";
+                        anchor.style.position="relative";
+                        anchor.style.zIndex="1";
+                    });
+                }
                 const bodyFont=safeInlineFontFamily(item.bodyFontFamily||"");
                 const bodySize=safeInlineFontSize(item.bodyFontSize||"");
                 if(bodyFont)body.style.fontFamily=bodyFont;
