@@ -1579,6 +1579,42 @@ async function applyRouteAppearance(section,title,token){
 }
 
 /* Recupera el color aplicado a cada fragmento del título STATUS desde el editor. */
+/* Divide el título STATUS sin perder negrita, cursiva, subrayado ni tamaño de cada fragmento. */
+function statusRichTitleParts(item, dynamicTime=""){
+    const holder=document.createElement("div");
+    holder.innerHTML=safeHtml(item?.titleHtml||"");
+    const fullText=holder.textContent||String(item?.title||"");
+    const splitAt=fullText.search(/\s/);
+    if(splitAt<0)return {authorHtml:"",timeHtml:""};
+    const makeRange=(start,end)=>{
+        const range=document.createRange();
+        const walker=document.createTreeWalker(holder,NodeFilter.SHOW_TEXT);
+        let offset=0,node,startNode=null,startOffset=0,endNode=null,endOffset=0;
+        while((node=walker.nextNode())){
+            const next=offset+node.nodeValue.length;
+            if(startNode===null&&start>=offset&&start<=next){startNode=node;startOffset=start-offset;}
+            if(end>=offset&&end<=next){endNode=node;endOffset=end-offset;break;}
+            offset=next;
+        }
+        if(!startNode||!endNode)return null;
+        range.setStart(startNode,startOffset);range.setEnd(endNode,endOffset);return range;
+    };
+    const authorRange=makeRange(0,splitAt);
+    const timeRange=makeRange(splitAt+1,fullText.length);
+    const authorFragment=authorRange?authorRange.cloneContents():document.createDocumentFragment();
+    const timeFragment=timeRange?timeRange.cloneContents():document.createDocumentFragment();
+    const replaceFragmentText=(fragment,value)=>{
+        const walker=document.createTreeWalker(fragment,NodeFilter.SHOW_TEXT);
+        const nodes=[];let n;while((n=walker.nextNode()))nodes.push(n);
+        if(!nodes.length){fragment.appendChild(document.createTextNode(value));return;}
+        nodes[0].nodeValue=value;
+        nodes.slice(1).forEach(node=>node.nodeValue="");
+    };
+    replaceFragmentText(timeFragment,dynamicTime);
+    const wrap=fragment=>{const div=document.createElement("div");div.appendChild(fragment);return div.innerHTML;};
+    return {authorHtml:wrap(authorFragment),timeHtml:wrap(timeFragment)};
+}
+
 function statusTitlePartColor(item, part){
     if(!item?.titleHtml)return "";
     const holder=document.createElement("div");
@@ -1715,16 +1751,17 @@ async function showCategory(section,title,description,updateUrl=false){
                         const splitAt=rawTitle.search(/\s/);
                         const authorText=splitAt<0?rawTitle:rawTitle.slice(0,splitAt);
                         const timeText=splitAt<0?statusRelativeTime(item):statusRelativeTime(item,rawTitle.slice(splitAt+1).trim());
+                        const richParts=statusRichTitleParts(item,timeText);
                         const author=document.createElement("span");
                         author.className="status-author";
-                        author.textContent=authorText;
+                        author.innerHTML=richParts.authorHtml||safeHtml(authorText);
                         const authorColor=statusTitlePartColor(item,"author");
                         if(authorColor)author.style.color=authorColor;
                         heading.appendChild(author);
                         if(timeText){
                             const time=document.createElement("span");
                             time.className="status-time";
-                            time.textContent=timeText;
+                            time.innerHTML=richParts.timeHtml||safeHtml(timeText);
                             const timeColor=statusTitlePartColor(item,"time");
                             if(timeColor)time.style.color=timeColor;
                             heading.appendChild(time);
