@@ -16,6 +16,7 @@
 html{min-height:100%;background:#020303}
 body{min-height:100vh;position:relative;background:transparent}
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:var(--route-background-image, url("https://i.ibb.co/DDskCf3v/IMG-1297.png"));background-color:var(--route-background-color, #020303);background-position:center center;background-repeat:no-repeat;background-size:cover;width:100vw;height:100vh;height:100svh}
+html.route-appearance-pending body::before{background-image:none!important;background-color:#020303!important}
 #letter-screen{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:none;justify-content:center;align-items:stretch;padding:42px 7vw;background:#000;transition:opacity 1.5s ease}
 .letter{width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65)}
 .letter-header{display:flex;justify-content:space-between;gap:15px;color:#746d62;font-family:monospace;font-size:11px;margin-bottom:28px;letter-spacing:1px;padding-bottom:15px;border-bottom:1px solid rgba(80,70,55,.2)}
@@ -1439,21 +1440,21 @@ function resetRouteAppearance(){
     content.style.boxShadow="";
 }
 async function applyRouteAppearance(section,title,token){
-    resetRouteAppearance();
+    const root=document.documentElement;
+    const cacheKey="0site_route_appearance_"+categorySlug(title);
     const slug=categorySlug(title);
-    if(!slug)return;
-    try{
-        const snap=await firestore.collection("categories").doc(slug).get();
-        if(token!==currentContentToken||!snap.exists)return;
-        const appearance=snap.data()?.appearance;
+    root.classList.add("route-appearance-pending");
+    resetRouteAppearance();
+
+    function paintAppearance(appearance){
         if(!appearance||typeof appearance!=="object")return;
-        const root=document.documentElement;
         if(typeof appearance.backgroundImage==="string"&&/^https:\/\//i.test(appearance.backgroundImage.trim())){
             const safeUrl=appearance.backgroundImage.trim().replace(/["\\\n\r]/g,"");
             root.style.setProperty("--route-background-image",`url("${safeUrl}")`);
         }
         if(validHexColor(appearance.backgroundColor))root.style.setProperty("--route-background-color",appearance.backgroundColor);
         const content=document.getElementById("content-area");
+        if(!content)return;
         const panelColor=validHexColor(appearance.panelColor)?appearance.panelColor:"#2d2d2d";
         const opacity=Math.max(0,Math.min(1,Number(appearance.panelOpacity??0.58)));
         const match=panelColor.match(/^#([0-9a-f]{6})$/i);
@@ -1469,7 +1470,36 @@ async function applyRouteAppearance(section,title,token){
         const radius=Math.max(0,Math.min(40,Number(appearance.panelRadius??0)));
         if(radius)content.style.borderRadius=`${radius}px`;
         if(validHexColor(appearance.shadowColor))content.style.boxShadow=`0 12px 35px ${appearance.shadowColor}`;
-    }catch(error){console.warn("No se pudo cargar la apariencia de esta ruta:",error);}
+    }
+
+    // Use the last known appearance immediately, then refresh it from Firestore.
+    if(slug){
+        try{
+            const cached=localStorage.getItem(cacheKey);
+            if(cached)paintAppearance(JSON.parse(cached));
+        }catch(error){console.warn("No se pudo leer la apariencia guardada localmente:",error);}
+    }
+
+    try{
+        if(!slug)return;
+        const snap=await firestore.collection("categories").doc(slug).get();
+        if(token!==currentContentToken)return;
+        if(!snap.exists){
+            try{localStorage.removeItem(cacheKey);}catch(error){}
+            return;
+        }
+        const appearance=snap.data()?.appearance;
+        if(appearance&&typeof appearance==="object"){
+            paintAppearance(appearance);
+            try{localStorage.setItem(cacheKey,JSON.stringify(appearance));}catch(error){}
+        }else{
+            try{localStorage.removeItem(cacheKey);}catch(error){}
+        }
+    }catch(error){
+        console.warn("No se pudo cargar la apariencia de esta ruta:",error);
+    }finally{
+        if(token===currentContentToken)root.classList.remove("route-appearance-pending");
+    }
 }
 
 /* MOSTRAR CATEGORÍAS */
@@ -1544,7 +1574,7 @@ async function showCategory(section,title,description,updateUrl=false){
                     }
                     article.appendChild(h);
                 }
-                if(section==="STATUS"&&item.statusDate){
+                if(item.statusDate){
                     const parts=String(item.statusDate).split("-").map(Number);
                     if(parts.length===3&&parts.every(Number.isFinite)){
                         const date=new Date(parts[0],parts[1]-1,parts[2]);
@@ -2420,10 +2450,10 @@ function renderPublicationEditor(editData=null){
         ${editorToolbar()}
         <label class="admin-status" for="record-title">TÍTULO</label>
         <div class="admin-input rich-editor title-editor" id="record-title" contenteditable="true" role="textbox" aria-label="Título" data-placeholder="" style="min-height:48px;overflow-wrap:anywhere"></div>
-        <div id="status-date-wrap" style="display:${menu==="STATUS"?"block":"none"}">
-            <label class="admin-status" for="status-date">FECHA DE PUBLICACIÓN</label>
-            <input class="admin-input" id="status-date" type="date" value="${editData?.statusDate||""}" aria-label="Fecha de publicación">
-            <p class="admin-hint">Esta fecha aparecerá debajo del título en STATUS. Puedes elegir cualquier día.</p>
+        <div id="publication-date-wrap">
+            <label class="admin-status" for="publication-date">FECHA DE PUBLICACIÓN (OPCIONAL)</label>
+            <input class="admin-input" id="publication-date" type="date" value="${editData?.statusDate||""}" aria-label="Fecha de publicación">
+            <p class="admin-hint">Puedes elegir una fecha para cualquier publicación, sin importar el menú o la categoría.</p>
         </div>
         <label class="admin-status" for="rich-editor">CONTENIDO</label>
         <div class="rich-editor" id="rich-editor" contenteditable="true" role="textbox" aria-label="Contenido" spellcheck="true"></div>
@@ -2438,7 +2468,6 @@ function renderPublicationEditor(editData=null){
     const categorySelect=document.getElementById("record-category");
     menuSelect.addEventListener("change",()=>{
         fillCategorySelect(menuSelect,categorySelect);
-        document.getElementById("status-date-wrap").style.display=menuSelect.value==="STATUS"?"block":"none";
     });
     const titleEditor=document.getElementById("record-title");
     const bodyEditor=document.getElementById("rich-editor");
@@ -2473,7 +2502,7 @@ function renderPublicationEditor(editData=null){
         const sameLocation=editData&&editData.menu===newMenu&&editData.category===newCategory;
         const data={
             menu:newMenu,category:newCategory,title,titleHtml,
-            statusDate:newMenu==="STATUS"?(document.getElementById("status-date")?.value||""):"",
+            statusDate:document.getElementById("publication-date")?.value||"",
             titleColor:validHexColor(titleEditor.style.color)?titleEditor.style.color:"#cccccc",
             titleFontFamily:safeInlineFontFamily(titleEditor.style.fontFamily)||"",
             titleFontSize:safeInlineFontSize(titleEditor.style.fontSize)||"",
@@ -3040,6 +3069,7 @@ function renderConfiguration(){
         };
         try{
             await firestore.collection("categories").doc(slug).set({appearance,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+            try{localStorage.setItem("0site_route_appearance_"+slug,JSON.stringify(appearance));}catch(error){}
             appearanceStatus.textContent="Apariencia guardada para /"+slug+".";
         }catch(error){console.error(error);appearanceStatus.textContent="No se pudo guardar. Comprueba las reglas de Firestore.";}
     });
@@ -3048,6 +3078,7 @@ function renderConfiguration(){
         if(!confirm("¿Restablecer la apariencia personalizada de /"+slug+"?"))return;
         try{
             await firestore.collection("categories").doc(slug).set({appearance:firebase.firestore.FieldValue.delete(),updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+            try{localStorage.removeItem("0site_route_appearance_"+slug);}catch(error){}
             await loadAppearanceEditor();
             appearanceStatus.textContent="Apariencia restablecida para /"+slug+".";
         }catch(error){console.error(error);appearanceStatus.textContent="No se pudo restablecer. Comprueba las reglas de Firestore.";}
