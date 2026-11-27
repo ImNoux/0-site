@@ -1579,17 +1579,37 @@ async function applyRouteAppearance(section,title,token){
 }
 
 /* STATUS: fecha relativa y metadatos */
-function statusRelativeTime(item){
+function statusRelativeTime(item, initialText=""){
+    // Si el título incluye "hace N días", N es el punto de partida y aumenta cada día.
+    const initialMatch=String(initialText).trim().match(/^hace\s+(\d+)\s+d[ií]as?$/i);
+    if(initialMatch){
+        let publishedAt=null;
+        if(item.createdAt){
+            if(typeof item.createdAt.toDate==="function")publishedAt=item.createdAt.toDate();
+            else if(item.createdAt instanceof Date)publishedAt=item.createdAt;
+            else if(typeof item.createdAt.seconds==="number")publishedAt=new Date(item.createdAt.seconds*1000);
+        }
+        if(!publishedAt&&item.statusDate){
+            const parts=String(item.statusDate).split("-").map(Number);
+            if(parts.length===3&&parts.every(Number.isFinite))publishedAt=new Date(parts[0],parts[1]-1,parts[2]);
+        }
+        const elapsed=publishedAt&&!Number.isNaN(publishedAt.getTime())?Math.max(0,Math.floor((Date.now()-publishedAt.getTime())/86400000)):0;
+        const totalDays=Number(initialMatch[1])+elapsed;
+        if(totalDays>=365){const years=Math.floor(totalDays/365);return `hace ${years} ${years===1?"año":"años"}`;}
+        return `hace ${totalDays} ${totalDays===1?"día":"días"}`;
+    }
     if(item.statusTimeText&&String(item.statusTimeText).trim())return String(item.statusTimeText).trim();
     let date=null;
-    if(item.statusDate){
-        const parts=String(item.statusDate).split("-").map(Number);
-        if(parts.length===3&&parts.every(Number.isFinite))date=new Date(parts[0],parts[1]-1,parts[2]);
-    }
-    if(!date&&item.createdAt){
+    // Prioriza la fecha real de creación/publicación para el tiempo automático.
+    if(item.createdAt){
         if(typeof item.createdAt.toDate==="function")date=item.createdAt.toDate();
         else if(item.createdAt instanceof Date)date=item.createdAt;
         else if(typeof item.createdAt.seconds==="number")date=new Date(item.createdAt.seconds*1000);
+    }
+    // La fecha elegida manualmente queda como respaldo si no existe createdAt.
+    if(!date&&item.statusDate){
+        const parts=String(item.statusDate).split("-").map(Number);
+        if(parts.length===3&&parts.every(Number.isFinite))date=new Date(parts[0],parts[1]-1,parts[2]);
     }
     if(!date||Number.isNaN(date.getTime()))return "recién publicado";
     const seconds=Math.max(0,Math.floor((Date.now()-date.getTime())/1000));
@@ -1658,34 +1678,48 @@ async function showCategory(section,title,description,updateUrl=false){
                 const article=document.createElement("article");
                 article.className="publication publication-font-modern";
                 if(section==="BLOG"&&title==="Stories")article.dataset.storySlug=routeSlug(item.title);
-                if(item.title){
-                    const h=document.createElement("h3");
-                    if(item.titleHtml)h.innerHTML=safeHtml(item.titleHtml);
-                    else h.textContent=item.title;
-                    if(validHexColor(item.titleColor))h.style.color=item.titleColor;
-                    const titleFont=safeInlineFontFamily(item.titleFontFamily||"");
-                    const titleSize=safeInlineFontSize(item.titleFontSize||"");
-                    if(titleFont)h.style.fontFamily=titleFont;
-                    if(titleSize)h.style.fontSize=titleSize;
-                    if(section==="BLOG"&&title==="Stories"){
-                        h.style.cursor="pointer";
-                        h.title="Abrir historia";
-                        h.addEventListener("click",()=>openRelato(item,true,orderedPublications));
-                    }
-                    article.appendChild(h);
-                }
                 const isStatusPublication=section==="STATUS"&&categorySlug(title)==="status";
-                if(isStatusPublication){
-                    const heading=document.createElement("div");
-                    heading.className="status-heading";
-                    const author=document.createElement("span");
-                    author.className="status-author";
-                    author.textContent=((item.statusAuthor||"zorg").trim()||"zorg")+".";
-                    const time=document.createElement("span");
-                    time.className="status-time";
-                    time.textContent=statusRelativeTime(item);
-                    heading.append(author,time);
-                    article.appendChild(heading);
+                // En STATUS, el encabezado completo se escribe directamente en TÍTULO.
+                // La primera publicación no muestra encabezado; desde la segunda sí.
+                if(item.title&&(!isStatusPublication||publicationIndex>0)){
+                    if(isStatusPublication){
+                        const heading=document.createElement("div");
+                        heading.className="status-heading";
+                        const rawTitle=String(item.title).trim();
+                        const splitAt=rawTitle.search(/\s/);
+                        const authorText=splitAt<0?rawTitle:rawTitle.slice(0,splitAt);
+                        const timeText=splitAt<0?statusRelativeTime(item):statusRelativeTime(item,rawTitle.slice(splitAt+1).trim());
+                        const author=document.createElement("span");
+                        author.className="status-author";
+                        author.textContent=authorText;
+                        heading.appendChild(author);
+                        if(timeText){
+                            const time=document.createElement("span");
+                            time.className="status-time";
+                            time.textContent=timeText;
+                            heading.appendChild(time);
+                        }
+                        const titleFont=safeInlineFontFamily(item.titleFontFamily||"");
+                        const titleSize=safeInlineFontSize(item.titleFontSize||"");
+                        if(titleFont)heading.style.fontFamily=titleFont;
+                        if(titleSize)heading.style.fontSize=titleSize;
+                        article.appendChild(heading);
+                    }else{
+                        const h=document.createElement("h3");
+                        if(item.titleHtml)h.innerHTML=safeHtml(item.titleHtml);
+                        else h.textContent=item.title;
+                        if(validHexColor(item.titleColor))h.style.color=item.titleColor;
+                        const titleFont=safeInlineFontFamily(item.titleFontFamily||"");
+                        const titleSize=safeInlineFontSize(item.titleFontSize||"");
+                        if(titleFont)h.style.fontFamily=titleFont;
+                        if(titleSize)h.style.fontSize=titleSize;
+                        if(section==="BLOG"&&title==="Stories"){
+                            h.style.cursor="pointer";
+                            h.title="Abrir historia";
+                            h.addEventListener("click",()=>openRelato(item,true,orderedPublications));
+                        }
+                        article.appendChild(h);
+                    }
                 }
                 const body=document.createElement("div");
                 body.className="publication-body";
@@ -2597,13 +2631,6 @@ function renderPublicationEditor(editData=null){
             <label class="admin-status" for="publication-date">FECHA DE PUBLICACIÓN (OPCIONAL)</label>
             <input class="admin-input" id="publication-date" type="date" value="${editData?.statusDate||""}" aria-label="Fecha de publicación">
         </div>
-        <div id="status-meta-fields" style="display:none">
-            <label class="admin-status" for="status-author">AUTOR EN STATUS</label>
-            <input class="admin-input" id="status-author" maxlength="40" value="${String(editData?.statusAuthor||"zorg").replace(/&/g,"&amp;").replace(/"/g,"&quot;")}" placeholder="zorg">
-            <label class="admin-status" for="status-time-text">TIEMPO MOSTRADO (OPCIONAL)</label>
-            <input class="admin-input" id="status-time-text" maxlength="50" value="${String(editData?.statusTimeText||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;")}" placeholder="Automático: hace 1 día">
-            <p class="admin-hint">Déjalo vacío para calcular el tiempo automáticamente. También puedes escribir uno manual, como «hace 1 día».</p>
-        </div>
         <label class="admin-status" for="rich-editor">CONTENIDO</label>
         <div class="rich-editor" id="rich-editor" contenteditable="true" role="textbox" aria-label="Contenido" spellcheck="true"></div>
         <div class="admin-actions">
@@ -2617,8 +2644,14 @@ function renderPublicationEditor(editData=null){
     const categorySelect=document.getElementById("record-category");
     function updateStatusEditorFields(){
         const isStatus=menuSelect.value==="STATUS"&&categorySlug(categorySelect.value)==="status";
-        document.getElementById("status-meta-fields").style.display=isStatus?"block":"none";
         document.getElementById("publication-date-wrap").style.display=isStatus?"block":"none";
+        const titleLabel=document.querySelector('label[for="record-title"]');
+        if(titleLabel)titleLabel.textContent=isStatus?"TÍTULO / AUTOR Y TIEMPO (OPCIONAL)":"TÍTULO (OPCIONAL)";
+        titleEditorPlaceholder(isStatus);
+    }
+    function titleEditorPlaceholder(isStatus){
+        const editor=document.getElementById("record-title");
+        if(editor)editor.dataset.placeholder=isStatus?"Ejemplo: zorg. Hace 1 día":"";
     }
     menuSelect.addEventListener("change",()=>{
         fillCategorySelect(menuSelect,categorySelect);updateStatusEditorFields();
@@ -2659,8 +2692,6 @@ function renderPublicationEditor(editData=null){
         const data={
             menu:newMenu,category:newCategory,title,titleHtml,
             statusDate:document.getElementById("publication-date")?.value||"",
-            statusAuthor:document.getElementById("status-author")?.value.trim()||"zorg",
-            statusTimeText:document.getElementById("status-time-text")?.value.trim()||"",
             titleColor:validHexColor(titleEditor.style.color)?titleEditor.style.color:"#cccccc",
             titleFontFamily:safeInlineFontFamily(titleEditor.style.fontFamily)||"",
             titleFontSize:safeInlineFontSize(titleEditor.style.fontSize)||"",
@@ -2850,16 +2881,7 @@ function renderFileEditor(editData=null){
     const menuSelect=document.getElementById("record-menu");
     const categorySelect=document.getElementById("record-category");
 
-    function updateStatusEditorFields(){
-        const isStatus=menuSelect.value==="STATUS"&&categorySlug(categorySelect.value)==="status";
-        document.getElementById("status-meta-fields").style.display=isStatus?"block":"none";
-        document.getElementById("publication-date-wrap").style.display=isStatus?"block":"none";
-    }
-    menuSelect.addEventListener("change",()=>{
-        fillCategorySelect(menuSelect,categorySelect);updateStatusEditorFields();
-    });
-    categorySelect.addEventListener("change",updateStatusEditorFields);
-    updateStatusEditorFields();
+    menuSelect.addEventListener("change",()=>fillCategorySelect(menuSelect,categorySelect));
 
     if(editData){
         document.getElementById("file-title").value=editData.title||"";
