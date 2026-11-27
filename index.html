@@ -166,7 +166,7 @@ nav{
 .admin-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}
 .admin-danger{border-color:#633!important;color:#c99!important}
 footer{border-top:0;padding:0 6px;text-align:center;color:#666;font-family:monospace;font-size:clamp(8px,2.2vw,11px);letter-spacing:.55px;line-height:1.4;margin-top:auto;white-space:nowrap;transform:none}
-.status-date{display:block;margin:-1px 0 1.1em;color:#777;font-size:12px;line-height:1.5;font-family:Arial,Helvetica,sans-serif;letter-spacing:.2px}.status-first-divider{border:0;border-top:1px solid rgba(130,130,130,.55);margin:22px 0 8px;width:100%;max-width:700px}
+.status-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:9px;margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:clamp(20px,4.2vw,28px);font-weight:400;line-height:1.35}.status-author{color:#ef4444;text-decoration:underline;text-underline-offset:3px}.status-time{color:inherit;font-weight:400}.status-first-divider{border:0;border-top:1px solid rgba(130,130,130,.55);margin:26px 0 28px;width:100%;max-width:700px}
 .container{position:relative;padding-bottom:34px}
 .container footer{position:absolute;left:0;right:0;bottom:-16px;margin:0}
 @keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -1654,12 +1654,7 @@ async function showCategory(section,title,description,updateUrl=false){
             if(existingLoading) existingLoading.remove();
 
             const orderedPublications=sortRecords(pubDocs.filter(item=>item.published!==false));
-            if(section==="STATUS"&&categorySlug(title)==="status"&&orderedPublications.length){
-                const separator=document.createElement("hr");
-                separator.className="status-first-divider";
-                content.appendChild(separator);
-            }
-            orderedPublications.forEach(item=>{
+            orderedPublications.forEach((item,publicationIndex)=>{
                 const article=document.createElement("article");
                 article.className="publication publication-font-modern";
                 if(section==="BLOG"&&title==="Stories")article.dataset.storySlug=routeSlug(item.title);
@@ -1679,12 +1674,18 @@ async function showCategory(section,title,description,updateUrl=false){
                     }
                     article.appendChild(h);
                 }
-                if(section==="STATUS"&&categorySlug(title)==="status"){
-                    const meta=document.createElement("div");
-                    meta.className="status-date";
-                    const author=(item.statusAuthor||"zorg").trim();
-                    meta.textContent=(author?author+"  ✨  ":"")+statusRelativeTime(item);
-                    article.appendChild(meta);
+                const isStatusPublication=section==="STATUS"&&categorySlug(title)==="status";
+                if(isStatusPublication){
+                    const heading=document.createElement("div");
+                    heading.className="status-heading";
+                    const author=document.createElement("span");
+                    author.className="status-author";
+                    author.textContent=((item.statusAuthor||"zorg").trim()||"zorg")+".";
+                    const time=document.createElement("span");
+                    time.className="status-time";
+                    time.textContent=statusRelativeTime(item);
+                    heading.append(author,time);
+                    article.appendChild(heading);
                 }
                 const body=document.createElement("div");
                 body.className="publication-body";
@@ -1716,6 +1717,11 @@ async function showCategory(section,title,description,updateUrl=false){
                 }else{
                     article.appendChild(body);
                     content.appendChild(article);
+                }
+                if(section==="STATUS"&&categorySlug(title)==="status"&&publicationIndex===0&&orderedPublications.length>1){
+                    const separator=document.createElement("hr");
+                    separator.className="status-first-divider";
+                    content.appendChild(separator);
                 }
             });
 
