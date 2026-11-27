@@ -1826,7 +1826,7 @@ function showSectionLanding(section,updateUrl=false){
         });
 }
 
-function renderRouteFromPath(){
+function renderRouteFromPath(allowStoryFallback=true){
     const parts=location.pathname.split("/").filter(Boolean).map(part=>{try{return decodeURIComponent(part)}catch(e){return part}});
     if(!parts.length|| (parts.length===1&&["index.html","index.htm"].includes(parts[0].toLowerCase())))return false;
     const slug=routeSlug(parts.join("/"));
@@ -1856,7 +1856,9 @@ function renderRouteFromPath(){
     }
 
     // Las historias de BLOG/Stories usan una ruta propia: /nombre-del-relato
-    if(parts.length===1&&slug!=="index-html"){
+    // En la primera pasada no asumir que una ruta desconocida es una historia:
+    // las categorías personalizadas pueden estar cargándose desde Firebase.
+    if(allowStoryFallback&&parts.length===1&&slug!=="index-html"){
         openRelatoBySlug(slug,false);
         const letter=document.getElementById("letter-screen");
         const home=document.getElementById("home-screen");
@@ -1979,8 +1981,12 @@ async function initializePage(){
         if(letter){letter.style.display="none";letter.style.opacity="0";}
         if(home){home.style.display="block";home.style.opacity="1";}
         transitionStarted=true;
+        // Resolver primero las rutas conocidas sin esperar a la carga de toda la configuración.
+        // Así la apariencia personalizada empieza a consultarse inmediatamente.
+        if(renderRouteFromPath(false))return;
         await categorySettingsPromise;
-        if(renderRouteFromPath())return;
+        // Después de cargar la configuración, resolver también las categorías nuevas/ocultas.
+        if(renderRouteFromPath(true))return;
         showInicio();
         return;
     }
