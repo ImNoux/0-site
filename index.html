@@ -11,12 +11,24 @@
 <link rel="icon" type="image/png" href="/favicon.PNG">
 <link rel="shortcut icon" type="image/png" href="/favicon.PNG">
 
-<!-- Evita mostrar el fondo global mientras se resuelve una ruta directa. -->
+<!-- Recupera primero el fondo propio de la ruta para evitar mostrar el fondo global al actualizar. -->
 <script>
 (function(){
   var parts=location.pathname.split('/').filter(Boolean);
   if(parts.length===1 && !/^(story|index\.html?|favicon\.png)$/i.test(parts[0])){
-    document.documentElement.classList.add('route-appearance-pending');
+    var root=document.documentElement;
+    root.classList.add('route-appearance-pending');
+    try{
+      var cached=localStorage.getItem('0site_route_appearance_'+parts[0].toLowerCase());
+      var appearance=cached?JSON.parse(cached):null;
+      if(appearance&&typeof appearance.backgroundImage==='string'&&/^https:\/\//i.test(appearance.backgroundImage.trim())){
+        var url=appearance.backgroundImage.trim().replace(/["\\\n\r]/g,'');
+        root.style.setProperty('--route-background-image','url("'+url+'")');
+      }else{
+        root.style.setProperty('--route-background-image','none');
+      }
+      if(appearance&&/^#[0-9a-f]{6}$/i.test(appearance.backgroundColor||''))root.style.setProperty('--route-background-color',appearance.backgroundColor);
+    }catch(e){root.style.setProperty('--route-background-image','none');}
   }
 })();
 </script>
@@ -27,7 +39,6 @@ html{min-height:100%;background:#020303}
 body{min-height:100vh;position:relative;background:transparent}
 /* El fondo ocupa el documento completo y conserva la imagen sin recortarla al desplazarse. */
 body::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:0;pointer-events:none;background-image:var(--route-background-image, url("https://i.ibb.co/DDskCf3v/IMG-1297.png"));background-color:var(--route-background-color, #020303);background-position:top center;background-repeat:repeat-y;background-size:100% auto}
-html.route-appearance-pending body::before{background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png")!important;background-color:#020303!important;background-position:top center!important;background-repeat:repeat-y!important;background-size:100% auto!important}
 #letter-screen{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:none;justify-content:center;align-items:stretch;padding:42px 7vw;background:#000;transition:opacity 1.5s ease}
 .letter{width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65)}
 .letter-header{display:flex;justify-content:space-between;gap:15px;color:#746d62;font-family:monospace;font-size:11px;margin-bottom:28px;letter-spacing:1px;padding-bottom:15px;border-bottom:1px solid rgba(80,70,55,.2)}
@@ -72,6 +83,7 @@ html.route-appearance-pending body::before{background-image:url("https://i.ibb.c
 }
 .blink-title{animation:signalFlicker 2s infinite}
 #home-screen{position:relative;z-index:1;display:none;opacity:0;min-height:100vh;min-height:100svh;padding:65px 20px 25px;transition:opacity 1.5s ease}
+#home-screen.custom-route #home-logo{display:none!important}
 .container{width:100%;max-width:930px;margin:auto;display:flex;flex-direction:column;min-height:calc(100vh - 90px);min-height:calc(100svh - 90px)}
 .main-title{text-align:center;font-size:clamp(30px,6vw,48px);font-weight:normal;letter-spacing:5px;color:#e5e5e5;margin-bottom:35px;text-shadow:0 0 15px rgba(255,255,255,.12)}
 .home-image{width:auto;max-width:min(76vw,280px);height:auto;max-height:190px;aspect-ratio:auto;margin:0 auto;display:block;object-fit:contain;filter:none;border:0;box-shadow:none;cursor:pointer;transition:opacity .3s}
@@ -431,7 +443,7 @@ nav{gap:2px}
 .editor-color-picker input::-webkit-color-swatch-wrapper{padding:0}
 .editor-color-picker input::-webkit-color-swatch{border:1px solid #777;border-radius:2px}
 .editor-size-control select{background:#080808;color:#ddd}
-.rich-editor{min-height:155px;padding:12px;background:#080808;border:1px solid #393c40;color:#c5c5c5;font-size:16px;line-height:1.55;outline:none;overflow-wrap:anywhere;border-radius:3px}
+.rich-editor{min-height:155px;padding:12px;background:#080808;border:1px solid #393c40;color:#ffffff;font-size:16px;line-height:1.55;outline:none;overflow-wrap:anywhere;border-radius:3px}
 .rich-editor:focus{border-color:#777}
 .rich-editor.title-editor{min-height:48px;margin-bottom:16px}
 .rich-editor:empty:before{content:attr(data-placeholder);color:#666}
@@ -454,7 +466,10 @@ nav{gap:2px}
   padding:0;
 }
 .publication-body p + p{margin-top:0.4em !important}
-.publication-body img,.publication-body .file-image,.file-image{margin:1em 0 !important}
+.publication-body img,.publication-body .file-image,.file-image{margin:.35em .25em !important}
+.publication-body img[data-wrap="left"]{float:left!important;margin:.25em .85em .5em 0!important}
+.publication-body img[data-wrap="right"]{float:right!important;margin:.25em 0 .5em .85em!important}
+.publication-body:after{content:"";display:block;clear:both}
 .publication-body ul,.publication-body ol{margin:1em 0 !important;padding-left:1.4em}
 .publication-body a{cursor:pointer;text-decoration:underline}
 @media(max-width:600px){
@@ -466,7 +481,7 @@ nav{gap:2px}
  .admin-box{padding:12px}
 }
 
-.rich-editor,.rich-editor.title-editor{color:#dedede !important;}
+.rich-editor,.rich-editor.title-editor{color:#ffffff !important;}
 .rich-editor *{color:inherit;}
 
 /* FIX DEFINITIVO SUPERPOSICIÓN */
@@ -474,7 +489,7 @@ nav{gap:2px}
 .publication-font-modern .publication-body {
   font-size: 17px !important;
   line-height: 1.7 !important;
-  color: #c8c8c8 !important;
+  color: #ffffff !important;
   white-space: normal !important;
   word-break: break-word !important;
 }
@@ -1381,23 +1396,33 @@ function safeHtml(html){
 
                 const alt=node.getAttribute("alt")||"Imagen";
                 const rawWidth=node.style.width||node.getAttribute("width")||"auto";
-                const safeWidth=/^(?:auto|(?:[1-9]\d?|100)%)$/.test(String(rawWidth).trim())
+                const safeWidth=/^(?:auto|(?:[1-9]\d?|100)%|[4-9]\dpx|[1-9]\d{2,3}px)$/.test(String(rawWidth).trim())
                     ?String(rawWidth).trim():"auto";
                 const rawAlign=node.getAttribute("data-align")||"left";
                 const safeAlign=["left","center","right"].includes(rawAlign)?rawAlign:"left";
+                const rawWrap=node.getAttribute("data-wrap")||"none";
+                const safeWrap=["left","right"].includes(rawWrap)?rawWrap:"none";
 
                 [...node.attributes].forEach(attr=>node.removeAttribute(attr.name));
 
                 node.setAttribute("src",imageUrl.href);
                 node.setAttribute("data-align",safeAlign);
+                node.setAttribute("data-wrap",safeWrap);
                 node.setAttribute("alt",alt.slice(0,200));
                 node.setAttribute("loading","lazy");
                 node.setAttribute("referrerpolicy","no-referrer");
                 node.style.width=safeWidth;
                 node.style.maxWidth="100%";
                 node.style.height="auto";
-                node.style.setProperty("margin-left",safeAlign==="right"?"auto":(safeAlign==="center"?"auto":"0"),"important");
-                node.style.setProperty("margin-right",safeAlign==="left"?"auto":(safeAlign==="center"?"auto":"0"),"important");
+                if(safeWrap!=="none"){
+                    node.style.float=safeWrap;
+                    node.style.display="inline";
+                    node.style.setProperty("margin",safeWrap==="left"?".25em .85em .5em 0":".25em 0 .5em .85em","important");
+                }
+                if(safeWrap==="none"){
+                    node.style.setProperty("margin-left",safeAlign==="right"?"auto":(safeAlign==="center"?"auto":"0"),"important");
+                    node.style.setProperty("margin-right",safeAlign==="left"?"auto":(safeAlign==="center"?"auto":"0"),"important");
+                }
 
                 return;
             }
@@ -1792,6 +1817,8 @@ async function showCategory(section,title,description,updateUrl=false){
     clearContentListeners();
     const content=document.getElementById("content-area");
     const token=++currentContentToken;
+    const builtInTitles=new Set(["portada","one space","the room","art","experiments","stories","status","contact","faq","guidelines","the project","entrada"]);
+    document.getElementById("home-screen")?.classList.toggle("custom-route",!builtInTitles.has(String(title||"").trim().toLowerCase()));
 
     content.innerHTML="";
     const appearanceTask=applyRouteAppearance(section,title,token);
@@ -2479,7 +2506,7 @@ function editorToolbar(){
         <div class="formato-icons">
             <button type="button" title="Color del texto" id="color-trigger" style="position:relative;">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-                <input type="color" id="editor-text-color" value="#c5c5c5" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" aria-label="Color del texto">
+                <input type="color" id="editor-text-color" value="#ffffff" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" aria-label="Color del texto">
             </button>
             <button type="button" id="insert-link" title="Insertar enlace (interno /ruta o externo https://)">
                 <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -2496,13 +2523,21 @@ function editorToolbar(){
             <button type="button" id="image-align-center" title="Centrar imagen">↔</button>
             <button type="button" id="image-align-right" title="Imagen a la derecha">↦</button>
         </div>
-        <select id="editor-image-size" class="formato-image-size" aria-label="Tamaño de imagen">
-            <option value="auto">Tamaño de imagen · Original</option>
-            <option value="25%">25%</option>
-            <option value="50%">50%</option>
-            <option value="70%">70%</option>
-            <option value="100%">100%</option>
-        </select>
+        <div class="formato-biu" style="margin-top:6px;">
+            <button type="button" id="image-wrap-left" title="Escribir a la derecha de la imagen">Texto ↤</button>
+            <button type="button" id="image-wrap-right" title="Escribir a la izquierda de la imagen">↦ Texto</button>
+            <button type="button" id="image-wrap-none" title="Imagen sin texto alrededor">▣</button>
+        </div>
+        <div class="formato-select-row" style="margin-top:8px;">
+            <label class="editor-dropdown">TAMAÑO
+                <select id="editor-image-size" class="formato-image-size" aria-label="Tamaño de imagen">
+                    <option value="auto">Original</option><option value="25%">25%</option><option value="50%">50%</option><option value="70%">70%</option><option value="100%">100%</option>
+                </select>
+            </label>
+            <label class="editor-dropdown">MEDIDA (PX)
+                <input id="editor-image-measure" type="number" min="40" max="1200" step="10" placeholder="Ej. 260" aria-label="Medida de imagen en píxeles" style="height:34px;width:100px;padding:5px 7px;background:#111;border:1px solid #45484d;color:#ddd;border-radius:3px;">
+            </label>
+        </div>
     </div>`;
 }
 
@@ -2517,14 +2552,14 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
             if(sel && sel.rangeCount){
                 const range = sel.getRangeAt(0);
                 const span = document.createElement("span");
-                span.style.color = "#dedede";
+                span.style.color = "#ffffff";
                 try{
                     range.surroundContents(span);
                 }catch(err){
-                    editor.style.color = "#dedede";
+                    editor.style.color = "#ffffff";
                 }
             }
-            editor.style.color = "#dedede";
+            editor.style.color = "#ffffff";
         });
     }
     forceWhiteOnPaste(titleEditor);
@@ -2537,6 +2572,7 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
     const sizePicker=document.getElementById("editor-font-size");
     const colorPicker=document.getElementById("editor-text-color");
     const imageSizePicker=document.getElementById("editor-image-size");
+    const imageMeasure=document.getElementById("editor-image-measure");
 
     function rememberSelection(editor=activeEditor){
         const selection=window.getSelection();
@@ -2631,12 +2667,24 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
         selectedEditorImage.style.width=event.target.value;
         selectedEditorImage.style.maxWidth="100%";
         selectedEditorImage.style.height="auto";
+        if(imageMeasure)imageMeasure.value="";
+    });
+    if(imageMeasure)imageMeasure.addEventListener("change",()=>{
+        if(!selectedEditorImage||!selectedEditorImage.isConnected){alert("Toca primero la imagen que quieres medir.");imageMeasure.value="";return;}
+        const px=Math.max(40,Math.min(1200,Number(imageMeasure.value)||0));
+        if(!px){imageMeasure.value="";return;}
+        selectedEditorImage.style.width=px+"px";
+        selectedEditorImage.style.maxWidth="100%";
+        selectedEditorImage.style.height="auto";
+        imageSizePicker.value="auto";
     });
     function alignSelectedImage(alignment){
         if(!selectedEditorImage||!selectedEditorImage.isConnected||!([titleEditor,bodyEditor].some(editor=>editor.contains(selectedEditorImage)))){
             alert("Toca primero la imagen que quieres alinear.");return;
         }
         selectedEditorImage.dataset.align=alignment;
+        selectedEditorImage.dataset.wrap="none";
+        selectedEditorImage.style.float="none";
         selectedEditorImage.style.display="block";
         selectedEditorImage.style.setProperty("margin-left",alignment==="right"?"auto":(alignment==="center"?"auto":"0"),"important");
         selectedEditorImage.style.setProperty("margin-right",alignment==="left"?"auto":(alignment==="center"?"auto":"0"),"important");
@@ -2644,6 +2692,18 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
     document.getElementById("image-align-left").addEventListener("click",()=>alignSelectedImage("left"));
     document.getElementById("image-align-center").addEventListener("click",()=>alignSelectedImage("center"));
     document.getElementById("image-align-right").addEventListener("click",()=>alignSelectedImage("right"));
+    function wrapSelectedImage(side){
+        if(!selectedEditorImage||!selectedEditorImage.isConnected||!bodyEditor.contains(selectedEditorImage)){
+            alert("Toca primero la imagen del contenido que quieres ajustar.");return;
+        }
+        selectedEditorImage.dataset.wrap=side;
+        selectedEditorImage.style.float=side==="none"?"none":side;
+        selectedEditorImage.style.display=side==="none"?"block":"inline";
+        selectedEditorImage.style.setProperty("margin",side==="left"?".25em .85em .5em 0":(side==="right"?".25em 0 .5em .85em":".35em .25em"),"important");
+    }
+    document.getElementById("image-wrap-left").addEventListener("click",()=>wrapSelectedImage("left"));
+    document.getElementById("image-wrap-right").addEventListener("click",()=>wrapSelectedImage("right"));
+    document.getElementById("image-wrap-none").addEventListener("click",()=>wrapSelectedImage("none"));
 
     const insertButton=document.getElementById("insert-link");
     function handleInsertLink(event){
@@ -2753,7 +2813,7 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
     if(validHexColor(editData?.bodyColor))bodyEditor.style.color=editData.bodyColor;
     fontPicker.value=titleFont||bodyFont||"Arial";
     sizePicker.value=(titleSize||bodySize||"16px").replace("px","");
-    colorPicker.value=validHexColor(titleEditor.style.color)?titleEditor.style.color:(validHexColor(bodyEditor.style.color)?bodyEditor.style.color:"#c5c5c5");
+    colorPicker.value=validHexColor(titleEditor.style.color)?titleEditor.style.color:(validHexColor(bodyEditor.style.color)?bodyEditor.style.color:"#ffffff");
 }
 
 /* PANEL ADMINISTRATIVO */
@@ -2875,7 +2935,7 @@ function renderPublicationEditor(editData=null){
             titleEditor.removeAttribute("style");bodyEditor.removeAttribute("style");
             document.getElementById("editor-font-family").value="Arial";
             document.getElementById("editor-font-size").value="16";
-            document.getElementById("editor-text-color").value="#c5c5c5";
+            document.getElementById("editor-text-color").value="#ffffff";
             document.getElementById("editor-image-size").value="auto";
             saveButton.textContent="PUBLICAR";
             setTimeout(()=>{if(document.getElementById("record-status"))document.getElementById("record-status").textContent="";},3500);
