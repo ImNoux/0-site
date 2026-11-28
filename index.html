@@ -1714,6 +1714,39 @@ function statusUpdateContentTime(body,item){
     }
 }
 
+// Devuelve la antigüedad numérica indicada en la primera línea del contenido STATUS.
+// Se usa el mismo contador diario que se muestra en pantalla para ordenar publicaciones.
+function statusAgeInDays(item){
+    const holder=document.createElement("div");
+    holder.innerHTML=safeHtml(item?.bodyHtml||"");
+    const firstLine=(holder.innerText||holder.textContent||"").split(/\r?\n/).map(line=>line.trim()).find(Boolean)||"";
+    const match=firstLine.match(/\bhace\s+(\d+)\s+(d[ií]as?|mes(?:es)?|a[nñ]os?)\b/i);
+    if(!match)return null;
+    const amount=Number(match[1]);
+    const unit=match[2].toLowerCase();
+    let initialDays=amount;
+    if(unit.startsWith("mes"))initialDays=amount*30;
+    else if(unit.startsWith("a"))initialDays=amount*365;
+    const currentText=statusRelativeTime(item,`hace ${amount} días`);
+    const currentMatch=currentText.match(/\bhace\s+(\d+)\s+(d[ií]as?|mes(?:es)?|a[nñ]os?)\b/i);
+    if(!currentMatch)return initialDays;
+    const currentAmount=Number(currentMatch[1]);
+    const currentUnit=currentMatch[2].toLowerCase();
+    if(currentUnit.startsWith("mes"))return currentAmount*30;
+    if(currentUnit.startsWith("a"))return currentAmount*365;
+    return currentAmount;
+}
+
+function sortStatusPublications(items){
+    return [...items].map((item,index)=>({item,index,age:statusAgeInDays(item)}))
+        .sort((a,b)=>{
+            if(a.age===null&&b.age===null)return a.index-b.index;
+            if(a.age===null)return 1;
+            if(b.age===null)return -1;
+            return a.age-b.age||a.index-b.index;
+        }).map(entry=>entry.item);
+}
+
 /* MOSTRAR CATEGORÍAS */
 
 async function showCategory(section,title,description,updateUrl=false){
@@ -1766,7 +1799,10 @@ async function showCategory(section,title,description,updateUrl=false){
             const existingLoading = content.querySelector(".admin-status");
             if(existingLoading) existingLoading.remove();
 
-            const orderedPublications=sortRecords(pubDocs.filter(item=>item.published!==false));
+            const visiblePublications=pubDocs.filter(item=>item.published!==false);
+            const orderedPublications=section==="STATUS"&&categorySlug(title)==="status"
+                ?sortStatusPublications(visiblePublications)
+                :sortRecords(visiblePublications);
             orderedPublications.forEach((item,publicationIndex)=>{
                 const article=document.createElement("article");
                 article.className="publication publication-font-modern";
