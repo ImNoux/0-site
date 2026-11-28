@@ -37,6 +37,11 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html{min-height:100%;background:#020303}
+#startup-loader{position:fixed;inset:0;z-index:20000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#020303;color:#aaa;font:11px monospace;letter-spacing:2px;text-align:center;padding:24px;transition:opacity .18s ease}
+#startup-loader .loader-mark{font:italic 24px Georgia,serif;color:#ddd;letter-spacing:4px}
+#startup-loader .loader-spinner{width:22px;height:22px;border:1px solid #444;border-top-color:#bbb;border-radius:50%;animation:startup-spin .8s linear infinite}
+@keyframes startup-spin{to{transform:rotate(360deg)}}
+#startup-loader.is-hidden{opacity:0;pointer-events:none}
 html.route-appearance-pending body::before{background-image:var(--route-background-image,none)!important;background-color:var(--route-background-color,#020303)!important}
 html.route-appearance-pending #home-screen{visibility:hidden!important}
 html.custom-route-start #home-screen{visibility:hidden!important}
@@ -632,6 +637,11 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
 
 <body>
 
+<div id="startup-loader" role="status" aria-live="polite">
+    <span class="loader-spinner" aria-hidden="true"></span>
+    <span>CARGANDO CONTENIDO</span>
+</div>
+
 <section id="letter-screen">
 <div class="letter">
     <div class="letter-header">
@@ -778,6 +788,8 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
         const message=document.createElement("div");
         message.style.cssText="position:fixed;z-index:9999;bottom:12px;left:12px;right:12px;padding:15px;background:#180909;border:1px solid #633;color:#ddd;font:12px monospace;line-height:1.7";
         message.textContent="No se pudieron cargar las librerías de Firebase. Comprueba tu conexión o si el navegador bloquea los servidores de Firebase.";
+        const loader=document.getElementById("startup-loader");
+        if(loader){loader.innerHTML="<span>NO SE PUDO CONECTAR CON FIREBASE</span><span style=\"letter-spacing:0\">Comprueba tu conexión y vuelve a cargar</span>";}
         document.body.appendChild(message);
     });
 })();
@@ -1106,8 +1118,12 @@ async function moveRecord(collectionName,records,index,direction,reloadFunction)
 
 /* AUTENTICACIÓN Y PRESENCIA */
 
+let resolveAuthReady;
+const authReady=new Promise(resolve=>{resolveAuthReady=resolve;});
+let authReadyResolved=false;
 auth.onAuthStateChanged(async user=>{
     currentUser=user;
+    if(!authReadyResolved){authReadyResolved=true;resolveAuthReady(user);}
 
     if(!user){
         try{await auth.signInAnonymously()}
@@ -1530,6 +1546,8 @@ function resetRouteAppearance(){
     content.style.webkitBackdropFilter="";
     content.style.borderRadius="";
     content.style.boxShadow="";
+    root.style.setProperty("--route-background-image",'url("https://i.ibb.co/DDskCf3v/IMG-1297.png")');
+    root.style.setProperty("--route-background-color","#020303");
 }
 async function applyRouteAppearance(section,title,token){
     const root=document.documentElement;
@@ -1609,7 +1627,10 @@ async function applyRouteAppearance(section,title,token){
     };
 
     if(hasCache){ refresh(); return; }
-    await refresh();
+    // Sin caché no ocultamos toda la página mientras responde Firestore.
+    // Se muestra el fondo general y la apariencia personalizada se aplica al llegar.
+    releaseBackground();
+    refresh();
 }
 
 /* Recupera el color aplicado a cada fragmento del título STATUS desde el editor. */
@@ -2430,9 +2451,11 @@ document.getElementById("home-logo").addEventListener("click",()=>{
     },2000);
 });
 
-function openAdmin(){
+async function openAdmin(){
     sessionStorage.setItem("0site_admin_panel_open","1");
     document.getElementById("admin-screen").style.display="block";
+    // Evita mostrar el login por error si Firebase aún está restaurando la sesión.
+    await Promise.race([authReady,new Promise(resolve=>setTimeout(resolve,5000))]);
     document.getElementById("admin-login-status").textContent="";
     document.getElementById("admin-password").value="";
     syncAdminEmailField();
@@ -3812,6 +3835,8 @@ async function loadConfig(){
 
 /* INICIO */
 
+const startupLoader=document.getElementById("startup-loader");
+if(startupLoader){startupLoader.classList.add("is-hidden");setTimeout(()=>startupLoader.remove(),220);}
 initializePage();
 
 }
