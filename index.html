@@ -1140,8 +1140,8 @@ function routeSlug(value){
 }
 function sectionPath(section){return "/"+String(section).toLowerCase();}
 function categoryPath(section,title){return "/"+routeSlug(title);}
-function changePublicUrl(path,replace=false){
-    if(location.pathname!==path){history[replace?"replaceState":"pushState"]({},"",path);}
+function changePublicUrl(path,replace=false,state=null){
+    if(location.pathname!==path||state){history[replace?"replaceState":"pushState"](state||{},"",path);}
 }
 
 /* MENÚS PÚBLICOS (OCULTA LAS CATEGORÍAS MARCADAS COMO HIDDEN) */
@@ -1711,15 +1711,31 @@ function statusElapsedCalendarDays(item){
     const today=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
     return Math.max(0,Math.round((today-start)/86400000));
 }
+function statusLegacyDays(item){
+    if(!item||!item.bodyHtml)return null;
+    const holder=document.createElement("div");
+    holder.innerHTML=safeHtml(item.bodyHtml);
+    const match=(holder.textContent||"").match(/(?:^|\s)hace\s+(\d+)\s+(d[ií]as?|a[nñ]os?)/i);
+    if(!match)return null;
+    const amount=Math.max(0,Number(match[1])||0);
+    return match[2].toLowerCase().startsWith("a")?amount*365:amount;
+}
+function statusManualClockData(item){
+    const stored=item?.statusManualDays!==undefined&&item?.statusManualDays!==null&&item?.statusManualDays!=="";
+    const legacy=!stored?statusLegacyDays(item):null;
+    if(stored)return {days:Math.max(0,Number(item.statusManualDays)||0),anchor:item.statusManualDaysAt?.toDate?.()||(item.statusManualDaysAt?.seconds?new Date(item.statusManualDaysAt.seconds*1000):new Date(item.statusManualDaysAt||statusPublicationAnchor(item)||Date.now()))};
+    if(legacy!==null)return {days:legacy,anchor:statusPublicationAnchor(item)||new Date()};
+    return null;
+}
 function statusRelativeTime(item, initialText=""){
     const date=statusPublicationAnchor(item);
     if(!date||Number.isNaN(date.getTime()))return "recién publicado";
     const now=new Date();
-    const manualBase=item?.statusManualDays!==undefined&&item?.statusManualDays!==null&&item?.statusManualDays!==""?Number(item.statusManualDays):null;
-    if(manualBase!==null&&Number.isFinite(manualBase)){
-        const baseAt=item.statusManualDaysAt?.toDate?.()||(item.statusManualDaysAt?.seconds?new Date(item.statusManualDaysAt.seconds*1000):new Date(item.statusManualDaysAt||date));
+    const manualClock=statusManualClockData(item);
+    if(manualClock){
+        const baseAt=manualClock.anchor;
         const elapsed=Math.max(0,Math.floor((Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())-Date.UTC(baseAt.getFullYear(),baseAt.getMonth(),baseAt.getDate()))/86400000));
-        const total=manualBase+elapsed;
+        const total=manualClock.days+elapsed;
         if(total<365)return `hace ${total} ${total===1?"día":"días"}`;
         const years=Math.floor(total/365);return `hace ${years} ${years===1?"año":"años"}`;
     }
@@ -1727,7 +1743,7 @@ function statusRelativeTime(item, initialText=""){
     if(seconds<60)return `hace ${seconds||1} ${seconds===1?"segundo":"segundos"}`;
     const minutes=Math.floor(seconds/60);if(minutes<60)return `hace ${minutes} ${minutes===1?"minuto":"minutos"}`;
     const hours=Math.floor(minutes/60);if(hours<24)return `hace ${hours} ${hours===1?"hora":"horas"}`;
-    const totalDays=statusElapsedCalendarDays(item);
+    const totalDays=Math.floor(seconds/86400);
     if(totalDays<365)return `hace ${totalDays} ${totalDays===1?"día":"días"}`;
     const years=Math.floor(totalDays/365);return `hace ${years} ${years===1?"año":"años"}`;
 }
@@ -1748,7 +1764,7 @@ function refreshStatusClocks(){
         if(seconds<60){node.textContent=`hace ${seconds||1} ${seconds===1?"segundo":"segundos"}`;return;}
         const minutes=Math.floor(seconds/60);if(minutes<60){node.textContent=`hace ${minutes} ${minutes===1?"minuto":"minutos"}`;return;}
         const hours=Math.floor(minutes/60);if(hours<24){node.textContent=`hace ${hours} ${hours===1?"hora":"horas"}`;return;}
-        const total=Math.max(0,Math.round((Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())-Date.UTC(published.getFullYear(),published.getMonth(),published.getDate()))/86400000));
+        const total=Math.max(0,Math.floor((now.getTime()-created)/86400000));
         if(total<365){node.textContent=`hace ${total} ${total===1?"día":"días"}`;return;}
         const years=Math.floor(total/365);node.textContent=`hace ${years} ${years===1?"año":"años"}`;
     });
@@ -1759,34 +1775,66 @@ function statusUpdateContentTime(body,item){
     if(!body)return;
     const walker=document.createTreeWalker(body,NodeFilter.SHOW_TEXT);
     let node;
-    const pattern=/(\S+\s+)hace\s+(\d+)\s+d[ií]as?/i;
+    const pattern=/(\S+\s+)hace\s+(\d+)\s+(d[ií]as?|a[nñ]os?)/i;
     while((node=walker.nextNode())){
         const value=node.nodeValue||"";
         const match=value.match(pattern);
         if(!match)continue;
-        const dynamicTime=statusRelativeTime(item,`hace ${match[2]} días`);
-        node.nodeValue=value.replace(pattern,`$1${dynamicTime}`);
+        const created=statusCreatedMillis(item)||Date.now();
+        const legacyDays=match[3].toLowerCase().startsWith("a")?Number(match[2])*365:Number(match[2]);
+        const span=document.createElement("span");
+        span.className="status-time";
+        span.dataset.createdAt=String(created);
+        span.dataset.manualDays=String(legacyDays);
+        span.dataset.manualDaysAt=String(created);
+        span.textContent=statusRelativeTime({...item,statusManualDays:legacyDays,statusManualDaysAt:created});
+        const before=value.slice(0,match.index)+match[1];
+        const after=value.slice(match.index+match[0].length);
+        const fragment=document.createDocumentFragment();
+        if(before)fragment.appendChild(document.createTextNode(before));
+        fragment.appendChild(span);
+        if(after)fragment.appendChild(document.createTextNode(after));
+        node.parentNode.replaceChild(fragment,node);
         break;
     }
 }
 
 // Devuelve la antigüedad actual escrita manualmente en el primer renglón de STATUS.
 // Se usa solo para ordenar esta categoría; las demás conservan su orden habitual.
-function statusDaysForSort(item){
-    if(Number.isFinite(Number(item?.statusManualDays))&&item?.statusManualDays!==undefined&&item?.statusManualDays!==null){
-        const anchor=item.statusManualDaysAt?.toDate?.()||(item.statusManualDaysAt?.seconds?new Date(item.statusManualDaysAt.seconds*1000):new Date(item.statusManualDaysAt||Date.now()));
-        const now=new Date();
-        const elapsed=Math.max(0,Math.round((Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())-Date.UTC(anchor.getFullYear(),anchor.getMonth(),anchor.getDate()))/86400000));
-        return Number(item.statusManualDays)+elapsed;
+function statusAgeForSort(item){
+    const now=Date.now();
+    const created=statusCreatedMillis(item);
+    if(item?.statusManualDays!==undefined&&item?.statusManualDays!==null&&item?.statusManualDays!==""){
+        const anchor=item.statusManualDaysAt?.toDate?.()||(item.statusManualDaysAt?.seconds?new Date(item.statusManualDaysAt.seconds*1000):new Date(Number(item.statusManualDaysAt)||created||now));
+        const elapsed=Math.max(0,Math.floor((Date.UTC(new Date(now).getFullYear(),new Date(now).getMonth(),new Date(now).getDate())-Date.UTC(anchor.getFullYear(),anchor.getMonth(),anchor.getDate()))/86400000));
+        return (Math.max(0,Number(item.statusManualDays)||0)+elapsed)*86400000;
     }
     const holder=document.createElement("div");
     holder.innerHTML=safeHtml(item.bodyHtml||"");
     const match=(holder.textContent||"").match(/(?:^|\s)hace\s+(\d+)\s+(d[ií]as?|a[nñ]os?)/i);
-    if(!match)return statusCreatedMillis(item)!==null?statusElapsedCalendarDays(item):null;
-    const amount=Number(match[1]);
-    const unit=match[2].toLowerCase();
-    const baseDays=unit.startsWith("a")?amount*365:amount;
-    return baseDays+statusElapsedCalendarDays(item);
+    if(match){
+        const amount=Number(match[1]);
+        const unit=match[2].toLowerCase();
+        const baseDays=unit.startsWith("a")?amount*365:amount;
+        return (baseDays+statusElapsedCalendarDays(item))*86400000;
+    }
+    return created!==null?Math.max(0,now-created):null;
+}
+
+// Quita del cuerpo el contador antiguo cuando el encabezado ya muestra el tiempo.
+function removeDuplicateStatusBodyTime(body){
+    if(!body)return;
+    const walker=document.createTreeWalker(body,NodeFilter.SHOW_TEXT);
+    const nodes=[];let node;
+    while((node=walker.nextNode()))nodes.push(node);
+    const pattern=/\bhace\s+\d+\s+(?:segundos?|minutos?|horas?|d[ií]as?|meses?|a[nñ]os?)\b/i;
+    nodes.forEach(textNode=>{
+        if(!pattern.test(textNode.nodeValue||""))return;
+        const value=textNode.nodeValue;
+        // Si el tiempo ocupa su propio renglón, elimina ese renglón completo;
+        // si está junto a otro texto, elimina únicamente la etiqueta temporal.
+        textNode.nodeValue=value.replace(/(^|\n)\s*hace\s+\d+\s+(?:segundos?|minutos?|horas?|d[ií]as?|meses?|a[nñ]os?)\s*(?=\n|$)/ig,"$1").replace(/\s*hace\s+\d+\s+(?:segundos?|minutos?|horas?|d[ií]as?|meses?|a[nñ]os?)\b/ig,"");
+    });
 }
 
 function statusCreatedMillis(item){
@@ -1816,8 +1864,8 @@ function sortStatusPublications(items){
     const firstPublication=firstIndex>=0?remaining.splice(firstIndex,1)[0]:null;
 
     remaining.sort((a,b)=>{
-        const ageA=statusDaysForSort(a);
-        const ageB=statusDaysForSort(b);
+        const ageA=statusAgeForSort(a);
+        const ageB=statusAgeForSort(b);
         if(ageA===null&&ageB===null)return compareRecords(a,b);
         if(ageA===null)return 1;
         if(ageB===null)return -1;
@@ -1830,7 +1878,7 @@ function sortStatusPublications(items){
 
 async function showCategory(section,title,description,updateUrl=false){
     closeMenus();
-    if(updateUrl)changePublicUrl(categoryPath(section,title));
+    if(updateUrl)changePublicUrl(categoryPath(section,title),false,{section,title});
 
     saveData("siteCategory",JSON.stringify({
         section,title,description
@@ -1899,7 +1947,9 @@ async function showCategory(section,title,description,updateUrl=false){
                     else h.textContent=item.title||"zorg";
                     h.querySelectorAll("a[href]").forEach(anchor=>{anchor.target="_blank";anchor.rel="noopener noreferrer";anchor.style.pointerEvents="auto";anchor.style.cursor="pointer";});
                     const emoji=document.createElement("span");emoji.className="status-emoji";emoji.textContent=item.statusEmoji||"";h.appendChild(emoji);
-                    const time=document.createElement("span");time.className="status-time";time.dataset.createdAt=statusCreatedMillis(item)||"";time.dataset.manualDays=item.statusManualDays??"";time.dataset.manualDaysAt=item.statusManualDaysAt?.toMillis?.()||item.statusManualDaysAt?.seconds*1000||item.statusManualDaysAt||"";time.textContent=statusRelativeTime(item);h.appendChild(time);
+                    if(publicationIndex!==0){
+                        const time=document.createElement("span");time.className="status-time";time.dataset.createdAt=statusCreatedMillis(item)||"";const manualClock=statusManualClockData(item);time.dataset.manualDays=manualClock?manualClock.days:"";time.dataset.manualDaysAt=manualClock?manualClock.anchor.getTime():"";time.textContent=statusRelativeTime(item);h.appendChild(time);
+                    }
                     article.appendChild(h);
                 }else if(item.title){
                     const h=document.createElement("h3");
@@ -1935,8 +1985,9 @@ async function showCategory(section,title,description,updateUrl=false){
                 body.className="publication-body";
                 body.innerHTML=safeHtml(item.bodyHtml||"");
                 if(isStatusPublication){
-                    // Las publicaciones antiguas conservan su encabezado dentro del contenido.
-                    if(!item.title&&!item.titleHtml)statusUpdateContentTime(body,item);
+                    // El tiempo vive únicamente en el encabezado; el primer post fijado no muestra tiempo.
+                    if(publicationIndex===0||item.title||item.titleHtml)removeDuplicateStatusBodyTime(body);
+                    else statusUpdateContentTime(body,item);
                     // Los enlaces de STATUS viven dentro del contenido y siempre
                     // quedan interactivos, incluso si tienen color/formato propio.
                     body.querySelectorAll("a[href]").forEach(anchor=>{
@@ -2148,7 +2199,7 @@ function openRelato(item,updateUrl=false,relatoList=null){
 
 function showSectionLanding(section,updateUrl=false){
     closeMenus();
-    if(updateUrl)changePublicUrl(sectionPath(section));
+    if(updateUrl)changePublicUrl(sectionPath(section),false,{section,landing:true});
     saveData("siteSection",section);
     const content=document.getElementById("content-area");
     ++currentContentToken;
@@ -2219,7 +2270,13 @@ function renderRouteFromPath(allowStoryFallback=true){
     }
 
 }
-window.addEventListener("popstate",()=>{
+window.addEventListener("popstate",event=>{
+    const state=event.state;
+    if(state?.section&&state?.title){
+        const exact=sections[state.section]?.find(item=>item.title===state.title);
+        if(exact){showCategory(state.section,exact.title,exact.description,false);return;}
+    }
+    if(state?.section&&state?.landing&&sections[state.section]){showSectionLanding(state.section,false);return;}
     if(!renderRouteFromPath()&&(location.pathname==="/"||location.pathname==="/index.html"))showInicio();
 });
 
