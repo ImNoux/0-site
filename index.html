@@ -25,8 +25,9 @@
 *{margin:0;padding:0;box-sizing:border-box}
 html{min-height:100%;background:#020303}
 body{min-height:100vh;position:relative;background:transparent}
-body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:var(--route-background-image, url("https://i.ibb.co/DDskCf3v/IMG-1297.png"));background-color:var(--route-background-color, #020303);background-position:center center;background-repeat:no-repeat;background-size:cover;width:100vw;height:100vh;height:100svh}
-html.route-appearance-pending body::before{background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png")!important;background-color:#020303!important;background-position:center center!important;background-repeat:no-repeat!important;background-size:cover!important}
+/* El fondo ocupa el documento completo y conserva la imagen sin recortarla al desplazarse. */
+body::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:0;pointer-events:none;background-image:var(--route-background-image, url("https://i.ibb.co/DDskCf3v/IMG-1297.png"));background-color:var(--route-background-color, #020303);background-position:top center;background-repeat:repeat-y;background-size:100% auto}
+html.route-appearance-pending body::before{background-image:url("https://i.ibb.co/DDskCf3v/IMG-1297.png")!important;background-color:#020303!important;background-position:top center!important;background-repeat:repeat-y!important;background-size:100% auto!important}
 #letter-screen{position:relative;z-index:1;min-height:100vh;min-height:100svh;display:none;justify-content:center;align-items:stretch;padding:42px 7vw;background:#000;transition:opacity 1.5s ease}
 .letter{width:100%;max-width:620px;min-height:360px;padding:38px 34px;background:linear-gradient(135deg,#f8f5ed,#eee9dc 55%,#f7f3e9);color:#29251f;border:1px solid rgba(255,255,255,.35);box-shadow:0 25px 80px rgba(0,0,0,.65)}
 .letter-header{display:flex;justify-content:space-between;gap:15px;color:#746d62;font-family:monospace;font-size:11px;margin-bottom:28px;letter-spacing:1px;padding-bottom:15px;border-bottom:1px solid rgba(80,70,55,.2)}
@@ -71,8 +72,6 @@ html.route-appearance-pending body::before{background-image:url("https://i.ibb.c
 }
 .blink-title{animation:signalFlicker 2s infinite}
 #home-screen{position:relative;z-index:1;display:none;opacity:0;min-height:100vh;min-height:100svh;padding:65px 20px 25px;transition:opacity 1.5s ease}
-/* Las rutas personalizadas se muestran sin repetir el logo de portada. */
-#home-screen.route-without-logo #home-logo{display:none!important}
 .container{width:100%;max-width:930px;margin:auto;display:flex;flex-direction:column;min-height:calc(100vh - 90px);min-height:calc(100svh - 90px)}
 .main-title{text-align:center;font-size:clamp(30px,6vw,48px);font-weight:normal;letter-spacing:5px;color:#e5e5e5;margin-bottom:35px;text-shadow:0 0 15px rgba(255,255,255,.12)}
 .home-image{width:auto;max-width:min(76vw,280px);height:auto;max-height:190px;aspect-ratio:auto;margin:0 auto;display:block;object-fit:contain;filter:none;border:0;box-shadow:none;cursor:pointer;transition:opacity .3s}
@@ -607,28 +606,6 @@ html::after{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;b
 .publication-body a:hover,.relato-detail-body a:hover{color:#ff9999}
 .publication-body a img,.relato-detail-body a img{cursor:pointer}
 
-
-/* Ajustes editor/publicaciones: compactos, texto blanco e imágenes uniformes */
-.rich-editor,.rich-editor.title-editor{min-height:72px;color:#fff!important;line-height:1.5;padding:10px}
-.rich-editor:empty{min-height:72px}
-.rich-editor p,.rich-editor div{margin:.2em 0!important;line-height:1.5}
-.rich-editor a{color:#fff}
-.rich-editor img{margin:.35em 0!important;max-width:100%;object-fit:cover}
-.editor-image-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.editor-image-controls label{display:flex;flex-direction:column;gap:5px;color:#fff;font:9px monospace;letter-spacing:.7px}
-.editor-image-controls select{width:100%;min-width:0;height:42px;padding:7px 10px;background:#292929;border:0;border-radius:8px;color:#fff;font:14px Arial,sans-serif}
-.publication-body{color:#fff!important}
-.publication-body p,.publication-body div{margin:0 0 .35em!important;line-height:1.6!important}
-.publication-body p:has(> br:only-child),.publication-body>div:has(> br:only-child){min-height:1em;height:1em}
-.publication-body img[data-align="left"]{float:left!important;display:inline-block!important;margin:3px 12px 8px 0!important}
-.publication-body img[data-align="right"]{float:right!important;display:inline-block!important;margin:3px 0 8px 12px!important}
-.publication-body img[data-align="center"]{float:none!important;display:block!important;margin:8px auto!important}
-.publication-body::after{content:"";display:block;clear:both}
-.rich-editor img[data-align="left"]{float:left!important;display:inline-block!important;margin:3px 12px 8px 0!important}
-.rich-editor img[data-align="right"]{float:right!important;display:inline-block!important;margin:3px 0 8px 12px!important}
-.rich-editor img[data-align="center"]{float:none!important;display:block!important;margin:8px auto!important}
-@media(max-width:600px){.editor-image-controls select{font-size:13px}.editor-image-controls{gap:6px}}
-
 </style>
 </head>
 
@@ -1142,23 +1119,6 @@ function routeSlug(value){
 }
 function sectionPath(section){return "/"+String(section).toLowerCase();}
 function categoryPath(section,title){return "/"+routeSlug(title);}
-
-/* Solo las categorías nuevas/personalizadas ocultan el logo superior.
-   Las secciones originales conservan el diseño actual. */
-function updateRouteLogo(section,title){
-    const home=document.getElementById("home-screen");
-    if(!home)return;
-    const builtInCategories={
-        HOME:["One Space","The Room"],
-        BLOG:["Art","Experiments","Stories"],
-        STATUS:["Status"],
-        ABOUT:["Contact","FAQ","Guidelines","The Project"],
-        INICIO:["Portada"]
-    };
-    const known=(builtInCategories[String(section||"").toUpperCase()]||[])
-        .some(name=>routeSlug(name)===routeSlug(title));
-    home.classList.toggle("route-without-logo",!known&&String(section||"").toUpperCase()!=="INICIO");
-}
 function changePublicUrl(path,replace=false){
     if(location.pathname!==path){history[replace?"replaceState":"pushState"]({},"",path);}
 }
@@ -1425,25 +1385,19 @@ function safeHtml(html){
                     ?String(rawWidth).trim():"auto";
                 const rawAlign=node.getAttribute("data-align")||"left";
                 const safeAlign=["left","center","right"].includes(rawAlign)?rawAlign:"left";
-                const rawMeasure=node.getAttribute("data-measure")||"original";
-                const safeMeasure=["original","1/1","16/9","4/3","3/4","9/16"].includes(rawMeasure)?rawMeasure:"original";
 
                 [...node.attributes].forEach(attr=>node.removeAttribute(attr.name));
 
                 node.setAttribute("src",imageUrl.href);
                 node.setAttribute("data-align",safeAlign);
-                node.setAttribute("data-measure",safeMeasure);
                 node.setAttribute("alt",alt.slice(0,200));
                 node.setAttribute("loading","lazy");
                 node.setAttribute("referrerpolicy","no-referrer");
                 node.style.width=safeWidth;
                 node.style.maxWidth="100%";
                 node.style.height="auto";
-                node.style.objectFit="cover";
-                if(safeMeasure!=="original")node.style.aspectRatio=safeMeasure.replace("/", " / ");
-                node.style.float=safeAlign==="left"?"left":(safeAlign==="right"?"right":"none");
-                node.style.display=safeAlign==="center"?"block":"inline-block";
-                node.style.setProperty("margin",safeAlign==="left"?"3px 12px 8px 0":(safeAlign==="right"?"3px 0 8px 12px":"8px auto"),"important");
+                node.style.setProperty("margin-left",safeAlign==="right"?"auto":(safeAlign==="center"?"auto":"0"),"important");
+                node.style.setProperty("margin-right",safeAlign==="left"?"auto":(safeAlign==="center"?"auto":"0"),"important");
 
                 return;
             }
@@ -1829,7 +1783,6 @@ function sortStatusPublications(items){
 
 async function showCategory(section,title,description,updateUrl=false){
     closeMenus();
-    updateRouteLogo(section,title);
     if(updateUrl)changePublicUrl(categoryPath(section,title));
 
     saveData("siteCategory",JSON.stringify({
@@ -2526,7 +2479,7 @@ function editorToolbar(){
         <div class="formato-icons">
             <button type="button" title="Color del texto" id="color-trigger" style="position:relative;">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
-                <input type="color" id="editor-text-color" value="#ffffff" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" aria-label="Color del texto">
+                <input type="color" id="editor-text-color" value="#c5c5c5" style="position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;" aria-label="Color del texto">
             </button>
             <button type="button" id="insert-link" title="Insertar enlace (interno /ruta o externo https://)">
                 <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
@@ -2543,27 +2496,13 @@ function editorToolbar(){
             <button type="button" id="image-align-center" title="Centrar imagen">↔</button>
             <button type="button" id="image-align-right" title="Imagen a la derecha">↦</button>
         </div>
-        <div class="editor-image-controls">
-            <label>TAMAÑO
-                <select id="editor-image-size" aria-label="Tamaño de imagen">
-                    <option value="100%">100%</option>
-                    <option value="75%" selected>75%</option>
-                    <option value="50%">50%</option>
-                    <option value="35%">35%</option>
-                    <option value="25%">25%</option>
-                </select>
-            </label>
-            <label>MEDIDA
-                <select id="editor-image-measure" aria-label="Medida de imagen">
-                    <option value="original" selected>Original</option>
-                    <option value="1/1">Cuadrada · 1:1</option>
-                    <option value="16/9">Horizontal · 16:9</option>
-                    <option value="4/3">Horizontal · 4:3</option>
-                    <option value="3/4">Vertical · 3:4</option>
-                    <option value="9/16">Vertical · 9:16</option>
-                </select>
-            </label>
-        </div>
+        <select id="editor-image-size" class="formato-image-size" aria-label="Tamaño de imagen">
+            <option value="auto">Tamaño de imagen · Original</option>
+            <option value="25%">25%</option>
+            <option value="50%">50%</option>
+            <option value="70%">70%</option>
+            <option value="100%">100%</option>
+        </select>
     </div>`;
 }
 
@@ -2598,27 +2537,6 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
     const sizePicker=document.getElementById("editor-font-size");
     const colorPicker=document.getElementById("editor-text-color");
     const imageSizePicker=document.getElementById("editor-image-size");
-    const imageMeasurePicker=document.getElementById("editor-image-measure");
-
-    function applyImageDimensions(editor=activeEditor){
-        if(!editor)return;
-        const width=imageSizePicker.value||"75%";
-        const measure=imageMeasurePicker.value||"original";
-        editor.querySelectorAll("img").forEach(img=>{
-            img.style.width=width;
-            img.style.maxWidth="100%";
-            img.style.height="auto";
-            img.style.objectFit="cover";
-            if(measure==="original"){
-                img.style.aspectRatio="";
-                img.style.height="auto";
-            }else{
-                img.style.aspectRatio=measure.replace("/", " / ");
-                img.style.height="auto";
-            }
-            img.dataset.measure=measure;
-        });
-    }
 
     function rememberSelection(editor=activeEditor){
         const selection=window.getSelection();
@@ -2704,16 +2622,24 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
     sizePicker.addEventListener("change",()=>applyInlineStyle("fontSize",sizePicker.value+"px"));
     colorPicker.addEventListener("input",()=>applyInlineStyle("color",colorPicker.value));
 
-    imageSizePicker.addEventListener("change",()=>applyImageDimensions(activeEditor));
-    imageMeasurePicker.addEventListener("change",()=>applyImageDimensions(activeEditor));
+    imageSizePicker.addEventListener("change",event=>{
+        if(!selectedEditorImage||!selectedEditorImage.isConnected||!([titleEditor,bodyEditor].some(editor=>editor.contains(selectedEditorImage)))){
+            selectedEditorImage=null;
+            alert("Toca primero la imagen que quieres cambiar y después selecciona su tamaño.");
+            return;
+        }
+        selectedEditorImage.style.width=event.target.value;
+        selectedEditorImage.style.maxWidth="100%";
+        selectedEditorImage.style.height="auto";
+    });
     function alignSelectedImage(alignment){
         if(!selectedEditorImage||!selectedEditorImage.isConnected||!([titleEditor,bodyEditor].some(editor=>editor.contains(selectedEditorImage)))){
             alert("Toca primero la imagen que quieres alinear.");return;
         }
         selectedEditorImage.dataset.align=alignment;
-        selectedEditorImage.style.display=alignment==="center"?"block":"inline-block";
-        selectedEditorImage.style.float=alignment==="left"?"left":(alignment==="right"?"right":"none");
-        selectedEditorImage.style.setProperty("margin",alignment==="left"?"3px 12px 8px 0":(alignment==="right"?"3px 0 8px 12px":"8px auto"),"important");
+        selectedEditorImage.style.display="block";
+        selectedEditorImage.style.setProperty("margin-left",alignment==="right"?"auto":(alignment==="center"?"auto":"0"),"important");
+        selectedEditorImage.style.setProperty("margin-right",alignment==="left"?"auto":(alignment==="center"?"auto":"0"),"important");
     }
     document.getElementById("image-align-left").addEventListener("click",()=>alignSelectedImage("left"));
     document.getElementById("image-align-center").addEventListener("click",()=>alignSelectedImage("center"));
@@ -2806,12 +2732,6 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
         if(!["http:","https:"].includes(url.protocol)){alert("Solo se permiten direcciones http o https.");return;}
         if(!/\.(avif|bmp|gif|jpe?g|png|svg|webp)$/i.test(url.pathname)&&!confirm("La dirección no termina en una extensión de imagen conocida. ¿Quieres intentarlo de todas formas?"))return;
         const img=document.createElement("img");img.src=url.href;img.alt="Imagen";img.loading="lazy";img.referrerPolicy="no-referrer";
-        img.style.width=imageSizePicker.value||"75%";
-        img.style.maxWidth="100%";
-        img.style.height="auto";
-        const initialMeasure=imageMeasurePicker.value||"original";
-        if(initialMeasure!=="original")img.style.aspectRatio=initialMeasure.replace("/", " / ");
-        img.dataset.measure=initialMeasure;
         const selection=window.getSelection();
         if(selection&&selection.rangeCount&&editor.contains(selection.anchorNode)){
             const range=selection.getRangeAt(0);range.deleteContents();range.insertNode(img);
@@ -2833,14 +2753,7 @@ function setupPublicationEditor(titleEditor,bodyEditor,editData=null){
     if(validHexColor(editData?.bodyColor))bodyEditor.style.color=editData.bodyColor;
     fontPicker.value=titleFont||bodyFont||"Arial";
     sizePicker.value=(titleSize||bodySize||"16px").replace("px","");
-    colorPicker.value=validHexColor(titleEditor.style.color)?titleEditor.style.color:(validHexColor(bodyEditor.style.color)?bodyEditor.style.color:"#ffffff");
-    const firstExistingImage=bodyEditor.querySelector("img");
-    if(firstExistingImage){
-        const storedWidth=/^(25|35|50|75|100)%$/.test(firstExistingImage.style.width)?firstExistingImage.style.width:"75%";
-        imageSizePicker.value=storedWidth;
-        const storedMeasure=firstExistingImage.dataset.measure||firstExistingImage.style.aspectRatio||"original";
-        imageMeasurePicker.value=["original","1/1","16/9","4/3","3/4","9/16"].includes(storedMeasure)?storedMeasure:"original";
-    }
+    colorPicker.value=validHexColor(titleEditor.style.color)?titleEditor.style.color:(validHexColor(bodyEditor.style.color)?bodyEditor.style.color:"#c5c5c5");
 }
 
 /* PANEL ADMINISTRATIVO */
