@@ -11,18 +11,19 @@
 <link rel="icon" type="image/png" href="/favicon.PNG">
 <link rel="shortcut icon" type="image/png" href="/favicon.PNG">
 
-<!-- Recupera primero el fondo propio de la ruta para evitar mostrar el fondo global al actualizar. -->
+<!-- Prepara la apariencia de rutas personalizadas antes del primer render. -->
 <script>
 (function(){
   var parts=location.pathname.split('/').filter(Boolean);
-  if(parts.length===1 && !/^(story|index\.html?|favicon\.png)$/i.test(parts[0])){
+  var builtIn=['portada','entrada','one-space','the-room','art','experiments','stories','status','contact','faq','guidelines','the-project','index.html','index.htm','favicon.png'];
+  if(parts.length===1 && !/^(story)$/i.test(parts[0]) && builtIn.indexOf(parts[0].toLowerCase())===-1){
     var root=document.documentElement;
-    root.classList.add('route-appearance-pending');
+    root.classList.add('route-appearance-pending','custom-route-start');
     try{
       var cached=localStorage.getItem('0site_route_appearance_'+parts[0].toLowerCase());
       var appearance=cached?JSON.parse(cached):null;
       if(appearance&&typeof appearance.backgroundImage==='string'&&/^https:\/\//i.test(appearance.backgroundImage.trim())){
-        var url=appearance.backgroundImage.trim().replace(/["\\\n\r]/g,'');
+        var url=appearance.backgroundImage.trim().replace(/["\\\\\\n\\r]/g,'');
         root.style.setProperty('--route-background-image','url("'+url+'")');
       }else{
         root.style.setProperty('--route-background-image','none');
@@ -36,6 +37,11 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html{min-height:100%;background:#020303}
+html.route-appearance-pending body::before{background-image:var(--route-background-image,none)!important;background-color:var(--route-background-color,#020303)!important}
+html.route-appearance-pending #home-screen{visibility:hidden!important}
+html.custom-route-start #home-screen{visibility:hidden!important}
+html.custom-route-start #home-logo{display:none!important}
+
 body{min-height:100vh;position:relative;background:transparent}
 /* El fondo ocupa el documento completo y conserva la imagen sin recortarla al desplazarse. */
 body::before{content:"";position:absolute;top:0;right:0;bottom:0;left:0;z-index:0;pointer-events:none;background-image:var(--route-background-image, url("https://i.ibb.co/DDskCf3v/IMG-1297.png"));background-color:var(--route-background-color, #020303);background-position:top center;background-repeat:repeat-y;background-size:100% auto}
@@ -1516,8 +1522,6 @@ function clearContentListeners(){
 /* APARIENCIA INDEPENDIENTE POR RUTA */
 function resetRouteAppearance(){
     const root=document.documentElement;
-    root.style.removeProperty("--route-background-image");
-    root.style.removeProperty("--route-background-color");
     const content=document.getElementById("content-area");
     if(!content)return;
     content.style.background="";
@@ -1561,7 +1565,7 @@ async function applyRouteAppearance(section,title,token){
     }
 
     function releaseBackground(){
-        if(token===currentContentToken)root.classList.remove("route-appearance-pending");
+        if(token===currentContentToken){root.classList.remove("route-appearance-pending");root.classList.remove("custom-route-start");}
     }
 
     if(!slug){releaseBackground();return;}
@@ -1680,51 +1684,77 @@ function statusTitlePartColor(item, part){
 }
 
 /* STATUS: fecha relativa y metadatos */
-function statusRelativeTime(item, initialText=""){
-    // Si el título incluye "hace N días", N es el punto de partida y aumenta cada día.
-    const initialMatch=String(initialText).trim().match(/^hace\s+(\d+)\s+d[ií]as?$/i);
-    if(initialMatch){
-        let publishedAt=null;
-        if(item.createdAt){
-            if(typeof item.createdAt.toDate==="function")publishedAt=item.createdAt.toDate();
-            else if(item.createdAt instanceof Date)publishedAt=item.createdAt;
-            else if(typeof item.createdAt.seconds==="number")publishedAt=new Date(item.createdAt.seconds*1000);
-        }
-        if(!publishedAt&&item.statusDate){
-            const parts=String(item.statusDate).split("-").map(Number);
-            if(parts.length===3&&parts.every(Number.isFinite))publishedAt=new Date(parts[0],parts[1]-1,parts[2]);
-        }
-        const elapsed=publishedAt&&!Number.isNaN(publishedAt.getTime())?Math.max(0,Math.floor((Date.now()-publishedAt.getTime())/86400000)):0;
-        const totalDays=Number(initialMatch[1])+elapsed;
-        if(totalDays>=365){const years=Math.floor(totalDays/365);return `hace ${years} ${years===1?"año":"años"}`;}
-        return `hace ${totalDays} ${totalDays===1?"día":"días"}`;
-    }
-    if(item.statusTimeText&&String(item.statusTimeText).trim())return String(item.statusTimeText).trim();
-    let date=null;
-    // Prioriza la fecha real de creación/publicación para el tiempo automático.
-    if(item.createdAt){
-        if(typeof item.createdAt.toDate==="function")date=item.createdAt.toDate();
-        else if(item.createdAt instanceof Date)date=item.createdAt;
-        else if(typeof item.createdAt.seconds==="number")date=new Date(item.createdAt.seconds*1000);
-    }
-    // La fecha elegida manualmente queda como respaldo si no existe createdAt.
-    if(!date&&item.statusDate){
+/* STATUS: fecha relativa y metadatos */
+function statusPublicationAnchor(item){
+    // La fecha manual seleccionada en el editor tiene prioridad.
+    if(item?.statusDate){
         const parts=String(item.statusDate).split("-").map(Number);
-        if(parts.length===3&&parts.every(Number.isFinite))date=new Date(parts[0],parts[1]-1,parts[2]);
+        if(parts.length===3&&parts.every(Number.isFinite)){
+            const manualDate=new Date(parts[0],parts[1]-1,parts[2]);
+            if(!Number.isNaN(manualDate.getTime()))return manualDate;
+        }
     }
+    const value=item?.createdAt;
+    if(value){
+        if(typeof value.toDate==="function")return value.toDate();
+        if(value instanceof Date)return value;
+        if(typeof value.seconds==="number")return new Date(value.seconds*1000);
+    }
+    return null;
+}
+function statusElapsedCalendarDays(item){
+    const publishedAt=statusPublicationAnchor(item);
+    if(!publishedAt||Number.isNaN(publishedAt.getTime()))return 0;
+    const now=new Date();
+    // Compara fechas de calendario local, no bloques exactos de 24 horas.
+    const start=Date.UTC(publishedAt.getFullYear(),publishedAt.getMonth(),publishedAt.getDate());
+    const today=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
+    return Math.max(0,Math.round((today-start)/86400000));
+}
+function statusRelativeTime(item, initialText=""){
+    const date=statusPublicationAnchor(item);
     if(!date||Number.isNaN(date.getTime()))return "recién publicado";
-    const seconds=Math.max(0,Math.floor((Date.now()-date.getTime())/1000));
-    if(seconds<60)return "hace un momento";
+    const now=new Date();
+    const manualBase=item?.statusManualDays!==undefined&&item?.statusManualDays!==null&&item?.statusManualDays!==""?Number(item.statusManualDays):null;
+    if(manualBase!==null&&Number.isFinite(manualBase)){
+        const baseAt=item.statusManualDaysAt?.toDate?.()||(item.statusManualDaysAt?.seconds?new Date(item.statusManualDaysAt.seconds*1000):new Date(item.statusManualDaysAt||date));
+        const elapsed=Math.max(0,Math.floor((Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())-Date.UTC(baseAt.getFullYear(),baseAt.getMonth(),baseAt.getDate()))/86400000));
+        const total=manualBase+elapsed;
+        if(total<365)return `hace ${total} ${total===1?"día":"días"}`;
+        const years=Math.floor(total/365);return `hace ${years} ${years===1?"año":"años"}`;
+    }
+    const seconds=Math.max(0,Math.floor((now.getTime()-date.getTime())/1000));
+    if(seconds<60)return `hace ${seconds||1} ${seconds===1?"segundo":"segundos"}`;
     const minutes=Math.floor(seconds/60);if(minutes<60)return `hace ${minutes} ${minutes===1?"minuto":"minutos"}`;
     const hours=Math.floor(minutes/60);if(hours<24)return `hace ${hours} ${hours===1?"hora":"horas"}`;
-    const days=Math.floor(hours/24);if(days<30)return `hace ${days} ${days===1?"día":"días"}`;
-    const months=Math.floor(days/30);if(months<12)return `hace ${months} ${months===1?"mes":"meses"}`;
-    const years=Math.floor(days/365);return `hace ${years} ${years===1?"año":"años"}`;
+    const totalDays=statusElapsedCalendarDays(item);
+    if(totalDays<365)return `hace ${totalDays} ${totalDays===1?"día":"días"}`;
+    const years=Math.floor(totalDays/365);return `hace ${years} ${years===1?"año":"años"}`;
 }
 
-// En STATUS el usuario escribe manualmente "zorg hace N días" en el contenido.
-// Solo actualizamos la parte temporal del primer renglón y dejamos intactos
-// el autor, los estilos y los enlaces del resto del contenido.
+function refreshStatusClocks(){
+    document.querySelectorAll(".status-time").forEach(node=>{
+        const created=Number(node.dataset.createdAt);if(!created)return;
+        const now=new Date(),published=new Date(created);
+        const base=node.dataset.manualDays===""?null:Number(node.dataset.manualDays);
+        if(base!==null&&Number.isFinite(base)){
+            const anchor=new Date(Number(node.dataset.manualDaysAt)||created);
+            const elapsed=Math.max(0,Math.round((Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())-Date.UTC(anchor.getFullYear(),anchor.getMonth(),anchor.getDate()))/86400000));
+            const total=base+elapsed;
+            if(total<365){node.textContent=`hace ${total} ${total===1?"día":"días"}`;return;}
+            const years=Math.floor(total/365);node.textContent=`hace ${years} ${years===1?"año":"años"}`;return;
+        }
+        const seconds=Math.max(0,Math.floor((now-created)/1000));
+        if(seconds<60){node.textContent=`hace ${seconds||1} ${seconds===1?"segundo":"segundos"}`;return;}
+        const minutes=Math.floor(seconds/60);if(minutes<60){node.textContent=`hace ${minutes} ${minutes===1?"minuto":"minutos"}`;return;}
+        const hours=Math.floor(minutes/60);if(hours<24){node.textContent=`hace ${hours} ${hours===1?"hora":"horas"}`;return;}
+        const total=Math.max(0,Math.round((Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())-Date.UTC(published.getFullYear(),published.getMonth(),published.getDate()))/86400000));
+        if(total<365){node.textContent=`hace ${total} ${total===1?"día":"días"}`;return;}
+        const years=Math.floor(total/365);node.textContent=`hace ${years} ${years===1?"año":"años"}`;
+    });
+}
+setInterval(refreshStatusClocks,1000);
+
 function statusUpdateContentTime(body,item){
     if(!body)return;
     const walker=document.createTreeWalker(body,NodeFilter.SHOW_TEXT);
@@ -1743,28 +1773,20 @@ function statusUpdateContentTime(body,item){
 // Devuelve la antigüedad actual escrita manualmente en el primer renglón de STATUS.
 // Se usa solo para ordenar esta categoría; las demás conservan su orden habitual.
 function statusDaysForSort(item){
+    if(Number.isFinite(Number(item?.statusManualDays))&&item?.statusManualDays!==undefined&&item?.statusManualDays!==null){
+        const anchor=item.statusManualDaysAt?.toDate?.()||(item.statusManualDaysAt?.seconds?new Date(item.statusManualDaysAt.seconds*1000):new Date(item.statusManualDaysAt||Date.now()));
+        const now=new Date();
+        const elapsed=Math.max(0,Math.round((Date.UTC(now.getFullYear(),now.getMonth(),now.getDate())-Date.UTC(anchor.getFullYear(),anchor.getMonth(),anchor.getDate()))/86400000));
+        return Number(item.statusManualDays)+elapsed;
+    }
     const holder=document.createElement("div");
     holder.innerHTML=safeHtml(item.bodyHtml||"");
     const match=(holder.textContent||"").match(/(?:^|\s)hace\s+(\d+)\s+(d[ií]as?|a[nñ]os?)/i);
-    if(!match)return null;
-
+    if(!match)return statusCreatedMillis(item)!==null?statusElapsedCalendarDays(item):null;
     const amount=Number(match[1]);
     const unit=match[2].toLowerCase();
     const baseDays=unit.startsWith("a")?amount*365:amount;
-    let publishedAt=null;
-    if(item.createdAt){
-        if(typeof item.createdAt.toDate==="function")publishedAt=item.createdAt.toDate();
-        else if(item.createdAt instanceof Date)publishedAt=item.createdAt;
-        else if(typeof item.createdAt.seconds==="number")publishedAt=new Date(item.createdAt.seconds*1000);
-    }
-    if(!publishedAt&&item.statusDate){
-        const parts=String(item.statusDate).split("-").map(Number);
-        if(parts.length===3&&parts.every(Number.isFinite))publishedAt=new Date(parts[0],parts[1]-1,parts[2]);
-    }
-    const elapsed=publishedAt&&!Number.isNaN(publishedAt.getTime())
-        ?Math.max(0,Math.floor((Date.now()-publishedAt.getTime())/86400000))
-        :0;
-    return baseDays+elapsed;
+    return baseDays+statusElapsedCalendarDays(item);
 }
 
 function statusCreatedMillis(item){
@@ -1869,9 +1891,17 @@ async function showCategory(section,title,description,updateUrl=false){
                 if(section==="STATUS"&&categorySlug(title)==="status")article.classList.add("publication-status");
                 if(section==="BLOG"&&title==="Stories")article.dataset.storySlug=routeSlug(item.title);
                 const isStatusPublication=section==="STATUS"&&categorySlug(title)==="status";
-                // El título sigue siendo opcional también en STATUS.
-                // Autor y tiempo se escriben manualmente dentro del contenido.
-                if(item.title){
+                if(isStatusPublication&&(item.title||item.titleHtml)){
+                    const h=document.createElement("h3");
+                    h.className="status-heading";
+                    h.style.color="#ef4444";
+                    if(item.titleHtml)h.innerHTML=safeHtml(item.titleHtml);
+                    else h.textContent=item.title||"zorg";
+                    h.querySelectorAll("a[href]").forEach(anchor=>{anchor.target="_blank";anchor.rel="noopener noreferrer";anchor.style.pointerEvents="auto";anchor.style.cursor="pointer";});
+                    const emoji=document.createElement("span");emoji.className="status-emoji";emoji.textContent=item.statusEmoji||"";h.appendChild(emoji);
+                    const time=document.createElement("span");time.className="status-time";time.dataset.createdAt=statusCreatedMillis(item)||"";time.dataset.manualDays=item.statusManualDays??"";time.dataset.manualDaysAt=item.statusManualDaysAt?.toMillis?.()||item.statusManualDaysAt?.seconds*1000||item.statusManualDaysAt||"";time.textContent=statusRelativeTime(item);h.appendChild(time);
+                    article.appendChild(h);
+                }else if(item.title){
                     const h=document.createElement("h3");
                     if(item.titleHtml)h.innerHTML=safeHtml(item.titleHtml);
                     else h.textContent=item.title;
@@ -1905,7 +1935,8 @@ async function showCategory(section,title,description,updateUrl=false){
                 body.className="publication-body";
                 body.innerHTML=safeHtml(item.bodyHtml||"");
                 if(isStatusPublication){
-                    statusUpdateContentTime(body,item);
+                    // Las publicaciones antiguas conservan su encabezado dentro del contenido.
+                    if(!item.title&&!item.titleHtml)statusUpdateContentTime(body,item);
                     // Los enlaces de STATUS viven dentro del contenido y siempre
                     // quedan interactivos, incluso si tienen color/formato propio.
                     body.querySelectorAll("a[href]").forEach(anchor=>{
@@ -2837,8 +2868,15 @@ function renderPublicationEditor(editData=null){
         <p class="admin-subtitle">${editData?"EDITAR PUBLICACIÓN":"NUEVA PUBLICACIÓN"}</p>
         ${addLocationSelectors(menu,category)}
         ${editorToolbar()}
-        <label class="admin-status" for="record-title">TÍTULO (OPCIONAL)</label>
+        <label class="admin-status" for="record-title" id="record-title-label">TÍTULO (OPCIONAL)</label>
         <div class="admin-input rich-editor title-editor" id="record-title" contenteditable="true" role="textbox" aria-label="Título" data-placeholder="" style="min-height:48px;overflow-wrap:anywhere"></div>
+        <div id="status-meta-wrap" style="display:none;margin:10px 0">
+            <label class="admin-status" for="status-emoji">EMOJI (OPCIONAL)</label>
+            <input class="admin-input" id="status-emoji" type="text" maxlength="12" placeholder="🥀">
+            <label class="admin-status" for="status-manual-days">MODIFICAR DÍAS (OPCIONAL)</label>
+            <input class="admin-input" id="status-manual-days" type="number" min="0" step="1" placeholder="Automático">
+            <p class="admin-status">El nombre de usuario puede llevar un enlace usando el botón de enlace del editor</p>
+        </div>
         <div id="publication-date-wrap">
             <label class="admin-status" for="publication-date">FECHA DE PUBLICACIÓN (OPCIONAL)</label>
             <input class="admin-input" id="publication-date" type="date" value="${editData?.statusDate||""}" aria-label="Fecha de publicación">
@@ -2856,9 +2894,10 @@ function renderPublicationEditor(editData=null){
     const categorySelect=document.getElementById("record-category");
     function updateStatusEditorFields(){
         const isStatus=menuSelect.value==="STATUS"&&categorySlug(categorySelect.value)==="status";
-        document.getElementById("publication-date-wrap").style.display=isStatus?"block":"none";
-        const titleLabel=document.querySelector('label[for="record-title"]');
-        if(titleLabel)titleLabel.textContent=isStatus?"TÍTULO / AUTOR Y TIEMPO (OPCIONAL)":"TÍTULO (OPCIONAL)";
+        document.getElementById("publication-date-wrap").style.display=isStatus?"none":"none";
+        document.getElementById("status-meta-wrap").style.display=isStatus?"block":"none";
+        const titleLabel=document.getElementById("record-title-label");
+        if(titleLabel)titleLabel.textContent=isStatus?"USUARIO (PUEDES AÑADIRLE UN ENLACE)":"TÍTULO (OPCIONAL)";
         titleEditorPlaceholder(isStatus);
     }
     function titleEditorPlaceholder(isStatus){
@@ -2874,6 +2913,10 @@ function renderPublicationEditor(editData=null){
     const bodyEditor=document.getElementById("rich-editor");
     titleEditor.innerHTML=editData?.titleHtml?safeHtml(editData.titleHtml):String(editData?.title||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
     bodyEditor.innerHTML=safeHtml(editData?.bodyHtml||"");
+    const statusEmojiInput=document.getElementById("status-emoji");
+    const statusDaysInput=document.getElementById("status-manual-days");
+    if(statusEmojiInput)statusEmojiInput.value=editData?.statusEmoji||"";
+    if(statusDaysInput&&editData?.statusManualDays!==undefined&&editData?.statusManualDays!==null)statusDaysInput.value=editData.statusManualDays;
     setupPublicationEditor(titleEditor,bodyEditor,editData);
 
     document.getElementById("record-cancel").addEventListener("click",()=>{
@@ -2901,9 +2944,13 @@ function renderPublicationEditor(editData=null){
         const newMenu=menuSelect.value;
         const newCategory=categorySelect.value;
         const sameLocation=editData&&editData.menu===newMenu&&editData.category===newCategory;
+        if(newMenu==="STATUS"&&categorySlug(newCategory)==="status"&&!title){
+            status.textContent="Escribe el nombre del usuario antes de publicar.";saveButton.disabled=false;return;
+        }
         const data={
             menu:newMenu,category:newCategory,title,titleHtml,
-            statusDate:document.getElementById("publication-date")?.value||"",
+            statusEmoji:newMenu==="STATUS"&&categorySlug(newCategory)==="status"?(document.getElementById("status-emoji")?.value||""):"",
+            statusDate:"",
             titleColor:validHexColor(titleEditor.style.color)?titleEditor.style.color:"#cccccc",
             titleFontFamily:safeInlineFontFamily(titleEditor.style.fontFamily)||"",
             titleFontSize:safeInlineFontSize(titleEditor.style.fontSize)||"",
@@ -2913,6 +2960,15 @@ function renderPublicationEditor(editData=null){
             bodyHtml,
             updatedAt:firebase.firestore.FieldValue.serverTimestamp()
         };
+        const isStatusPost=newMenu==="STATUS"&&categorySlug(newCategory)==="status";
+        const manualDaysValue=document.getElementById("status-manual-days")?.value??"";
+        if(isStatusPost&&manualDaysValue!==""){
+            data.statusManualDays=Math.max(0,parseInt(manualDaysValue,10)||0);
+            data.statusManualDaysAt=Date.now();
+        }else if(editingId){
+            data.statusManualDays=firebase.firestore.FieldValue.delete();
+            data.statusManualDaysAt=firebase.firestore.FieldValue.delete();
+        }
         try{
             if(editingId){
                 if(sameLocation&&hasCustomOrder(editData))data.order=editData.order;
