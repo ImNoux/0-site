@@ -1741,8 +1741,33 @@ function statusDaysForSort(item){
     return baseDays+elapsed;
 }
 
+function statusCreatedMillis(item){
+    const value=item?.createdAt;
+    if(value&&typeof value.toMillis==="function")return value.toMillis();
+    if(value&&typeof value.toDate==="function")return value.toDate().getTime();
+    if(value instanceof Date)return value.getTime();
+    if(value&&typeof value.seconds==="number")return value.seconds*1000;
+    return null;
+}
+
 function sortStatusPublications(items){
-    return [...items].sort((a,b)=>{
+    const remaining=[...items];
+    if(remaining.length<2)return remaining;
+
+    // La primera publicación histórica (la que se publicó originalmente)
+    // permanece fijada arriba, aunque su contador de días sea el más alto.
+    let firstIndex=-1;
+    let firstCreatedAt=Infinity;
+    remaining.forEach((item,index)=>{
+        const createdAt=statusCreatedMillis(item);
+        if(createdAt!==null&&Number.isFinite(createdAt)&&createdAt<firstCreatedAt){
+            firstCreatedAt=createdAt;
+            firstIndex=index;
+        }
+    });
+    const firstPublication=firstIndex>=0?remaining.splice(firstIndex,1)[0]:null;
+
+    remaining.sort((a,b)=>{
         const ageA=statusDaysForSort(a);
         const ageB=statusDaysForSort(b);
         if(ageA===null&&ageB===null)return compareRecords(a,b);
@@ -1750,6 +1775,7 @@ function sortStatusPublications(items){
         if(ageB===null)return -1;
         return ageA-ageB||compareRecords(a,b);
     });
+    return firstPublication?[firstPublication,...remaining]:remaining;
 }
 
 /* MOSTRAR CATEGORÍAS */
